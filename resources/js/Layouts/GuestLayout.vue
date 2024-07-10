@@ -74,6 +74,11 @@
                 <v-btn icon="mdi-redo"></v-btn>
             </template>
 
+            <span class="ml-12">
+                <v-icon icon="mdi-plus-circle" @click="zoomIn"></v-icon>
+                <v-icon icon="mdi-minus-circle" @click="zoomOut"></v-icon>
+            </span>
+
             <template v-slot:append>
                 <v-btn>
                     <v-icon icon="mdi-layers"></v-icon>
@@ -99,5 +104,9 @@ export default {
             rail: true,
         }
     },
+    props: {
+        zoomIn: Function,
+        zoomOut: Function
+    }
 }
 </script>

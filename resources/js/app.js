@@ -13,6 +13,9 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+//konva
+import VueKonva from 'vue-konva';
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const vuetify = createVuetify({
@@ -28,9 +31,10 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(vuetify)
+            .use(VueKonva)
             .mount(el);
     },
     progress: {
-        color: '#4B5563',
+        color: '#000000',
     },
 });
