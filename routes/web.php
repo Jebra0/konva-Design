@@ -11,6 +11,13 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
     ]);
 });
+////////////////////////////// TEST ////////////////////////
+
+Route::get('/design', function (){
+    return Inertia::render('Design');
+});
+
+////////////////////////////////////////////////////////
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
