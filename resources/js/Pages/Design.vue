@@ -31,6 +31,7 @@
 import GuestLayout from "../Layouts/GuestLayout.vue";
 import { Head } from '@inertiajs/vue3';
 import { v4 as uuidv4 } from 'uuid';
+import {th} from "vuetify/locale";
 const width = 500 ;
 const height = 500 ;
 export default {
@@ -61,6 +62,11 @@ export default {
                 undoAction: this.undoAction,
                 redoAction: this.redoAction,
                 AlignLeft: this.AlignLeft,
+                AlignRight: this.AlignRight,
+                AlignTop: this.AlignTop,
+                AlignBottom: this.AlignBottom,
+                AlignCenter: this.AlignCenter,
+                AlignMiddle: this.AlignMiddle,
             },
         };
     },
@@ -222,22 +228,152 @@ export default {
             URL.revokeObjectURL(url);
         },
         //position functions
-        AlignLeft(){
-            // console.log('left');
+        AlignLeft() {
             if (this.selectedShapeId) {
-                const shape = this.findShape(this.selectedShapeId);
-                if (shape) {
-                    console.log(shape.x)
-                    shape.x = 50;
+                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
+                if (shapeIndex !== -1) {
+                    const shape = this.shapes[shapeIndex];
+                    if (shape.type === 'v-rect') {
+                        shape.x = 1;
+                    } else {
+                        shape.x = 50;
+                    }
+
+                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
+                    if (konvaShape) {
+                        konvaShape.x(50);
+                    }
+
+                    this.$refs.layer.getNode().draw();
                     this.saveHistory();
                 }
             }
         },
-        AlignRight(){},
-        AlignTop(){},
-        AlignBottom(){},
-        AlignCenter(){},
-        AlignMiddle(){},
+        AlignRight(){
+            if (this.selectedShapeId) {
+                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
+                if (shapeIndex !== -1) {
+                    const shape = this.shapes[shapeIndex];
+                    if (shape.type === 'v-rect') {
+                        shape.x = width - 101;
+                    } else {
+                        shape.x = width - 50;
+                    }
+
+                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
+                    if (konvaShape) {
+                        if (shape.type === 'v-rect') {
+                            konvaShape.x(width - 101);
+                        }else {
+                            konvaShape.x(width - 50);
+                        }
+                    }
+
+                    this.$refs.layer.getNode().draw();
+                    this.saveHistory();
+                }
+            }
+        },
+        AlignTop(){
+            if (this.selectedShapeId) {
+                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
+                if (shapeIndex !== -1) {
+                    const shape = this.shapes[shapeIndex];
+                        if (shape.type === 'v-rect') {
+                            shape.y = 1;
+                        } else {
+                            shape.y = 50;
+                        }
+
+                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
+                    if (konvaShape) {
+                        if (shape.type === 'v-rect') {
+                            konvaShape.y(1);
+                        }else {
+                            konvaShape.y(50);
+                        }
+                    }
+
+                    this.$refs.layer.getNode().draw();
+                    this.saveHistory();
+                }
+            }
+        },
+        AlignBottom(){
+            if (this.selectedShapeId) {
+                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
+                if (shapeIndex !== -1) {
+                    const shape = this.shapes[shapeIndex];
+                    if (shape.type === 'v-rect') {
+                        shape.y = height - 101;
+                    } else {
+                        shape.y = height - 50;
+                    }
+
+                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
+                    if (konvaShape) {
+                        if (shape.type === 'v-rect') {
+                            konvaShape.y(height - 101);
+                        }else {
+                            konvaShape.y(height - 50);
+                        }
+                    }
+
+                    this.$refs.layer.getNode().draw();
+                    this.saveHistory();
+                }
+            }
+        },
+        AlignCenter(){
+            if (this.selectedShapeId) {
+                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
+                if (shapeIndex !== -1) {
+                    const shape = this.shapes[shapeIndex];
+                    if (shape.type === 'v-rect') {
+                        shape.x = 200;
+                    } else {
+                        shape.x = 250;
+                    }
+
+                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
+                    if (konvaShape) {
+                        if (shape.type === 'v-rect') {
+                            konvaShape.x(150);
+                        }else {
+                            konvaShape.x(250);
+                        }
+                    }
+
+                    this.$refs.layer.getNode().draw();
+                    this.saveHistory();
+                }
+            }
+        },
+        AlignMiddle(){
+            if (this.selectedShapeId) {
+                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
+                if (shapeIndex !== -1) {
+                    const shape = this.shapes[shapeIndex];
+                    if (shape.type === 'v-rect') {
+                        shape.y = 200;
+                    } else {
+                        shape.y = 250;
+                    }
+
+                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
+                    if (konvaShape) {
+                        if (shape.type === 'v-rect') {
+                            konvaShape.y(150);
+                        }else {
+                            konvaShape.y(250);
+                        }
+                    }
+
+                    this.$refs.layer.getNode().draw();
+                    this.saveHistory();
+                }
+            }
+        },
 //////////////////////////////////////////////
     },
 };

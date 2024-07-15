@@ -95,35 +95,35 @@
                                             location="bottom"
                                         >Align Left</v-tooltip>
                                     </v-btn>
-                                    <v-btn>
+                                    <v-btn @click="actions.AlignRight">
                                         <v-icon  icon="mdi-align-horizontal-right"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Right</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9">
+                                    <v-btn class="mr-9" @click="actions.AlignTop">
                                         <v-icon icon="mdi-align-vertical-top"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Top</v-tooltip>
                                     </v-btn>
-                                    <v-btn>
+                                    <v-btn @click="actions.AlignBottom">
                                         <v-icon  icon="mdi-align-vertical-bottom"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Down</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9">
+                                    <v-btn class="mr-9" @click="actions.AlignCenter">
                                         <v-icon icon="mdi-align-horizontal-center"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Center</v-tooltip>
                                     </v-btn>
-                                    <v-btn>
+                                    <v-btn @click="actions.AlignMiddle">
                                         <v-icon  icon="mdi-align-vertical-center"></v-icon>
                                         <v-tooltip
                                             activator="parent"
