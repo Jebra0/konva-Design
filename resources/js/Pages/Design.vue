@@ -22,7 +22,7 @@
                     <v-transformer ref="transformer" />
                 </v-layer>
             </v-stage>
-            <input type="color" v-model="selectedFillColor" @input="updateShapeFill" />
+<!--            <input type="color" v-model="selectedFillColor" @input="updateShapeFill" />-->
         </div>
     </GuestLayout>
 </template>
@@ -67,10 +67,12 @@ export default {
                 AlignBottom: this.AlignBottom,
                 AlignCenter: this.AlignCenter,
                 AlignMiddle: this.AlignMiddle,
+                handleImageClick1: this.handleImageClick1,
             },
         };
     },
     methods: {
+        handleImageClick1(){console.log('test')},
         zoomIn() {
             let scaleBy = 70;
             let oldScale = this.configKonva.width;

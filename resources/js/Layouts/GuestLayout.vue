@@ -1,11 +1,6 @@
 <template>
     <v-layout class="rounded rounded-md">
-
-        <v-navigation-drawer
-            permanent
-            width="200"
-        >
-
+        <v-navigation-drawer permanent width="250">
             <v-list density="compact">
                 <v-list-item @click="openTemp" prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
                 <v-card v-if="selectedOption.templates" elevation="1" outlined>
@@ -14,9 +9,18 @@
                 </v-card>
 
                 <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
-                <v-card v-if="selectedOption.text" elevation="1" outlined>
-                    <v-card-title>TEST</v-card-title>
-                    <v-card-text> test test test test etst etst etst ethsj </v-card-text>
+                <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
+                    <v-btn elevation="0" width="100%" style=" text-transform: none; font-size: 25px;"><h1>Create header</h1></v-btn>
+                    <v-btn elevation="0" width="100%" style="text-transform: none; font-size: 18px;"><h4>Create sub header</h4></v-btn>
+                    <v-btn elevation="0" width="100%" style="text-transform: none; font-size: 14px;">Create Body Text</v-btn>
+                    <div v-for="(imageObj, index) in texts" :key="index">
+                        <img
+                            :src="imageObj.src"
+                            alt="Text Image"
+                            @click="imageObj.method"
+                            style="cursor: pointer"
+                        >
+                    </div>
                 </v-card>
 
                 <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
@@ -26,13 +30,24 @@
                 </v-card>
 
                 <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
-                <div v-if="selectedOption.elements" class="d-flex mx-4 flex-wrap justify-between">
+                <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
+                    <v-icon icon="mdi-minus" color="black" size="70" @click="actions.addShape(minusConfig)" ></v-icon>
+                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70" @click="actions.addShape(minusConfig)" ></v-icon>
                     <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(rectConfig)" ></v-icon>
                     <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70" @click="actions.addShape(circleConfig)"></v-icon>
                     <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(triangleConfig)"></v-icon>
                     <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(hexagonConfig)"></v-icon>
                     <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(octagonConfig)"></v-icon>
+                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70" @click="actions.addShape(starConfig)"></v-icon>
+                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70" @click="actions.addShape(rhombusConfig)"></v-icon>
+                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(pentagonConfig)"></v-icon>
+                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70" @click="actions.addShape(messageConfig)"></v-icon>
+                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70" @click="actions.addShape(plusConfig)"></v-icon>
+                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70" @click="actions.addShape(arrowConfig)"></v-icon>
+                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70" @click="actions.addShape(heartConfig)"></v-icon>
+
                 </div>
+
                 <v-list-item @click="openUp" prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
                 <v-card v-if="selectedOption.upload" elevation="1" outlined>
                     <v-card-title>TEST</v-card-title>
@@ -218,6 +233,8 @@ export default {
             min: 0,
             max: 1,
             opacity: 1,
+            ////////////////
+            texts: [],
         }
     },methods: {
         openTemp(){
@@ -241,6 +258,17 @@ export default {
         openLayer(){
             this.selectedOption.layers = !this.selectedOption.layers;
         },
+        loadImages() {
+            for (let i = 1; i <= 34; i++) {
+                this.texts.push({
+                    src: `/images/text/p${i}.png`,
+                    method: this.actions[`handleImageClick${i}`]
+                });
+            }
+        },
+    },
+    mounted() {
+        this.loadImages();
     },
     props: {
         actions: {
@@ -250,3 +278,9 @@ export default {
     }
 }
 </script>
+<style scoped>
+.scroll{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+</style>
