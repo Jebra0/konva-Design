@@ -251,24 +251,24 @@ export default {
                 }
             }
         },
-        AlignRight(){
+        AlignRight() {
             if (this.selectedShapeId) {
                 const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
                 if (shapeIndex !== -1) {
                     const shape = this.shapes[shapeIndex];
-                    if (shape.type === 'v-rect') {
-                        shape.x = width - 101;
-                    } else {
-                        shape.x = width - 50;
-                    }
+
+                    const stage = this.$refs.stage.getNode();
+                    const scale = stage.scaleX();
+
+                    const scaledWidth = stage.width() * scale;
+
+                    const newX = shape.type === 'v-rect' ? (scaledWidth - 101) : (scaledWidth - 50);
+
+                    shape.x = newX;
 
                     const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
                     if (konvaShape) {
-                        if (shape.type === 'v-rect') {
-                            konvaShape.x(width - 101);
-                        }else {
-                            konvaShape.x(width - 50);
-                        }
+                        konvaShape.x(newX);
                     }
 
                     this.$refs.layer.getNode().draw();
@@ -301,24 +301,24 @@ export default {
                 }
             }
         },
-        AlignBottom(){
+        AlignBottom() {
             if (this.selectedShapeId) {
                 const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
                 if (shapeIndex !== -1) {
                     const shape = this.shapes[shapeIndex];
-                    if (shape.type === 'v-rect') {
-                        shape.y = height - 101;
-                    } else {
-                        shape.y = height - 50;
-                    }
+
+                    const stage = this.$refs.stage.getNode();
+                    const scale = stage.scaleX();
+
+                    const scaledHeight = stage.height() * scale;
+
+                    const newY = shape.type === 'v-rect' ? scaledHeight - 101 : scaledHeight - 50;
+
+                    shape.y = newY;
 
                     const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
                     if (konvaShape) {
-                        if (shape.type === 'v-rect') {
-                            konvaShape.y(height - 101);
-                        }else {
-                            konvaShape.y(height - 50);
-                        }
+                        konvaShape.y(newY);
                     }
 
                     this.$refs.layer.getNode().draw();
@@ -326,24 +326,24 @@ export default {
                 }
             }
         },
-        AlignCenter(){
+        AlignCenter() {
             if (this.selectedShapeId) {
                 const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
                 if (shapeIndex !== -1) {
                     const shape = this.shapes[shapeIndex];
-                    if (shape.type === 'v-rect') {
-                        shape.x = 200;
-                    } else {
-                        shape.x = 250;
-                    }
+
+                    const stage = this.$refs.stage.getNode();
+                    const scale = stage.scaleX();
+
+                    const scaledWidth = stage.width() * scale;
+
+                    const newX = shape.type === 'v-rect' ? (scaledWidth - 101) / 2 : (scaledWidth - 50) / 2;
+
+                    shape.x = newX;
 
                     const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
                     if (konvaShape) {
-                        if (shape.type === 'v-rect') {
-                            konvaShape.x(150);
-                        }else {
-                            konvaShape.x(250);
-                        }
+                        konvaShape.x(newX);
                     }
 
                     this.$refs.layer.getNode().draw();
@@ -351,24 +351,24 @@ export default {
                 }
             }
         },
-        AlignMiddle(){
+        AlignMiddle() {
             if (this.selectedShapeId) {
                 const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
                 if (shapeIndex !== -1) {
                     const shape = this.shapes[shapeIndex];
-                    if (shape.type === 'v-rect') {
-                        shape.y = 200;
-                    } else {
-                        shape.y = 250;
-                    }
+
+                    const stage = this.$refs.stage.getNode();
+                    const scale = stage.scaleY();
+
+                    const scaledHeight = stage.height() * scale;
+
+                    const newY = shape.type === 'v-rect' ? (scaledHeight - 101) / 2 : (scaledHeight - 50) / 2;
+
+                    shape.y = newY;
 
                     const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
                     if (konvaShape) {
-                        if (shape.type === 'v-rect') {
-                            konvaShape.y(150);
-                        }else {
-                            konvaShape.y(250);
-                        }
+                        konvaShape.y(newY);
                     }
 
                     this.$refs.layer.getNode().draw();
