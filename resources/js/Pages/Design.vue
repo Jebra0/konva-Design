@@ -22,7 +22,6 @@
                     <v-transformer ref="transformer" />
                 </v-layer>
             </v-stage>
-<!--            <input type="color" v-model="selectedFillColor" @input="updateShapeFill" />-->
         </div>
     </GuestLayout>
 </template>
@@ -31,7 +30,6 @@
 import GuestLayout from "../Layouts/GuestLayout.vue";
 import { Head } from '@inertiajs/vue3';
 import { v4 as uuidv4 } from 'uuid';
-import {th} from "vuetify/locale";
 const width = 500 ;
 const height = 500 ;
 export default {
@@ -47,7 +45,6 @@ export default {
             },
             shapes: [],
             selectedShapeId: null,
-            selectedFillColor: 'rgb(179, 177, 177)',
             history: [],
             historyStep: -1,
             actions: {
@@ -68,6 +65,8 @@ export default {
                 AlignCenter: this.AlignCenter,
                 AlignMiddle: this.AlignMiddle,
                 handleImageClick1: this.handleImageClick1,
+                updateStageFill: this.updateStageFill,
+                updateStageBackgroundImage: this.updateStageBackgroundImage,
             },
         };
     },
@@ -140,17 +139,41 @@ export default {
             this.selectedShapeId = id;
             this.updateTransformer();
         },
+///////////////////////////////////////////
+////////// Background ///////////////////
+        updateStageFill(color) {
+            const stageContainer = this.$refs.stage.getNode().container();
+            stageContainer.style.backgroundColor = color;
+        },
+        updateStageBackgroundImage(imageUrl){
+            const layer = this.$refs.layer.getNode();
+            const imageObj = new Image();
+            imageObj.onload = () => {
+                // Check if the background image already exists
+                let existingBackground = layer.findOne('.background-image');
+
+                if (existingBackground) {
+                    existingBackground.image(imageObj); // Update the existing background image
+                } else {
+                    const backgroundImage = new Konva.Image({
+                        image: imageObj,
+                        width: this.configKonva.width,
+                        height: this.configKonva.height,
+                        listening: false, // to prevent it from capturing events
+                        name: 'background-image'
+                    });
+
+                    layer.add(backgroundImage);
+                    backgroundImage.moveToBottom();
+                }
+
+                this.$refs.layer.getNode().batchDraw();
+            };
+
+            imageObj.src = imageUrl;
+        },
 ////////////////////////////////////////////
 ///////////// Default Functionality ////////
-        updateShapeFill() {
-            if (this.selectedShapeId) {
-                const shape = this.findShape(this.selectedShapeId);
-                if (shape) {
-                    shape.fill = this.selectedFillColor;
-                    this.saveHistory();
-                }
-            }
-        },
         saveHistory() {
             const shapesCopy = JSON.parse(JSON.stringify(this.shapes));
             if (this.historyStep < this.history.length - 1) {

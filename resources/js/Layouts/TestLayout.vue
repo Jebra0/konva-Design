@@ -31,21 +31,20 @@
 
                 <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
-                    <v-icon icon="mdi-minus" color="black" size="70" @click="actions.addShape(minusConfig)" ></v-icon>
-                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70" @click="actions.addShape(minusConfig)" ></v-icon>
-                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(rectConfig)" ></v-icon>
-                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70" @click="actions.addShape(circleConfig)"></v-icon>
-                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(triangleConfig)"></v-icon>
-                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(hexagonConfig)"></v-icon>
-                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(octagonConfig)"></v-icon>
-                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70" @click="actions.addShape(starConfig)"></v-icon>
-                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70" @click="actions.addShape(rhombusConfig)"></v-icon>
-                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(pentagonConfig)"></v-icon>
-                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70" @click="actions.addShape(messageConfig)"></v-icon>
-                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70" @click="actions.addShape(plusConfig)"></v-icon>
-                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70" @click="actions.addShape(arrowConfig)"></v-icon>
-                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70" @click="actions.addShape(heartConfig)"></v-icon>
-
+                    <v-icon icon="mdi-minus" color="black" size="70"   ></v-icon>
+                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70"   ></v-icon>
+                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"  @click="actions.addShape(rectConfig)" ></v-icon>
+                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70" @click="actions.addShape(circleConfig)" ></v-icon>
+                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(triangleConfig)" ></v-icon>
+                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(hexagonConfig)" ></v-icon>
+                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(octagonConfig)" ></v-icon>
+                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70"  ></v-icon>
+                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70"  ></v-icon>
+                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70"  ></v-icon>
+                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70"  ></v-icon>
+                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70"  ></v-icon>
+                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70"  ></v-icon>
+                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"  ></v-icon>
                 </div>
 
                 <v-list-item @click="openUp" prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
@@ -61,7 +60,7 @@
                         <img
                             :src="image.src"
                             alt="Background image"
-                            @click="actions.updateStageBackgroundImage(image.src)"
+
                             style="cursor: pointer; width: 150px; margin-left: 20px; margin-bottom: 15px"
                         >
                     </div>
@@ -77,19 +76,19 @@
         </v-navigation-drawer>
         <v-app-bar :elevation="1">
             <template v-slot:prepend>
-                <v-btn icon="mdi-undo" @click="actions.undoAction"></v-btn>
-                <v-btn icon="mdi-redo" @click="actions.redoAction"></v-btn>
+                <v-btn icon="mdi-undo"  ></v-btn>
+                <v-btn icon="mdi-redo"  ></v-btn>
             </template>
 
             <span class="ml-20">
-                <v-btn @click="actions.zoomIn">
+                <v-btn @click="actions.zoomFunction('in')" >
                     <v-icon icon="mdi-magnify-plus-outline" size="25px"></v-icon>
                     <v-tooltip
                         activator="parent"
                         location="bottom"
                     >Zoom In</v-tooltip>
                 </v-btn>
-                <v-btn @click="actions.zoomOut">
+                <v-btn @click="actions.zoomFunction('out')" >
                     <v-icon icon="mdi-magnify-minus-outline" size="25px"></v-icon>
                     <v-tooltip
                         activator="parent"
@@ -110,42 +109,42 @@
                             <v-list style="width: 200px">
                                 <v-list-item >
                                     <v-list-item-title>Position</v-list-item-title>
-                                    <v-btn class="mr-9" @click="actions.AlignLeft">
+                                    <v-btn class="mr-9" @click="actions.alignLeft" >
                                         <v-icon icon="mdi-align-horizontal-left"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Left</v-tooltip>
                                     </v-btn>
-                                    <v-btn @click="actions.AlignRight">
+                                    <v-btn @click="actions.alignRight" >
                                         <v-icon  icon="mdi-align-horizontal-right"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Right</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9" @click="actions.AlignTop">
+                                    <v-btn class="mr-9" @click="actions.alignTop" >
                                         <v-icon icon="mdi-align-vertical-top"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Top</v-tooltip>
                                     </v-btn>
-                                    <v-btn @click="actions.AlignBottom">
+                                    <v-btn @click="actions.alignBottom" >
                                         <v-icon  icon="mdi-align-vertical-bottom"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Down</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9" @click="actions.AlignCenter">
+                                    <v-btn class="mr-9"  >
                                         <v-icon icon="mdi-align-horizontal-center"></v-icon>
                                         <v-tooltip
                                             activator="parent"
                                             location="bottom"
                                         >Align Center</v-tooltip>
                                     </v-btn>
-                                    <v-btn @click="actions.AlignMiddle">
+                                    <v-btn  >
                                         <v-icon  icon="mdi-align-vertical-center"></v-icon>
                                         <v-tooltip
                                             activator="parent"
@@ -167,7 +166,7 @@
                                 <v-list-item>
                                     <v-list-item-title>Transparency</v-list-item-title>
                                     <v-slider
-                                        @mouseout="actions.shapeOpacity(opacity)"
+                                        @mouseout="actions.objectOpacity(opacity)"
                                         v-model="opacity"
                                         :max="max"
                                         :min="min"
@@ -180,28 +179,28 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-                    <v-btn @click="actions.saveJson">
+                    <v-btn @click="actions.saveAsJson" >
                         <v-icon icon="mdi-content-save"></v-icon>
                         <v-tooltip
                             activator="parent"
                             location="bottom"
                         >Save As Json File</v-tooltip>
                     </v-btn>
-                    <v-btn @click="actions.duplicateShape">
+                    <v-btn @click="actions.duplicateObjects" >
                         <v-icon icon="mdi-content-copy"></v-icon>
                         <v-tooltip
                             activator="parent"
                             location="bottom"
                         >Duplicate</v-tooltip>
                     </v-btn>
-                    <v-btn @click="actions.destroyShape">
+                    <v-btn @click="actions.destroyObjects" >
                         <v-icon icon="mdi-delete"></v-icon>
                         <v-tooltip
                             activator="parent"
                             location="bottom"
                         >Delete</v-tooltip>
                     </v-btn>
-                    <v-btn  @click="actions.exportShape">
+                    <v-btn  @click="actions.exportImage" >
                         <v-icon icon="mdi-download"></v-icon>
                         <v-tooltip
                             activator="parent"
@@ -217,7 +216,7 @@
     </v-layout>
 </template>
 <script>
-import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Pages/shapesConfig.js';
+import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
 
 export default {
     data () {
