@@ -1,6 +1,6 @@
 <template>
     <v-layout class="rounded rounded-md">
-        <v-navigation-drawer permanent width="250">
+        <v-navigation-drawer permanent width="300">
             <v-list density="compact">
                 <v-list-item @click="openTemp" prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
                 <v-card v-if="selectedOption.templates" elevation="1" outlined>
@@ -67,17 +67,37 @@
                 </v-card>
 
                 <v-list-item @click="openLayer" prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
-                <v-card v-if="selectedOption.layers" elevation="1" outlined>
-                    <v-card-title>TEST</v-card-title>
-                    <v-card-text> test test test test etst etst etst ethsj </v-card-text>
-                </v-card>
+                <v-card 
+                    v-if="selectedOption.layers" 
+                    elevation="1" 
+                    class="scroll"
+                >
+                    <div
+                        class="m-2 p-2 layer d-flex"
+                        v-for="(layer, i) in reversedLayers"
+                        :key="i"
+                        :value="layer"
+                    >
+                        <span v-if="layer.name !== 'Defualt Layer'">
+                            <button @click="actions.hideLayer(!layer.visible, layer.id)" class="mr-2">
+                                <v-icon :icon="layer.visible? 'mdi-eye': 'mdi-eye-closed'"></v-icon>
+                            </button>
+                            <button @click="actions.deleteLayer(layer.id)" ><v-icon icon="mdi-delete"></v-icon></button>
+                        </span>
+                        <span  v-text="layer.name" class="ml-1" style="width: 120px;"></span>
 
+                        <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
+                            <button v-if="(!layer.lastOne) " @click="actions.moveLayer('up', layer.id)" ><v-icon icon="mdi-arrow-up"></v-icon></button>
+                            <button v-if="(!layer.firstOne) " @click="actions.moveLayer('down', layer.id)" ><v-icon icon="mdi-arrow-down"></v-icon></button>
+                        </span>
+                    </div>
+                </v-card>
             </v-list>
         </v-navigation-drawer>
         <v-app-bar :elevation="1">
             <template v-slot:prepend>
-                <v-btn icon="mdi-undo"  ></v-btn>
-                <v-btn icon="mdi-redo"  ></v-btn>
+                <v-btn color="red" icon="mdi-undo" @click="actions.unDo" ></v-btn>
+                <v-btn color="red" icon="mdi-redo" @click="actions.reDo" ></v-btn>
             </template>
 
             <span class="ml-20">
@@ -100,7 +120,7 @@
             <template v-slot:append>
                 <div style="" >
                     <v-btn>
-                        <v-icon icon="mdi-layers"></v-icon>
+                        <v-icon color="red" icon="mdi-layers"></v-icon>
                         <v-tooltip
                             activator="parent"
                             location="bottom"
@@ -243,6 +263,7 @@ export default {
             texts: [],
             selectedFillColor: 'white',
             images: [],
+            hide: true,
         }
     },
     methods: {
@@ -287,10 +308,19 @@ export default {
         this.loadImages();
         this.backgroundImages();
     },
+    computed: {
+        reversedLayers() {
+            return [...this.layers].reverse();
+        },
+    },
     props: {
         actions: {
             type: Object,
             required: true,
+        },
+        layers: {
+            type: Array,
+            default: () => [],
         },
     }
 }
@@ -299,5 +329,8 @@ export default {
 .scroll{
     max-height: 300px;
     overflow-y: scroll;
+}
+.layer{
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
 }
 </style>

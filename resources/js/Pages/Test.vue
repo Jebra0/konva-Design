@@ -1,6 +1,6 @@
 <template>
     <Head title="Test"></Head>
-    <TestLayout v-if="isLayoutReady" :actions="actions">
+    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers">
         <div class="my-3" id="container"></div>
 <!--        {{ selectedObjectIds }}-->
     </TestLayout>
@@ -41,7 +41,8 @@ export default {
                 destroyObjects: this.destroyObjects,
                 duplicateObjects: this.duplicateObjects,
                 objectOpacity: this.objectOpacity,
-                doFunction: this.doFunction,
+                unDo: this.unDo,
+                reDo: this.reDo,
                 //positions
                 alignLeft: this.alignLeft,
                 alignRight: this.alignRight,
@@ -49,10 +50,15 @@ export default {
                 alignBottom: this.alignBottom,
                 alignCenter: this.alignCenter,
                 alignMiddle: this.alignMiddle,
+                //layers
+                hideLayer: this.hideLayer,
+                deleteLayer: this.deleteLayer,
+                moveLayer: this.moveLayer,
             },
             isLayoutReady: false,
             transformer: null,
             selectedObjectIds: [],
+            layers: [],
         };
     },
     mounted() {
@@ -72,6 +78,7 @@ export default {
                 });
 
                 this.defaultLayer = new Konva.Layer();
+                this.layers.push({'id': 0, 'name': 'Defualt Layer'});
                 this.stage.add(this.defaultLayer);
 
                 // Create a transformer
@@ -127,13 +134,27 @@ export default {
 
         addShape(config) {
             const newLayer = new Konva.Layer();
+            newLayer.id(uuidv4());
             this.stage.add(newLayer);
 
-            config.id = uuidv4();
+            config.id = uuidv4()
 
             const ShapeConstructor = Konva[config.type];
             const shape = new ShapeConstructor(config);
 
+            const currentLength = this.layers.length;
+            if (currentLength > 1) {
+                this.layers[currentLength - 1].lastOne = false;
+            }
+            this.layers.push({
+                'id': newLayer.id(),
+                'name': shape.getClassName(),
+                'layer': newLayer,
+                'visible': true,
+                'firstOne': this.layers.length === 1,
+                'lastOne': true
+            })
+            
             shape.on("click", (e) => {
                 e.cancelBubble = true;
                 this.toggleSelection(shape.id());
@@ -213,6 +234,7 @@ export default {
             const newSelectedIds = [];
             this.selectedObjectIds.forEach((id) => {
                 const newLayer = new Konva.Layer();
+                newLayer.id(uuidv4());
                 this.stage.add(newLayer);
 
                 const shape = this.stage.findOne(`#${id}`);
@@ -223,6 +245,18 @@ export default {
                         id: uuidv4(),
                     });
                     newLayer.add(clonedShape);
+                    const currentLength = this.layers.length;
+                    if (currentLength > 1) {
+                        this.layers[currentLength - 1].lastOne = false;
+                    }
+                    this.layers.push({
+                        'id': newLayer.id(),
+                        'name': clonedShape.getClassName(),
+                        'layer': newLayer,
+                        'visible': true,
+                        'firstOne': this.layers.length === 1,
+                        'lastOne': true
+                    });
                     newSelectedIds.push(clonedShape.id());
 
                     clonedShape.on("click", (e) => {
@@ -244,8 +278,11 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        doFunction(unOrRe){
-
+        unDo(){
+            
+        },
+        reDo(){
+            
         },
         //positions
         alignLeft() {
@@ -263,37 +300,43 @@ export default {
                     const shape = this.stage.findOne(`#${id}`);
                     return shape ? shape.x() : Infinity;
                 }));
-
-                this.selectedObjectIds.forEach((id) => {
-                    const shape = this.stage.findOne(`#${id}`);
-                    if (shape) {
-                        shape.x(leftMostX);
-                    }
-                });
             }
 
-            this.defaultLayer.batchDraw();
         },
         alignRight(){
             if (this.selectedObjectIds.length === 0) return;
 
+            const stageWidth = this.stage.width();
+
             if (this.selectedObjectIds.length === 1) {
                 const shape = this.stage.findOne(`#${this.selectedObjectIds[0]}`);
-                if(shape.getClassName() === 'Rect'){
-                    shape.x(this.stage.width() - (shape.width() * shape.scaleX()));
-                }else {
-                    shape.x(this.stage.width() - (shape.width() * shape.scaleX()) + 50);
+                if (shape) {
+                    const shapeType = shape.getClassName();
+                    if (shapeType === 'Rect') {
+                        shape.x(stageWidth - shape.width() * shape.scaleX() - 1);
+                    } else if (shapeType === 'Circle' || shapeType === 'Ellipse' || shapeType === 'RegularPolygon') {
+                        shape.x(stageWidth - shape.radius() * shape.scaleX() - 1);
+                    } else {
+                        shape.x(stageWidth - 50); // Default alignment for other shapes
+                    }
                 }
             } else {
                 const rightMostX = Math.max(...this.selectedObjectIds.map((id) => {
                     const shape = this.stage.findOne(`#${id}`);
-                    return shape ? shape.x() + shape.width() : -Infinity;
+                    return shape ? shape.x() + (shape.getClassName() === 'Rect' ? shape.width() * shape.scaleX() : shape.radius() * shape.scaleX()) : -Infinity;
                 }));
 
                 this.selectedObjectIds.forEach((id) => {
                     const shape = this.stage.findOne(`#${id}`);
                     if (shape) {
-                        shape.x(rightMostX - shape.width());
+                        const shapeType = shape.getClassName();
+                        if (shapeType === 'Rect') {
+                            shape.x(rightMostX - shape.width() * shape.scaleX());
+                        } else if (shapeType === 'Circle' || shapeType === 'Ellipse' || shapeType === 'RegularPolygon') {
+                            shape.x(rightMostX - shape.radius() * shape.scaleX());
+                        } else {
+                            shape.x(rightMostX - 50); // Default alignment for other shapes
+                        }
                     }
                 });
             }
@@ -352,6 +395,72 @@ export default {
 
             this.defaultLayer.batchDraw();
         },
+//////////////////////////////
+////// Layering //////////////
+        hideLayer(action, layerId){
+            const layerObj = this.layers.find(layerObj => layerObj.id === layerId);            
+            layerObj.layer.visible(action);
+            layerObj.visible = action;
+            layerObj.layer.batchDraw();
+        },  
+        deleteLayer(layerId){
+            const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
+            const layerObj = this.layers[layerIndex];
+            if (layerObj.firstOne) {
+                if(!layerObj.lastOne){
+                    this.layers[layerIndex + 1].firstOne = true;
+                }
+            }
+            if (layerObj.lastOne) {
+                if(!layerObj.firstOne){
+                    this.layers[layerIndex - 1].lastOne = true;
+                }
+            }
+            layerObj.layer.destroy();
+            this.layers.splice(layerIndex, 1);
+        },
+        moveLayer(action, layerId) {
+            const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
+            const layerObj = this.layers[layerIndex];
+            if(action === 'up'){
+                const nextObj = this.layers[layerIndex + 1];
+                if(nextObj.lastOne){
+                    //change
+                    layerObj.lastOne = true;
+                    nextObj.lastOne = false;   
+                }
+                if(layerObj.firstOne){
+                        nextObj.firstOne = true;
+                        layerObj.firstOne = false;
+                }
+                const konvaLayer = this.stage.findOne(`#${layerId}`);
+                konvaLayer.moveUp();
+                //swap
+                let temp = this.layers[layerIndex];
+                this.layers[layerIndex] = this.layers[layerIndex + 1];
+                this.layers[layerIndex + 1] = temp;
+            }else{
+                const nextObj = this.layers[layerIndex - 1];
+                if(nextObj.firstOne){
+                    //change
+                    layerObj.firstOne = true;
+                    nextObj.firstOne = false;
+                }
+                if(layerObj. lastOne){
+                    nextObj.lastOne = true;
+                    layerObj.lastOne = false;
+                }
+                const konvaLayer = this.stage.findOne(`#${layerId}`);
+                konvaLayer.moveDown();
+                //swap
+                let temp = this.layers[layerIndex];
+                this.layers[layerIndex] = this.layers[layerIndex - 1];
+                this.layers[layerIndex - 1] = temp;
+            }
+
+            this.stage.batchDraw();
+        }
+
 
     },
 }
