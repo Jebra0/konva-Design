@@ -188,7 +188,7 @@
         <!-- text buttons -->
         <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'text'">
             <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-            @input="actions.updateStageFill(selectedFillColor)" />
+            @input="actions.fillColor(selectedFillColor)" />
             <div class="d-flex">
                 <v-select 
                     label="font family"
@@ -197,35 +197,35 @@
                     class="m-2 mt-5"
                 ></v-select>
             </div>
-            <input type="number" placeholder="14" style="width: 100px; border: 1px solid #ddd;"/>
+            <input type="number" v-model="fontSize" @input="actions.textSize(fontSize)" style="width: 100px; border: 1px solid #ddd;"/>
             <v-btn>
                 <v-icon icon="mdi-format-align-center"></v-icon>
                 <v-menu activator="parent">
                     <v-list >
                         <v-list-item>
-                            <v-btn class="" @click="actions.alignLeft">
+                            <v-btn class="" @click="actions.alignText('justify')">
                                 <v-icon icon="mdi-format-align-justify"></v-icon>
                             </v-btn>
-                            <v-btn @click="actions.alignRight">
+                            <v-btn @click="actions.alignText('right')">
                                 <v-icon icon="mdi-format-align-right"></v-icon>
                             </v-btn>
-                            <v-btn class="" @click="actions.alignTop">
+                            <v-btn class="" @click="actions.alignText('left')">
                                 <v-icon icon="mdi-format-align-left"></v-icon>
                             </v-btn>
-                            <v-btn @click="actions.alignBottom">
+                            <v-btn @click="actions.alignText('center')">
                                 <v-icon icon="mdi-format-align-center"></v-icon>
                             </v-btn>
                         </v-list-item>
                     </v-list>
                 </v-menu>
             </v-btn>
-            <v-btn >
+            <v-btn @click="toggleFOntCase()" >
                 <v-icon icon="mdi-format-letter-case-upper"></v-icon>
             </v-btn>
-            <v-btn >
+            <v-btn @click="toggleFontWeight" >
                 <v-icon icon="mdi-format-bold"></v-icon>
             </v-btn>
-            <v-btn >
+            <v-btn @click="toggleFontItalic()">
                 <v-icon icon="mdi-format-italic"></v-icon>
             </v-btn>
             <v-btn >
@@ -235,9 +235,10 @@
                         <v-list-item>
                             <v-list-item-title>Spacing</v-list-item-title>
                             <v-slider 
-                                @mouseout="" 
-                                :max="max"
-                                :min="min" 
+                                @mouseout="actions.textCharSpacing(charSpacing)" 
+                                :max="sMax"
+                                :min="sMin" 
+                                v-model="charSpacing"
                                 style="width: 250px" 
                                 class="align-center"
                                 hide-details>
@@ -246,12 +247,14 @@
                         <v-list-item>
                             <v-list-item-title>line height</v-list-item-title>
                             <v-slider 
-                                @mouseout="" 
-                                :max="max"
-                                :min="min" 
+                                @mouseout="actions.textLineHight(lineHight)" 
+                                :max="lMax"
+                                :min="lMin" 
+                                v-model="lineHight"
                                 style="width: 250px" 
                                 class="align-center"
-                                hide-details>
+                                hide-details
+                            >
                             </v-slider>
                         </v-list-item>
                     </v-list>
@@ -261,7 +264,7 @@
         <!-- shape buttons -->
         <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'shape'">
         <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-        @input="actions.updateStageFill(selectedFillColor)" />
+        @input="actions.fillColor(selectedFillColor)" />
         </v-app-bar>
         <!-- image buttons -->
         <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'image'">
@@ -304,6 +307,18 @@ export default {
             selectedFillColor: 'white',
             images: [],
             hide: true,
+            fontSize: 30,
+            fontWeight: 'normal',
+            fontItalic: 'normal',
+            fontCase: 'lower',
+            //// lineHight /////
+            lMin: 0,
+            lMax: 3,
+            lineHight: 1,
+            //// charspacing /////
+            sMin: -10,
+            sMax: 50,
+            charSpacing: 1,
         }
     },
     methods: {
@@ -341,6 +356,18 @@ export default {
                     src: `/images/backgrounds/p${i}.jpg`,
                 });
             }
+        },
+        toggleFontWeight() {
+            this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
+            this.actions.textStyle(this.fontWeight); 
+        },
+        toggleFontItalic() {
+            this.fontItalic = this.fontItalic === 'normal' ? 'italic' : 'normal';
+            this.actions.textStyle(this.fontItalic); 
+        },
+        toggleFOntCase() {
+            this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
+            this.actions.textCase(this.fontCase); 
         },
     },
     mounted() {

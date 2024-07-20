@@ -1,11 +1,7 @@
 <template>
+
     <Head title="Test"></Head>
-    <TestLayout 
-        v-if="isLayoutReady" 
-        :actions="actions" 
-        :layers="layers"
-        :objectSelected="objectSelected"
-    >
+    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected">
         <div class="my-3" id="container"></div>
     </TestLayout>
 </template>
@@ -62,12 +58,20 @@ export default {
                 //setImageBackground: this.setImageBackground,
                 //text
                 addHeader: this.addHeader,
+                //decoration
+                fillColor: this.fillColor,
+                textSize: this.textSize,
+                textStyle: this.textStyle,
+                textCase: this.textCase,
+                textLineHight: this.textLineHight,
+                textCharSpacing: this.textCharSpacing,
+                alignText: this.alignText,
             },
             isLayoutReady: false,
             transformer: null,
             selectedObjectIds: [],
             layers: [],
-            objectSelected:[],
+            objectSelected: [],
         };
     },
     mounted() {
@@ -87,7 +91,7 @@ export default {
                 });
 
                 this.defaultLayer = new Konva.Layer();
-                this.layers.push({'id': 0, 'name': 'Defualt Layer'});
+                this.layers.push({ 'id': 0, 'name': 'Defualt Layer' });
                 this.stage.add(this.defaultLayer);
 
                 // Create a transformer
@@ -105,11 +109,11 @@ export default {
                 });
                 this.defaultLayer.draw();
             } else {
-                    // Retry initializing after a short delay if the container is not found
+                // Retry initializing after a short delay if the container is not found
                 setTimeout(this.initializeKonva, 100);
             }
         },
-    // snap objects
+        // snap objects
         handleDragMove(e) {
             this.stage.find('.guid-line').forEach((l) => l.destroy());
 
@@ -162,7 +166,7 @@ export default {
                 'firstOne': this.layers.length === 1,
                 'lastOne': true
             })
-            
+
             shape.on("click", (e) => {
                 e.cancelBubble = true;
                 this.toggleSelection(shape.id(), 'shape');
@@ -171,7 +175,7 @@ export default {
             newLayer.add(shape);
             newLayer.batchDraw();
         },
-    //Transformer and Selection
+        //Transformer and Selection
         toggleSelection(id, type) {
             const index = this.selectedObjectIds.indexOf(id);
             const index2 = this.objectSelected.indexOf(id);
@@ -180,7 +184,7 @@ export default {
                 this.objectSelected.splice(index2, 1);
             } else {
                 this.selectedObjectIds.push(id); // Select if not already selected
-                this.objectSelected.push({objectId: id, objectType: type});
+                this.objectSelected.push({ objectId: id, objectType: type });
             }
             this.updateTransformer();
         },
@@ -196,7 +200,7 @@ export default {
             this.transformer.nodes(selectedShapes);
             this.defaultLayer.batchDraw(); // Ensure the layer is redrawn
         },
-    //Default Functionality
+        //Default Functionality
         download(uri, name) {
             let link = document.createElement('a');
             link.download = name;
@@ -211,10 +215,10 @@ export default {
             this.download(url, 'stage.json');
             URL.revokeObjectURL(url);
         },
-        zoomFunction(inOrOut){
+        zoomFunction(inOrOut) {
             const oldScale = this.stage.scaleX();
             let newScale;
-            if (inOrOut === 'in') {                
+            if (inOrOut === 'in') {
                 newScale = oldScale + ZOOM_STEP;
             } else if (inOrOut === 'out') {
                 newScale = oldScale - ZOOM_STEP;
@@ -228,14 +232,15 @@ export default {
 
             this.stage.batchDraw();
         },
-        exportImage(){
+        exportImage() {
             let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
             this.download(dataURL, 'Design.png');
         },
-        destroyObjects(){
+        destroyObjects() {
             this.selectedObjectIds.forEach((id) => {
                 const shape = this.stage.findOne(`#${id}`);
-                if (shape) {shape
+                if (shape) {
+                    shape
                     const layer = shape.getLayer();
                     this.deleteLayer(layer.id());
                     shape.destroy();
@@ -244,7 +249,7 @@ export default {
             this.clearSelection();
             this.defaultLayer.batchDraw();
         },
-        duplicateObjects(){
+        duplicateObjects() {
             const newSelectedIds = [];
             this.selectedObjectIds.forEach((id) => {
                 const newLayer = new Konva.Layer();
@@ -283,7 +288,7 @@ export default {
                 this.selectedObjectIds = newSelectedIds;
             });
         },
-        objectOpacity(opacity){
+        objectOpacity(opacity) {
             this.selectedObjectIds.forEach((id) => {
                 const shape = this.stage.findOne(`#${id}`);
                 if (shape) {
@@ -292,11 +297,11 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        unDo(){
-            
+        unDo() {
+
         },
-        reDo(){
-            
+        reDo() {
+
         },
         //positions
         alignLeft() {
@@ -304,9 +309,9 @@ export default {
 
             if (this.selectedObjectIds.length === 1) {
                 const shape = this.stage.findOne(`#${this.selectedObjectIds[0]}`);
-                if(shape.getClassName() === 'Rect'){
+                if (shape.getClassName() === 'Rect') {
                     shape.x(0);
-                }else {
+                } else {
                     shape.x(50);
                 }
             } else {
@@ -317,7 +322,7 @@ export default {
             }
 
         },
-        alignRight(){
+        alignRight() {
             if (this.selectedObjectIds.length === 0) return;
 
             const stageWidth = this.stage.width();
@@ -362,9 +367,9 @@ export default {
 
             if (this.selectedObjectIds.length === 1) {
                 const shape = this.stage.findOne(`#${this.selectedObjectIds[0]}`);
-                if(shape.getClassName() === 'Rect'){
+                if (shape.getClassName() === 'Rect') {
                     shape.y(0);
-                }else {
+                } else {
                     shape.y(50);
                 }
             } else {
@@ -383,14 +388,14 @@ export default {
 
             this.defaultLayer.batchDraw();
         },
-        alignBottom(){
+        alignBottom() {
             if (this.selectedObjectIds.length === 0) return;
 
             if (this.selectedObjectIds.length === 1) {
                 const shape = this.stage.findOne(`#${this.selectedObjectIds[0]}`);
-                if(shape.getClassName() === 'Rect'){
+                if (shape.getClassName() === 'Rect') {
                     shape.y(this.stage.height() - (shape.height() * shape.scaleY()));
-                }else {
+                } else {
                     shape.y(this.stage.height() - (shape.height() * shape.scaleY()) + 50);
                 }
             } else {
@@ -409,23 +414,23 @@ export default {
 
             this.defaultLayer.batchDraw();
         },
-    // Layering //////////////
-        hideLayer(action, layerId){
-            const layerObj = this.layers.find(layerObj => layerObj.id === layerId);            
+        // Layering //////////////
+        hideLayer(action, layerId) {
+            const layerObj = this.layers.find(layerObj => layerObj.id === layerId);
             layerObj.layer.visible(action);
             layerObj.visible = action;
             layerObj.layer.batchDraw();
-        },  
-        deleteLayer(layerId){
+        },
+        deleteLayer(layerId) {
             const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
             const layerObj = this.layers[layerIndex];
             if (layerObj.firstOne) {
-                if(!layerObj.lastOne){
+                if (!layerObj.lastOne) {
                     this.layers[layerIndex + 1].firstOne = true;
                 }
             }
             if (layerObj.lastOne) {
-                if(!layerObj.firstOne){
+                if (!layerObj.firstOne) {
                     this.layers[layerIndex - 1].lastOne = true;
                 }
             }
@@ -435,16 +440,16 @@ export default {
         moveLayer(action, layerId) {
             const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
             const layerObj = this.layers[layerIndex];
-            if(action === 'up'){
+            if (action === 'up') {
                 const nextObj = this.layers[layerIndex + 1];
-                if(nextObj.lastOne){
+                if (nextObj.lastOne) {
                     //change
                     layerObj.lastOne = true;
-                    nextObj.lastOne = false;   
+                    nextObj.lastOne = false;
                 }
-                if(layerObj.firstOne){
-                        nextObj.firstOne = true;
-                        layerObj.firstOne = false;
+                if (layerObj.firstOne) {
+                    nextObj.firstOne = true;
+                    layerObj.firstOne = false;
                 }
                 const konvaLayer = this.stage.findOne(`#${layerId}`);
                 konvaLayer.moveUp();
@@ -452,14 +457,14 @@ export default {
                 let temp = this.layers[layerIndex];
                 this.layers[layerIndex] = this.layers[layerIndex + 1];
                 this.layers[layerIndex + 1] = temp;
-            }else{
+            } else {
                 const nextObj = this.layers[layerIndex - 1];
-                if(nextObj.firstOne){
+                if (nextObj.firstOne) {
                     //change
                     layerObj.firstOne = true;
                     nextObj.firstOne = false;
                 }
-                if(layerObj. lastOne){
+                if (layerObj.lastOne) {
                     nextObj.lastOne = true;
                     layerObj.lastOne = false;
                 }
@@ -473,7 +478,7 @@ export default {
 
             this.stage.batchDraw();
         },
-    //image background
+        //image background
         /*setImageBackground(url){
             console.log(this.layers)
             const newLayer = new Konva.Layer();
@@ -531,20 +536,21 @@ export default {
 
         },*/
     //text
-        addHeader(){
+        addHeader() {
             const newLayer = new Konva.Layer();
             newLayer.id(uuidv4());
             this.stage.add(newLayer);
 
             var text = new Konva.Text({
-                    x: this.stage.width() / 2,
-                    y: 15,
-                    text: 'Simple Text',
-                    fontSize: 40,
-                    fontFamily: 'Audiowide',
-                    fill: 'black',
-                    id: uuidv4(),
-                    draggable: true
+                x: this.stage.width() / 2,
+                y: 15,
+                text: 'Simple Text',
+                fontSize: 60,
+                fontFamily: 'Audiowide',
+                fill: 'black',
+                id: uuidv4(),
+                width: 200,
+                draggable: true
             });
 
             const currentLength = this.layers.length;
@@ -553,20 +559,184 @@ export default {
             }
             this.layers.push({
                 'id': newLayer.id(),
-                'name': 'text',//+ text.text.substring(0, 10)+'..',
+                'name': 'text',
                 'layer': newLayer,
                 'visible': true,
                 'firstOne': this.layers.length === 1,
                 'lastOne': true
             })
-            
+
             text.on("click", (e) => {
                 e.cancelBubble = true;
                 this.toggleSelection(text.id(), 'text');
             });
 
+            //editable
+            this.editText(text);
+
+
             newLayer.add(text);
             newLayer.batchDraw();
+        },
+        //editable text
+        editText(text) {
+            const transformer = this.transformer;
+            const stage = this.stage;
+
+            text.on('transform', () => {
+                const scaleX = text.scaleX();
+                text.setAttrs({
+                    width: text.width() * scaleX,
+                    scaleX: 1,
+                });
+            });
+
+            text.on('dblclick', () => {
+                text.hide();
+                transformer.hide();
+
+                const textPosition = text.absolutePosition();
+                const areaPosition = {
+                    x: stage.container().offsetLeft + textPosition.x,
+                    y: stage.container().offsetTop + textPosition.y,
+                };
+
+                const textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+
+                Object.assign(textarea.style, {
+                    position: 'absolute',
+                    top: `${areaPosition.y}px`,
+                    left: `${areaPosition.x}px`,
+                    width: `${text.width() - text.padding() * 2}px`,
+                    height: `${text.height() - text.padding() * 2 + 5}px`,
+                    fontSize: `${text.fontSize()}px`,
+                    border: 'none',
+                    padding: '3px',
+                    margin: '0px',
+                    overflow: 'hidden',
+                    background: 'none',
+                    outline: 'none',
+                    resize: 'none',
+                    lineHeight: text.lineHeight(),
+                    fontFamily: text.fontFamily(),
+                    transformOrigin: 'left top',
+                    textAlign: text.align(),
+                    color: text.fill(),
+                    transform: `rotateZ(${text.rotation()}deg) translateY(-0px)`,
+                });
+
+                textarea.value = text.text();
+                textarea.focus();
+
+                const removeTextarea = () => {
+                    textarea.parentNode.removeChild(textarea);
+                    window.removeEventListener('click', handleOutsideClick);
+                    text.show();
+                    transformer.show();
+                    transformer.forceUpdate();
+                };
+
+                const setTextareaWidth = (newWidth) => {
+                    if (!newWidth) {
+                        newWidth = text.placeholder.length * text.fontSize();
+                    }
+                    textarea.style.width = `${Math.ceil(newWidth)}px`;
+                };
+
+                const handleKeydown = (e) => {
+                    if (e.keyCode === 13 && !e.shiftKey) {
+                        text.text(textarea.value);
+                        removeTextarea();
+                    } else if (e.keyCode === 27) {
+                        removeTextarea();
+                    } else {
+                        const scale = text.getAbsoluteScale().x;
+                        setTextareaWidth(text.width() * scale);
+                        textarea.style.height = 'auto';
+                        textarea.style.height = `${textarea.scrollHeight + text.fontSize()}px`;
+                    }
+                };
+
+                const handleOutsideClick = (e) => {
+                    if (e.target !== textarea) {
+                        text.text(textarea.value);
+                        removeTextarea();
+                    }
+                };
+
+                textarea.addEventListener('keydown', handleKeydown);
+                setTimeout(() => window.addEventListener('click', handleOutsideClick));
+            });
+        },
+    //decoration
+        fillColor(color){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.fill(color);
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        textSize(size){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.fontSize(size);
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        // for bold & italic
+        textStyle(style){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.fontStyle(style);
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        textCase(fontCase){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    if(fontCase === 'upper'){
+                        object.text(object.text().toUpperCase());
+                    }else if(fontCase === 'lower'){
+                        object.text(object.text().toLowerCase());
+                    }
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        textLineHight(textLineHight){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.lineHeight(textLineHight);
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        textCharSpacing(charSpacing){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.letterSpacing(charSpacing);
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        alignText(align){
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.align(align);
+                }
+            });
+            this.defaultLayer.batchDraw();
         },
 
     },
