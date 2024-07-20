@@ -1,8 +1,12 @@
 <template>
     <Head title="Test"></Head>
-    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers">
+    <TestLayout 
+        v-if="isLayoutReady" 
+        :actions="actions" 
+        :layers="layers"
+        :objectSelected="objectSelected"
+    >
         <div class="my-3" id="container"></div>
-<!--        {{ selectedObjectIds }}-->
     </TestLayout>
 </template>
 
@@ -54,11 +58,16 @@ export default {
                 hideLayer: this.hideLayer,
                 deleteLayer: this.deleteLayer,
                 moveLayer: this.moveLayer,
+                //background
+                //setImageBackground: this.setImageBackground,
+                //text
+                addHeader: this.addHeader,
             },
             isLayoutReady: false,
             transformer: null,
             selectedObjectIds: [],
             layers: [],
+            objectSelected:[],
         };
     },
     mounted() {
@@ -94,7 +103,6 @@ export default {
                         this.clearSelection();
                     }
                 });
-
                 this.defaultLayer.draw();
             } else {
                     // Retry initializing after a short delay if the container is not found
@@ -157,24 +165,28 @@ export default {
             
             shape.on("click", (e) => {
                 e.cancelBubble = true;
-                this.toggleSelection(shape.id());
+                this.toggleSelection(shape.id(), 'shape');
             });
 
             newLayer.add(shape);
             newLayer.batchDraw();
         },
     //Transformer and Selection
-        toggleSelection(id) {
+        toggleSelection(id, type) {
             const index = this.selectedObjectIds.indexOf(id);
+            const index2 = this.objectSelected.indexOf(id);
             if (index >= 0) {
                 this.selectedObjectIds.splice(index, 1); // Deselect if already selected
+                this.objectSelected.splice(index2, 1);
             } else {
                 this.selectedObjectIds.push(id); // Select if not already selected
+                this.objectSelected.push({objectId: id, objectType: type});
             }
             this.updateTransformer();
         },
         clearSelection() {
             this.selectedObjectIds = [];
+            this.objectSelected = [];
             this.updateTransformer();
         },
         updateTransformer() {
@@ -202,7 +214,7 @@ export default {
         zoomFunction(inOrOut){
             const oldScale = this.stage.scaleX();
             let newScale;
-            if (inOrOut === 'in') {
+            if (inOrOut === 'in') {                
                 newScale = oldScale + ZOOM_STEP;
             } else if (inOrOut === 'out') {
                 newScale = oldScale - ZOOM_STEP;
@@ -223,7 +235,9 @@ export default {
         destroyObjects(){
             this.selectedObjectIds.forEach((id) => {
                 const shape = this.stage.findOne(`#${id}`);
-                if (shape) {
+                if (shape) {shape
+                    const layer = shape.getLayer();
+                    this.deleteLayer(layer.id());
                     shape.destroy();
                 }
             });
@@ -261,7 +275,7 @@ export default {
 
                     clonedShape.on("click", (e) => {
                         e.cancelBubble = true;
-                        this.toggleSelection(clonedShape.id());
+                        this.toggleSelection(clonedShape.id(), 'shape');
                     });
 
                 }
@@ -395,8 +409,7 @@ export default {
 
             this.defaultLayer.batchDraw();
         },
-//////////////////////////////
-////// Layering //////////////
+    // Layering //////////////
         hideLayer(action, layerId){
             const layerObj = this.layers.find(layerObj => layerObj.id === layerId);            
             layerObj.layer.visible(action);
@@ -459,8 +472,102 @@ export default {
             }
 
             this.stage.batchDraw();
-        }
+        },
+    //image background
+        /*setImageBackground(url){
+            console.log(this.layers)
+            const newLayer = new Konva.Layer();
+            newLayer.id(uuidv4());
+            this.stage.add(newLayer);
+            const imageObj = new Image();
 
+            const scale = this.stage.scale();
+
+            imageObj.onload = () => {
+                const backgroundImage = new Konva.Image({
+                    image: imageObj,
+                    width: width*scale.x,
+                    height: height*scale.y,
+                });
+                newLayer.add(backgroundImage);
+                newLayer.batchDraw(); 
+            };
+            imageObj.src = url;
+            // checkk if ther is already background 
+            if( this.layers.length >= 2 && this.layers[1].name === 'Background'){
+                this.deleteLayer(this.layers[1].id);
+            }
+            // check if it have other layers 
+            if(this.layers.length >= 2){
+                this.layers[1].firstOne = false;
+            }
+            // creat new element in layers
+            let newElement = ({
+                'id': newLayer.id(),
+                'name': 'Background',
+                'layer': newLayer,
+                'visible': true,
+                'firstOne': true,
+                'lastOne': this.layers.length === 1 ? true : false
+            })
+            // add the new element to the first 
+            this.layers.splice(1, 0, newElement);
+
+            this.defaultLayer = new Konva.Layer();
+            this.stage.add(this.defaultLayer);
+            // Create a transformer
+            this.transformer = new Konva.Transformer();
+            this.defaultLayer.add(this.transformer);
+
+            this.defaultLayer.on("dragmove", this.handleDragMove);
+            this.defaultLayer.on("dragend", this.handleDragEnd);
+
+            // Click outside of shapes to remove the transformer
+            this.stage.on('click', (e) => {
+                if (e.target === this.stage) {
+                    this.clearSelection();
+                }
+            });
+
+        },*/
+    //text
+        addHeader(){
+            const newLayer = new Konva.Layer();
+            newLayer.id(uuidv4());
+            this.stage.add(newLayer);
+
+            var text = new Konva.Text({
+                    x: this.stage.width() / 2,
+                    y: 15,
+                    text: 'Simple Text',
+                    fontSize: 40,
+                    fontFamily: 'Audiowide',
+                    fill: 'black',
+                    id: uuidv4(),
+                    draggable: true
+            });
+
+            const currentLength = this.layers.length;
+            if (currentLength > 1) {
+                this.layers[currentLength - 1].lastOne = false;
+            }
+            this.layers.push({
+                'id': newLayer.id(),
+                'name': 'text',//+ text.text.substring(0, 10)+'..',
+                'layer': newLayer,
+                'visible': true,
+                'firstOne': this.layers.length === 1,
+                'lastOne': true
+            })
+            
+            text.on("click", (e) => {
+                e.cancelBubble = true;
+                this.toggleSelection(text.id(), 'text');
+            });
+
+            newLayer.add(text);
+            newLayer.batchDraw();
+        },
 
     },
 }

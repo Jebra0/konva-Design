@@ -171,6 +171,7 @@ export default {
             };
 
             imageObj.src = imageUrl;
+            console.log(imageObj)
         },
 ////////////////////////////////////////////
 ///////////// Default Functionality ////////
