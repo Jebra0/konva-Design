@@ -13,11 +13,28 @@ Route::get('/', function () {
 });
 ////////////////////////////// TEST ////////////////////////
 
-Route::get('/design', function (){
+Route::get('/design', function () {
     return Inertia::render('Design');
 });
-Route::get('/test', function (){
-    return Inertia::render('Test');
+Route::get('/test', function () {
+    // get the font families
+    $fontFiles = [];
+    $directory = public_path('fonts');
+
+    $files = glob($directory . '/*.ttf');
+
+    foreach ($files as $file) {
+        $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
+        $parts = explode('-', $filenameWithoutExtension);
+        $cleanedFilename = $parts[0];
+
+        $fontFiles[] = [
+            'name' => $cleanedFilename,
+            'src' => 'fonts/' . $cleanedFilename . '.ttf'
+        ];
+    }
+
+    return Inertia::render('Test', ['fonts' => $fontFiles]);
 });
 
 ////////////////////////////////////////////////////////
@@ -32,4 +49,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

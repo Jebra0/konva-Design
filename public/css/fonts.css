@@ -1,0 +1,24 @@
+@font-face {
+                font-family: 'AbrilFatface';
+                src: url('/fonts/AbrilFatface-Regular.ttf') format('truetype');
+            }
+@font-face {
+                font-family: 'DancingScript';
+                src: url('/fonts/DancingScript-VariableFont_wght.ttf') format('truetype');
+            }
+@font-face {
+                font-family: 'PlaywriteBEVLG';
+                src: url('/fonts/PlaywriteBEVLG-VariableFont_wght.ttf') format('truetype');
+            }
+@font-face {
+                font-family: 'PlaywriteHU';
+                src: url('/fonts/PlaywriteHU-VariableFont_wght.ttf') format('truetype');
+            }
+@font-face {
+                font-family: 'RobotoMono';
+                src: url('/fonts/RobotoMono-VariableFont_wght.ttf') format('truetype');
+            }
+@font-face {
+                font-family: 'brush';
+                src: url('/fonts/brush.ttf') format('truetype');
+            }

@@ -1,8 +1,10 @@
 <template>
 
     <Head title="Test"></Head>
-    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected">
+    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected"
+        :fonts="fonts">
         <div class="my-3" id="container"></div>
+        <!-- {{ fonts }} -->
     </TestLayout>
 </template>
 
@@ -30,6 +32,9 @@ export default {
     components: {
         TestLayout,
         Head,
+    },
+    props: {
+        fonts: Array
     },
     data() {
         return {
@@ -66,6 +71,7 @@ export default {
                 textLineHight: this.textLineHight,
                 textCharSpacing: this.textCharSpacing,
                 alignText: this.alignText,
+                changeFontFamily: this.changeFontFamily,
             },
             isLayoutReady: false,
             transformer: null,
@@ -79,6 +85,7 @@ export default {
         nextTick(() => {
             this.initializeKonva();
         });
+        this.loadFonts();
     },
     methods: {
         initializeKonva() {
@@ -535,7 +542,7 @@ export default {
             });
 
         },*/
-    //text
+        //text
         addHeader() {
             const newLayer = new Konva.Layer();
             newLayer.id(uuidv4());
@@ -546,7 +553,7 @@ export default {
                 y: 15,
                 text: 'Simple Text',
                 fontSize: 60,
-                fontFamily: 'Audiowide',
+                fontFamily: 'brush',
                 fill: 'black',
                 id: uuidv4(),
                 width: 200,
@@ -669,8 +676,8 @@ export default {
                 setTimeout(() => window.addEventListener('click', handleOutsideClick));
             });
         },
-    //decoration
-        fillColor(color){
+        //decoration
+        fillColor(color) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
@@ -679,7 +686,7 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        textSize(size){
+        textSize(size) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
@@ -689,7 +696,7 @@ export default {
             this.defaultLayer.batchDraw();
         },
         // for bold & italic
-        textStyle(style){
+        textStyle(style) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
@@ -698,20 +705,20 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        textCase(fontCase){
+        textCase(fontCase) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
-                    if(fontCase === 'upper'){
+                    if (fontCase === 'upper') {
                         object.text(object.text().toUpperCase());
-                    }else if(fontCase === 'lower'){
+                    } else if (fontCase === 'lower') {
                         object.text(object.text().toLowerCase());
                     }
                 }
             });
             this.defaultLayer.batchDraw();
         },
-        textLineHight(textLineHight){
+        textLineHight(textLineHight) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
@@ -720,7 +727,7 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        textCharSpacing(charSpacing){
+        textCharSpacing(charSpacing) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
@@ -729,11 +736,26 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        alignText(align){
+        alignText(align) {
             this.selectedObjectIds.forEach((id) => {
                 const object = this.stage.findOne(`#${id}`);
                 if (object) {
                     object.align(align);
+                }
+            });
+            this.defaultLayer.batchDraw();
+        },
+        loadFonts() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/fonts.css';
+            document.head.appendChild(link);
+        },
+        changeFontFamily(fontFamily) {
+            this.selectedObjectIds.forEach((id) => {
+                const object = this.stage.findOne(`#${id}`);
+                if (object) {
+                    object.fontFamily(fontFamily.name);
                 }
             });
             this.defaultLayer.batchDraw();

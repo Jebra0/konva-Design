@@ -80,16 +80,16 @@
                     <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
                         <span v-if="layer.name !== 'Defualt Layer'">
                             <button @click="actions.hideLayer(!layer.visible, layer.id)" class="mr-2">
-                                <v-icon :icon="layer.visible? 'mdi-eye': 'mdi-eye-closed'"></v-icon>
+                                <v-icon :icon="layer.visible ? 'mdi-eye' : 'mdi-eye-closed'"></v-icon>
                             </button>
                             <button @click="actions.deleteLayer(layer.id)"><v-icon icon="mdi-delete"></v-icon></button>
                         </span>
                         <span v-text="layer.name" class="ml-1" style="width: 120px;"></span>
 
                         <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
-                            <button v-if="(!layer.lastOne) " @click="actions.moveLayer('up', layer.id)"><v-icon
+                            <button v-if="(!layer.lastOne)" @click="actions.moveLayer('up', layer.id)"><v-icon
                                     icon="mdi-arrow-up"></v-icon></button>
-                            <button v-if="(!layer.firstOne) " @click="actions.moveLayer('down', layer.id)"><v-icon
+                            <button v-if="(!layer.firstOne)" @click="actions.moveLayer('down', layer.id)"><v-icon
                                     icon="mdi-arrow-down"></v-icon></button>
                         </span>
                     </div>
@@ -188,20 +188,26 @@
         <!-- text buttons -->
         <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'text'">
             <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-            @input="actions.fillColor(selectedFillColor)" />
+                @input="actions.fillColor(selectedFillColor)" />
             <div class="d-flex">
-                <v-select 
-                    label="font family"
-                    :items="['cairo', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-                    style="width: 150px; "
-                    class="m-2 mt-5"
-                ></v-select>
+                <v-combobox 
+                    clearable
+                    label="font style"
+                    :items="fonts"
+                    item-title="name"
+                    item-value="name"
+                    v-model="selectedFont" 
+                    @update:modelValue="actions.changeFontFamily(selectedFont)"
+                    style="width: 150px;" class="m-2 mt-5"
+                >
+                </v-combobox>
             </div>
-            <input type="number" v-model="fontSize" @input="actions.textSize(fontSize)" style="width: 100px; border: 1px solid #ddd;"/>
+            <input type="number" v-model="fontSize" @input="actions.textSize(fontSize)"
+                style="width: 100px; border: 1px solid #ddd;" />
             <v-btn>
                 <v-icon icon="mdi-format-align-center"></v-icon>
                 <v-menu activator="parent">
-                    <v-list >
+                    <v-list>
                         <v-list-item>
                             <v-btn class="" @click="actions.alignText('justify')">
                                 <v-icon icon="mdi-format-align-justify"></v-icon>
@@ -219,42 +225,29 @@
                     </v-list>
                 </v-menu>
             </v-btn>
-            <v-btn @click="toggleFOntCase()" >
+            <v-btn @click="toggleFOntCase()">
                 <v-icon icon="mdi-format-letter-case-upper"></v-icon>
             </v-btn>
-            <v-btn @click="toggleFontWeight" >
+            <v-btn @click="toggleFontWeight">
                 <v-icon icon="mdi-format-bold"></v-icon>
             </v-btn>
             <v-btn @click="toggleFontItalic()">
                 <v-icon icon="mdi-format-italic"></v-icon>
             </v-btn>
-            <v-btn >
+            <v-btn>
                 <v-icon icon="mdi-format-line-spacing"></v-icon>
                 <v-menu activator="parent">
                     <v-list>
                         <v-list-item>
                             <v-list-item-title>Spacing</v-list-item-title>
-                            <v-slider 
-                                @mouseout="actions.textCharSpacing(charSpacing)" 
-                                :max="sMax"
-                                :min="sMin" 
-                                v-model="charSpacing"
-                                style="width: 250px" 
-                                class="align-center"
-                                hide-details>
+                            <v-slider @mouseout="actions.textCharSpacing(charSpacing)" :max="sMax" :min="sMin"
+                                v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                         <v-list-item>
                             <v-list-item-title>line height</v-list-item-title>
-                            <v-slider 
-                                @mouseout="actions.textLineHight(lineHight)" 
-                                :max="lMax"
-                                :min="lMin" 
-                                v-model="lineHight"
-                                style="width: 250px" 
-                                class="align-center"
-                                hide-details
-                            >
+                            <v-slider @mouseout="actions.textLineHight(lineHight)" :max="lMax" :min="lMin"
+                                v-model="lineHight" style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                     </v-list>
@@ -263,8 +256,8 @@
         </v-app-bar>
         <!-- shape buttons -->
         <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'shape'">
-        <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-        @input="actions.fillColor(selectedFillColor)" />
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
+                @input="actions.fillColor(selectedFillColor)" />
         </v-app-bar>
         <!-- image buttons -->
         <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'image'">
@@ -282,7 +275,7 @@
 import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
 
 export default {
-    data () {
+    data() {
         return {
             selectedOption: {
                 templates: false,
@@ -319,28 +312,34 @@ export default {
             sMin: -10,
             sMax: 50,
             charSpacing: 1,
+
+            selectedFont: 'cairo',
+            fontFamilies: []
         }
     },
+    computed: {
+
+    },
     methods: {
-        openTemp(){
+        openTemp() {
             this.selectedOption.templates = !this.selectedOption.templates;
         },
-        openText(){
+        openText() {
             this.selectedOption.text = !this.selectedOption.text;
         },
-        openPhotos(){
+        openPhotos() {
             this.selectedOption.photos = !this.selectedOption.photos;
         },
-        openElement(){
+        openElement() {
             this.selectedOption.elements = !this.selectedOption.elements;
         },
-        openUp(){
+        openUp() {
             this.selectedOption.upload = !this.selectedOption.upload;
         },
-        openBack(){
+        openBack() {
             this.selectedOption.background = !this.selectedOption.background;
         },
-        openLayer(){
+        openLayer() {
             this.selectedOption.layers = !this.selectedOption.layers;
         },
         loadImages() {
@@ -359,20 +358,21 @@ export default {
         },
         toggleFontWeight() {
             this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
-            this.actions.textStyle(this.fontWeight); 
+            this.actions.textStyle(this.fontWeight);
         },
         toggleFontItalic() {
             this.fontItalic = this.fontItalic === 'normal' ? 'italic' : 'normal';
-            this.actions.textStyle(this.fontItalic); 
+            this.actions.textStyle(this.fontItalic);
         },
         toggleFOntCase() {
             this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
-            this.actions.textCase(this.fontCase); 
+            this.actions.textCase(this.fontCase);
         },
     },
     mounted() {
         this.loadImages();
         this.backgroundImages();
+        this.fontFamilies = this.fonts.map(font => font.name);
     },
     computed: {
         reversedLayers() {
@@ -392,15 +392,20 @@ export default {
             type: Array,
             default: () => [],
         },
+        fonts: {
+            type: Array,
+            required: true,
+        },
     }
 }
 </script>
 <style scoped>
-.scroll{
+.scroll {
     max-height: 300px;
     overflow-y: scroll;
 }
-.layer{
+
+.layer {
     box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
 }
 </style>
