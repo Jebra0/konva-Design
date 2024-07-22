@@ -14,7 +14,7 @@ import { Head } from '@inertiajs/vue3';
 import Konva from "konva";
 import { nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
-
+import axios from 'axios';
 // Import the snapping functions
 import {
     getLineGuideStops,
@@ -62,7 +62,7 @@ export default {
                 //background
                 //setImageBackground: this.setImageBackground,
                 //text
-                addHeader: this.addHeader,
+                addText: this.addText,
                 //decoration
                 fillColor: this.fillColor,
                 textSize: this.textSize,
@@ -72,6 +72,8 @@ export default {
                 textCharSpacing: this.textCharSpacing,
                 alignText: this.alignText,
                 changeFontFamily: this.changeFontFamily,
+                //templates
+                saveAsTemplate: this.saveAsTemplate,
             },
             isLayoutReady: false,
             transformer: null,
@@ -115,6 +117,9 @@ export default {
                     }
                 });
                 this.defaultLayer.draw();
+
+                ///////
+                this.testTextTemplate();
             } else {
                 // Retry initializing after a short delay if the container is not found
                 setTimeout(this.initializeKonva, 100);
@@ -150,7 +155,47 @@ export default {
         handleDragEnd(e) {
             this.stage.find('.guid-line').forEach((l) => l.destroy());
         },
+        testTextTemplate() {
+            //const template = { "attrs": { "width": 500, "height": 500 }, "className": "Stage", "children": [{ "attrs": {}, "className": "Layer", "children": [{ "attrs": {}, "className": "Transformer" }] }, { "attrs": { "id": "050d8d54-ea31-40f9-b65a-3b96ec15ae63" }, "className": "Layer", "children": [{ "attrs": { "x": 173, "y": 205, "text": "Heading", "fontSize": 45, "fontFamily": "cairo", "fill": "black", "id": "2c5914b9-a0e3-42c2-930b-2fc89bd4d9f6", "draggable": true }, "className": "Text" }] }, { "attrs": { "id": "cad3d5d7-9c77-4370-b242-c798e124e153" }, "className": "Layer", "children": [{ "attrs": { "x": 181, "y": 245, "text": "Subheading", "fontSize": 28, "fontFamily": "cairo", "fill": "black", "id": "3044c0f2-03be-444c-af41-f8d002b6aa59", "draggable": true }, "className": "Text" }] }] };
+            const template = {"attrs":{"width":500,"height":500},"className":"Stage","children":[{"attrs":{},"className":"Layer","children":[{"attrs":{"x":23,"y":54},"className":"Transformer"}]},{"attrs":{"id":"e0bcd1b2-ecce-4fde-92e7-0fec9bf14b9d"},"className":"Layer","children":[]},{"attrs":{"id":"47764d29-f4eb-42c5-a740-679b933915bc"},"className":"Layer","children":[{"attrs":{"x":16,"y":41,"text":"Subheading","fontSize":28,"fontFamily":"cairo","fill":"black","id":"4ee15bd6-bd4c-4d9a-8270-dbfea772d720","draggable":true},"className":"Text"}]},{"attrs":{"id":"5a887a75-3b17-4d88-bc30-f9da637013d1"},"className":"Layer","children":[{"attrs":{"type":"Rect","x":248,"y":211,"id":"91af62a5-d681-42b3-b6e8-db99ce46ddc3","width":100,"height":100,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"Rect"}]},{"attrs":{"id":"03c7b349-9684-454d-80e2-684aa5145e0a"},"className":"Layer","children":[{"attrs":{"type":"Circle","x":427,"y":203,"radius":50,"id":"4e738924-4107-490f-adc7-41c4ee3ae470","fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"Circle"}]},{"attrs":{"id":"60aa6c7e-6508-46da-9133-dddf29d46ffc"},"className":"Layer","children":[{"attrs":{"type":"RegularPolygon","x":82,"y":217,"radius":50,"id":"922c3e1b-1c4b-41c5-8374-bf3cc2b02aa3","sides":3,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"RegularPolygon"}]},{"attrs":{"id":"f38e52f9-8394-4cff-9659-985c566fefe4"},"className":"Layer","children":[{"attrs":{"type":"RegularPolygon","x":322,"y":126,"radius":50,"id":"4e707ad9-6e1a-478a-bb04-f8d2937b389d","sides":6,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"RegularPolygon"}]},{"attrs":{"id":"453e1ae1-4829-4e4c-9722-e648e632363d"},"className":"Layer","children":[{"attrs":{"type":"RegularPolygon","x":208,"y":144,"id":"e011bc48-f6c3-4ed7-90c8-d33aa47d6ff2","sides":8,"radius":50,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"RegularPolygon"}]}]}
+            template.children.forEach(child => {
+                if (child.className === 'Layer') {
+                    const newLayer = new Konva.Layer();
+                    newLayer.id(uuidv4());
+                    this.stage.add(newLayer);
 
+                    child.children.forEach(grandChild => {
+                        // with this condition i create aditional layer with no children
+                        if (grandChild.className !== 'Transformer') {
+                            const objectConstructor = Konva[grandChild.className];
+                            const object = new objectConstructor(grandChild.attrs);
+                            object.id(uuidv4());
+
+                            const currentLength = this.layers.length;
+                            if (currentLength > 1) {
+                                this.layers[currentLength - 1].lastOne = false;
+                            }
+                            this.layers.push({
+                                'id': newLayer.id(),
+                                'name': object.getClassName(),
+                                'layer': newLayer,
+                                'visible': true,
+                                'firstOne': this.layers.length === 1,
+                                'lastOne': true
+                            })
+
+                            object.on("click", (e) => {
+                                e.cancelBubble = true;
+                                this.toggleSelection(object.id(), object.getClassName());
+                            });
+
+                            newLayer.add(object);
+                        }
+                    });
+                    newLayer.batchDraw();
+                }
+            });
+        },
         addShape(config) {
             const newLayer = new Konva.Layer();
             newLayer.id(uuidv4());
@@ -176,7 +221,7 @@ export default {
 
             shape.on("click", (e) => {
                 e.cancelBubble = true;
-                this.toggleSelection(shape.id(), 'shape');
+                this.toggleSelection(shape.id(), shape.getClassName());
             });
 
             newLayer.add(shape);
@@ -287,7 +332,7 @@ export default {
 
                     clonedShape.on("click", (e) => {
                         e.cancelBubble = true;
-                        this.toggleSelection(clonedShape.id(), 'shape');
+                        this.toggleSelection(clonedShape.id(), clonedShape.getClassName());
                     });
 
                 }
@@ -543,22 +588,15 @@ export default {
 
         },*/
         //text
-        addHeader() {
+        addText(config) {
             const newLayer = new Konva.Layer();
             newLayer.id(uuidv4());
             this.stage.add(newLayer);
 
-            var text = new Konva.Text({
-                x: this.stage.width() / 2,
-                y: 15,
-                text: 'Simple Text',
-                fontSize: 60,
-                fontFamily: 'brush',
-                fill: 'black',
-                id: uuidv4(),
-                width: 200,
-                draggable: true
-            });
+            config.id = uuidv4();
+
+            const textConstructor = Konva['Text'];
+            const text = new textConstructor(config);
 
             const currentLength = this.layers.length;
             if (currentLength > 1) {
@@ -566,7 +604,7 @@ export default {
             }
             this.layers.push({
                 'id': newLayer.id(),
-                'name': 'text',
+                'name': text.getClassName(),
                 'layer': newLayer,
                 'visible': true,
                 'firstOne': this.layers.length === 1,
@@ -575,12 +613,11 @@ export default {
 
             text.on("click", (e) => {
                 e.cancelBubble = true;
-                this.toggleSelection(text.id(), 'text');
+                this.toggleSelection(text.id(), text.getClassName());
             });
 
             //editable
             this.editText(text);
-
 
             newLayer.add(text);
             newLayer.batchDraw();
@@ -760,7 +797,11 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-
+        async saveAsTemplate(type) {
+            // console.log(type)
+            const satageJson = this.stage.toJSON();
+            let res = await axios.post('/template/add', {data: satageJson, type: type });
+        }
     },
 }
 </script>

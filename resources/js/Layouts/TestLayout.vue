@@ -11,16 +11,19 @@
 
                 <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
-                    <v-btn elevation="0" width="100%" style=" text-transform: none; font-size: 25px;">
+                    <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
+                        style=" text-transform: none; font-size: 25px;">
                         <h1>Create header</h1>
                     </v-btn>
-                    <v-btn elevation="0" width="100%" style="text-transform: none; font-size: 18px;">
+                    <v-btn @click="addSubHeader()" elevation="0" width="100%"
+                        style="text-transform: none; font-size: 18px;">
                         <h4>Create sub header</h4>
                     </v-btn>
-                    <v-btn elevation="0" width="100%" style="text-transform: none; font-size: 14px;">Create Body
+                    <v-btn @click="addBodyText()" elevation="0" width="100%"
+                        style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
                     <div v-for="(imageObj, index) in texts" :key="index">
-                        <img :src="imageObj.src" alt="Text Image" @click="actions.addHeader" style="cursor: pointer">
+                        <img :src="imageObj.src" alt="Text Image" @click="" width="250px" style="cursor: pointer">
                     </div>
                 </v-card>
 
@@ -165,9 +168,31 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
+
+                    <!-- ///////////////// -->
+                    <v-dialog max-width="500">
+                        <template v-slot:activator="{ props: activatorProps }">
+                            <v-btn v-bind="activatorProps">
+                                <v-icon icon="mdi-content-save"></v-icon>
+                                <v-tooltip activator="parent" location="bottom">Save As Template</v-tooltip>
+                            </v-btn>
+                        </template>
+                        <template v-slot:default="{ isActive }">
+                            <v-card title="Template Name">
+                                <v-text-field v-model="templateType" ></v-text-field>
+                                
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+
+                                    <v-btn text="Save" @click="actions.saveAsTemplate(templateType); isActive.value = false"></v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </template>
+                    </v-dialog>
+                    <!-- /////////////// -->
                     <v-btn @click="actions.saveAsJson">
                         <v-icon icon="mdi-content-save"></v-icon>
-                        <v-tooltip activator="parent" location="bottom">Save As Json File</v-tooltip>
+                        <v-tooltip activator="parent" location="bottom">Save As json</v-tooltip>
                     </v-btn>
                     <v-btn @click="actions.duplicateObjects">
                         <v-icon icon="mdi-content-copy"></v-icon>
@@ -186,20 +211,13 @@
         </v-app-bar>
 
         <!-- text buttons -->
-        <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'text'">
+        <v-app-bar v-if="SelectedObjectType === 'Text'">
             <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
                 @input="actions.fillColor(selectedFillColor)" />
             <div class="d-flex">
-                <v-combobox 
-                    clearable
-                    label="font style"
-                    :items="fonts"
-                    item-title="name"
-                    item-value="name"
-                    v-model="selectedFont" 
-                    @update:modelValue="actions.changeFontFamily(selectedFont)"
-                    style="width: 150px;" class="m-2 mt-5"
-                >
+                <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
+                    v-model="selectedFont" @update:modelValue="actions.changeFontFamily(selectedFont)"
+                    style="width: 150px;" class="m-2 mt-5">
                 </v-combobox>
             </div>
             <input type="number" v-model="fontSize" @input="actions.textSize(fontSize)"
@@ -255,12 +273,12 @@
             </v-btn>
         </v-app-bar>
         <!-- shape buttons -->
-        <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'shape'">
+        <v-app-bar v-if="SelectedObjectType === 'Shape'">
             <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
                 @input="actions.fillColor(selectedFillColor)" />
         </v-app-bar>
         <!-- image buttons -->
-        <v-app-bar v-if="objectSelected.length === 1 && objectSelected[0].objectType === 'image'">
+        <v-app-bar v-if="SelectedObjectType === 'Image'">
             <v-btn>
                 <v-icon icon="mdi-crop"></v-icon>
             </v-btn>
@@ -273,6 +291,7 @@
 </template>
 <script>
 import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
+import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
 
 export default {
     data() {
@@ -314,11 +333,10 @@ export default {
             charSpacing: 1,
 
             selectedFont: 'cairo',
-            fontFamilies: []
-        }
-    },
-    computed: {
+            fontFamilies: [],
 
+            templateType: ''
+        }
     },
     methods: {
         openTemp() {
@@ -343,7 +361,7 @@ export default {
             this.selectedOption.layers = !this.selectedOption.layers;
         },
         loadImages() {
-            for (let i = 1; i <= 34; i++) {
+            for (let i = 1; i <= 5; i++) {
                 this.texts.push({
                     src: `/images/text/p${i}.png`,
                 });
@@ -368,6 +386,15 @@ export default {
             this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
             this.actions.textCase(this.fontCase);
         },
+        addHeader() {
+            this.actions.addText(headerText);
+        },
+        addSubHeader() {
+            this.actions.addText(subHeaderText);
+        },
+        addBodyText() {
+            this.actions.addText(bodyText);
+        },
     },
     mounted() {
         this.loadImages();
@@ -378,6 +405,35 @@ export default {
         reversedLayers() {
             return [...this.layers].reverse();
         },
+        SelectedObjectType() {
+            if (this.objectSelected.length === 1) {
+                if (this.objectSelected[0].objectType === 'Text') {
+                    return 'Text';
+                } else if (this.objectSelected[0].objectType === 'Image') {
+                    return 'Image';
+                } else {
+                    return 'Shape';
+                }
+            }
+            if (this.objectSelected.length > 1) {
+                const firstType = this.objectSelected[0].objectType;
+                const allSameType = this.objectSelected.every(obj => obj.objectType === firstType);
+
+                if (allSameType) {
+                    if (firstType === 'Text' || firstType === 'Image') {
+                        return firstType;
+                    } else {
+                        return 'Shape';
+                    }
+                } else {
+                    const hasTextOrImage = this.objectSelected.some(obj => obj.objectType === 'Text' || obj.objectType === 'Image');
+                    if (hasTextOrImage) {
+                        return null;
+                    }
+                    return 'Shape';
+                }
+            }
+        }
     },
     props: {
         actions: {

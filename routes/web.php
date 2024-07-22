@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\TemplateController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -36,6 +36,9 @@ Route::get('/test', function () {
 
     return Inertia::render('Test', ['fonts' => $fontFiles]);
 });
+
+Route::get('/template/{template}', [TemplateController::class,'index']);
+Route::post('/template/add', [TemplateController::class,'store']);
 
 ////////////////////////////////////////////////////////
 
