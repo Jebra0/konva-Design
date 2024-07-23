@@ -80,6 +80,8 @@ export default {
                 //templates
                 saveAsTemplate: this.saveAsTemplate,
                 getSelectedTemplate: this.getSelectedTemplate,
+                //images
+                addImage: this.addImage,
             },
             isLayoutReady: false,
             transformer: null,
@@ -247,8 +249,8 @@ export default {
                 this.objectSelected.splice(index2, 1);
             } else {
                 this.selectedObjectIds.push(id); // Select if not already selected
-                this.objectSelected.push({ 
-                    objectId: id, 
+                this.objectSelected.push({
+                    objectId: id,
                     objectType: type,
                     congig: config
                 });
@@ -812,6 +814,7 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
+        // templates
         async saveAsTemplate(name, type) {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
@@ -848,7 +851,45 @@ export default {
                 this.getTemplate(template);
             }
         },
+        // images
+        addImage(url) {
+            const newLayer = new Konva.Layer();
+            newLayer.id(uuidv4());
+            this.stage.add(newLayer);
+            const imageObj = new Image();
 
+            imageObj.onload = () => {
+                const image = new Konva.Image({
+                    image: imageObj,
+                    width: width - 100,
+                    height: height - 100,
+                    draggable: true,
+                    id: uuidv4(),
+                });
+
+                const currentLength = this.layers.length;
+                if (currentLength > 1) {
+                    this.layers[currentLength - 1].lastOne = false;
+                }
+                this.layers.push({
+                    'id': newLayer.id(),
+                    'name': image.getClassName(),
+                    'layer': newLayer,
+                    'visible': true,
+                    'firstOne': this.layers.length === 1,
+                    'lastOne': true
+                })
+
+                image.on("click", (e) => {
+                    e.cancelBubble = true;
+                    this.toggleSelection(image.id(), image.getClassName(), image);
+                });
+
+                newLayer.add(image);
+                newLayer.batchDraw();
+            };
+            imageObj.src = url;
+        }
     },
 }
 </script>

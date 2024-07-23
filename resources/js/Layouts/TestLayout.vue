@@ -29,9 +29,16 @@
 <!-- /////// finish ////////////////////////////////// -->
                 <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos"
                     value="Photos"></v-list-item>
-                <v-card v-if="selectedOption.photos" elevation="1" outlined>
-                    <v-card-title>TEST</v-card-title>
-                    <v-card-text> test test test test etst etst etst ethsj </v-card-text>
+                <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
+                    <div class="imgParent" v-for="(image, index) in images" :key="index">
+                        <img
+                            :src="image.src"
+                            alt=""
+                            @click="actions.addImage(image.src)"
+                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px"
+                        >
+                        <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{image.author}}</a></p>
+                    </div>
                 </v-card>
 
                 <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements"
@@ -339,10 +346,26 @@ export default {
             templateName: '',
             templateType: '',
 
-            
+            unsplashAccessKey: 'LhMEo6peuEizFSw0vjF5kANy-B6dgWvBoNmvxSdOlL0',
+            unsplashUrl: 'https://api.unsplash.com/photos'
         }
     },
     methods: {
+        fetchUnsplashImages(){
+            fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
+                .then(res => res.json())
+                .then(json => {
+                    // console.log(json[0].urls.full)
+                    json.forEach(element => {
+                        this.images.push({
+                            src: element.urls.full,
+                            portfolio: element.user.portfolio_url,
+                            author: element.user.name
+                        });
+                    });
+                    
+                });
+        },
         openTemp() {
             this.selectedOption.templates = !this.selectedOption.templates;
         },
@@ -364,20 +387,20 @@ export default {
         openLayer() {
             this.selectedOption.layers = !this.selectedOption.layers;
         },
-        loadImages() {
-            for (let i = 1; i <= 5; i++) {
-                this.texts.push({
-                    src: `/images/Text/p${i}.png`,
-                });
-            }
-        },
-        backgroundImages() {
-            for (let i = 1; i <= 21; i++) {
-                this.images.push({
-                    src: `/images/backgrounds/p${i}.jpg`,
-                });
-            }
-        },
+        // loadImages() {
+        //     for (let i = 1; i <= 5; i++) {
+        //         this.texts.push({
+        //             src: `/images/Text/p${i}.png`,
+        //         });
+        //     }
+        // },
+        // backgroundImages() {
+        //     for (let i = 1; i <= 21; i++) {
+        //         this.images.push({
+        //             src: `/images/backgrounds/p${i}.jpg`,
+        //         });
+        //     }
+        // },
         toggleFontWeight() {
             this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
             this.actions.textStyle(this.fontWeight);
@@ -401,9 +424,10 @@ export default {
         },
     },
     mounted() {
-        this.loadImages();
-        this.backgroundImages();
+        // this.loadImages();
+        // this.backgroundImages();
         this.fontFamilies = this.fonts.map(font => font.name);
+        this.fetchUnsplashImages();
     },
     computed: {
         reversedLayers() {
@@ -471,5 +495,25 @@ export default {
 
 .layer {
     box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+.imgParent{
+    position: relative;
+  display: inline-block; 
+}
+.imgParent img{
+    display: block;
+    width: 100%;
+}
+.author{
+    position: absolute;
+  bottom: 4%;
+  left: 7%; 
+  color: white; /* Text color */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  padding: 10px; /* Space around text */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Text size */
+  text-align: center;
+  width: 250px;
 }
 </style>
