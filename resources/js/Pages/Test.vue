@@ -1,10 +1,11 @@
 <template>
 
     <Head title="Test"></Head>
-    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected"
-        :fonts="fonts">
+    <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected" :fonts="fonts"
+        :textTemplates="textTemplates">
         <div class="my-3" id="container"></div>
-        <!-- {{ fonts }} -->
+        <!-- {{ textTemplates }} -->
+        <!-- {{ objectSelected }} -->
     </TestLayout>
 </template>
 
@@ -34,7 +35,11 @@ export default {
         Head,
     },
     props: {
-        fonts: Array
+        fonts: Array,
+        textTemplates: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {
@@ -74,12 +79,15 @@ export default {
                 changeFontFamily: this.changeFontFamily,
                 //templates
                 saveAsTemplate: this.saveAsTemplate,
+                getSelectedTemplate: this.getSelectedTemplate,
             },
             isLayoutReady: false,
             transformer: null,
             selectedObjectIds: [],
             layers: [],
             objectSelected: [],
+
+            stage: null,
         };
     },
     mounted() {
@@ -90,7 +98,7 @@ export default {
         this.loadFonts();
     },
     methods: {
-        initializeKonva() {
+        initializeKonva(template = null) {
             const container = document.getElementById('container');
             if (container) {
                 this.stage = new Konva.Stage({
@@ -119,7 +127,9 @@ export default {
                 this.defaultLayer.draw();
 
                 ///////
-                this.testTextTemplate();
+                if (template !== null) {
+                    this.getTemplate(template);
+                }
             } else {
                 // Retry initializing after a short delay if the container is not found
                 setTimeout(this.initializeKonva, 100);
@@ -155,9 +165,9 @@ export default {
         handleDragEnd(e) {
             this.stage.find('.guid-line').forEach((l) => l.destroy());
         },
-        testTextTemplate() {
-            //const template = { "attrs": { "width": 500, "height": 500 }, "className": "Stage", "children": [{ "attrs": {}, "className": "Layer", "children": [{ "attrs": {}, "className": "Transformer" }] }, { "attrs": { "id": "050d8d54-ea31-40f9-b65a-3b96ec15ae63" }, "className": "Layer", "children": [{ "attrs": { "x": 173, "y": 205, "text": "Heading", "fontSize": 45, "fontFamily": "cairo", "fill": "black", "id": "2c5914b9-a0e3-42c2-930b-2fc89bd4d9f6", "draggable": true }, "className": "Text" }] }, { "attrs": { "id": "cad3d5d7-9c77-4370-b242-c798e124e153" }, "className": "Layer", "children": [{ "attrs": { "x": 181, "y": 245, "text": "Subheading", "fontSize": 28, "fontFamily": "cairo", "fill": "black", "id": "3044c0f2-03be-444c-af41-f8d002b6aa59", "draggable": true }, "className": "Text" }] }] };
-            const template = {"attrs":{"width":500,"height":500},"className":"Stage","children":[{"attrs":{},"className":"Layer","children":[{"attrs":{"x":23,"y":54},"className":"Transformer"}]},{"attrs":{"id":"e0bcd1b2-ecce-4fde-92e7-0fec9bf14b9d"},"className":"Layer","children":[]},{"attrs":{"id":"47764d29-f4eb-42c5-a740-679b933915bc"},"className":"Layer","children":[{"attrs":{"x":16,"y":41,"text":"Subheading","fontSize":28,"fontFamily":"cairo","fill":"black","id":"4ee15bd6-bd4c-4d9a-8270-dbfea772d720","draggable":true},"className":"Text"}]},{"attrs":{"id":"5a887a75-3b17-4d88-bc30-f9da637013d1"},"className":"Layer","children":[{"attrs":{"type":"Rect","x":248,"y":211,"id":"91af62a5-d681-42b3-b6e8-db99ce46ddc3","width":100,"height":100,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"Rect"}]},{"attrs":{"id":"03c7b349-9684-454d-80e2-684aa5145e0a"},"className":"Layer","children":[{"attrs":{"type":"Circle","x":427,"y":203,"radius":50,"id":"4e738924-4107-490f-adc7-41c4ee3ae470","fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"Circle"}]},{"attrs":{"id":"60aa6c7e-6508-46da-9133-dddf29d46ffc"},"className":"Layer","children":[{"attrs":{"type":"RegularPolygon","x":82,"y":217,"radius":50,"id":"922c3e1b-1c4b-41c5-8374-bf3cc2b02aa3","sides":3,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"RegularPolygon"}]},{"attrs":{"id":"f38e52f9-8394-4cff-9659-985c566fefe4"},"className":"Layer","children":[{"attrs":{"type":"RegularPolygon","x":322,"y":126,"radius":50,"id":"4e707ad9-6e1a-478a-bb04-f8d2937b389d","sides":6,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"RegularPolygon"}]},{"attrs":{"id":"453e1ae1-4829-4e4c-9722-e648e632363d"},"className":"Layer","children":[{"attrs":{"type":"RegularPolygon","x":208,"y":144,"id":"e011bc48-f6c3-4ed7-90c8-d33aa47d6ff2","sides":8,"radius":50,"fill":"rgb(179 177 177)","draggable":true,"name":"object"},"className":"RegularPolygon"}]}]}
+        //get template from json
+        getTemplate(template) {
+            //if (template.children) {
             template.children.forEach(child => {
                 if (child.className === 'Layer') {
                     const newLayer = new Konva.Layer();
@@ -186,7 +196,7 @@ export default {
 
                             object.on("click", (e) => {
                                 e.cancelBubble = true;
-                                this.toggleSelection(object.id(), object.getClassName());
+                                this.toggleSelection(object.id(), object.getClassName(), object);
                             });
 
                             newLayer.add(object);
@@ -195,6 +205,7 @@ export default {
                     newLayer.batchDraw();
                 }
             });
+            // }
         },
         addShape(config) {
             const newLayer = new Konva.Layer();
@@ -221,14 +232,14 @@ export default {
 
             shape.on("click", (e) => {
                 e.cancelBubble = true;
-                this.toggleSelection(shape.id(), shape.getClassName());
+                this.toggleSelection(shape.id(), shape.getClassName(), shape);
             });
 
             newLayer.add(shape);
             newLayer.batchDraw();
         },
         //Transformer and Selection
-        toggleSelection(id, type) {
+        toggleSelection(id, type, config) {
             const index = this.selectedObjectIds.indexOf(id);
             const index2 = this.objectSelected.indexOf(id);
             if (index >= 0) {
@@ -236,7 +247,11 @@ export default {
                 this.objectSelected.splice(index2, 1);
             } else {
                 this.selectedObjectIds.push(id); // Select if not already selected
-                this.objectSelected.push({ objectId: id, objectType: type });
+                this.objectSelected.push({ 
+                    objectId: id, 
+                    objectType: type,
+                    congig: config
+                });
             }
             this.updateTransformer();
         },
@@ -252,7 +267,7 @@ export default {
             this.transformer.nodes(selectedShapes);
             this.defaultLayer.batchDraw(); // Ensure the layer is redrawn
         },
-        //Default Functionality
+        //Default  //TrFunctionality
         download(uri, name) {
             let link = document.createElement('a');
             link.download = name;
@@ -332,7 +347,7 @@ export default {
 
                     clonedShape.on("click", (e) => {
                         e.cancelBubble = true;
-                        this.toggleSelection(clonedShape.id(), clonedShape.getClassName());
+                        this.toggleSelection(clonedShape.id(), clonedShape.getClassName(), clonedShape);
                     });
 
                 }
@@ -613,7 +628,7 @@ export default {
 
             text.on("click", (e) => {
                 e.cancelBubble = true;
-                this.toggleSelection(text.id(), text.getClassName());
+                this.toggleSelection(text.id(), text.getClassName(), text);
             });
 
             //editable
@@ -797,11 +812,43 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
-        async saveAsTemplate(type) {
-            // console.log(type)
-            const satageJson = this.stage.toJSON();
-            let res = await axios.post('/template/add', {data: satageJson, type: type });
-        }
+        async saveAsTemplate(name, type) {
+            try {
+                let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
+
+                let blob = await fetch(dataURL).then(res => res.blob());
+
+                let formData = new FormData();
+                formData.append('name', name);
+                formData.append('data', this.stage.toJSON());
+                formData.append('type', type);
+                formData.append('image', blob, `${name}.png`);
+
+                let res = await axios.post('/template/add', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                if (res.status === 201) {
+                    alert('Template created successfully!');
+                } else {
+                    alert('Try again!');
+                }
+            } catch (error) {
+                console.error('Error saving template:', error);
+                alert('An error occurred. Please try again.');
+            }
+        },
+        async getSelectedTemplate(id) {
+            let res = await axios.get(`/template/${id}`);
+            let data = res.data.data;
+            if (data) {
+                const template = JSON.parse(data);
+                this.getTemplate(template);
+            }
+        },
+
     },
 }
 </script>

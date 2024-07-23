@@ -8,7 +8,7 @@
                     <v-card-title>TEST</v-card-title>
                     <v-card-text> test test test test etst etst etst ethsj </v-card-text>
                 </v-card>
-
+<!-- /////// work is here ////////////////////////////////// -->
                 <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
                     <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
@@ -22,11 +22,11 @@
                     <v-btn @click="addBodyText()" elevation="0" width="100%"
                         style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
-                    <div v-for="(imageObj, index) in texts" :key="index">
-                        <img :src="imageObj.src" alt="Text Image" @click="" width="250px" style="cursor: pointer">
+                    <div class="d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
+                        <img :src="temp.image" width="250px" alt="Text Image" @click="actions.getSelectedTemplate(temp.id)" style="cursor: pointer">
                     </div>
                 </v-card>
-
+<!-- /////// finish ////////////////////////////////// -->
                 <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos"
                     value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" elevation="1" outlined>
@@ -178,13 +178,15 @@
                             </v-btn>
                         </template>
                         <template v-slot:default="{ isActive }">
-                            <v-card title="Template Name">
-                                <v-text-field v-model="templateType" ></v-text-field>
+                            <v-card title="Save as template">
+                                <v-text-field label="Template Name" required v-model="templateName" ></v-text-field>
                                 
+                                <v-select label="Template Type" required v-model="templateType" :items="['Text', 'Invetation', 'Business card']"></v-select>
+
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
-                                    <v-btn text="Save" @click="actions.saveAsTemplate(templateType); isActive.value = false"></v-btn>
+                                    <v-btn text="Save" @click="actions.saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -212,12 +214,11 @@
 
         <!-- text buttons -->
         <v-app-bar v-if="SelectedObjectType === 'Text'">
-            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-                @input="actions.fillColor(selectedFillColor)" />
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor" @input="actions.fillColor(selectedFillColor)" />
             <div class="d-flex">
                 <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
                     v-model="selectedFont" @update:modelValue="actions.changeFontFamily(selectedFont)"
-                    style="width: 150px;" class="m-2 mt-5">
+                    :style="changeFont" width="150px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
             <input type="number" v-model="fontSize" @input="actions.textSize(fontSize)"
@@ -335,7 +336,10 @@ export default {
             selectedFont: 'cairo',
             fontFamilies: [],
 
-            templateType: ''
+            templateName: '',
+            templateType: '',
+
+            
         }
     },
     methods: {
@@ -363,7 +367,7 @@ export default {
         loadImages() {
             for (let i = 1; i <= 5; i++) {
                 this.texts.push({
-                    src: `/images/text/p${i}.png`,
+                    src: `/images/Text/p${i}.png`,
                 });
             }
         },
@@ -450,6 +454,10 @@ export default {
         },
         fonts: {
             type: Array,
+            required: true,
+        },
+        textTemplates: {
+            type: Object,
             required: true,
         },
     }

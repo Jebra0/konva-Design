@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
+use App\Models\Template;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -33,8 +34,13 @@ Route::get('/test', function () {
             'src' => 'fonts/' . $cleanedFilename . '.ttf'
         ];
     }
+    // templates
+    $temps = Template::where('type', 'Text')
+        ->select(['id', 'image'])
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-    return Inertia::render('Test', ['fonts' => $fontFiles]);
+    return Inertia::render('Test', ['fonts' => $fontFiles, 'textTemplates'=> $temps]);
 });
 
 Route::get('/template/{template}', [TemplateController::class,'index']);

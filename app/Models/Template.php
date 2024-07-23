@@ -10,6 +10,7 @@ class Template extends Model
     use HasFactory;
 
     protected $fillable = [
+        "name",
         "type",
         "data",
         "image",

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('templates', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable(false);
             $table->string('type')->nullable(false); //text or design
             $table->json('data')->nullable(false);
             $table->string('image')->nullable(false);
