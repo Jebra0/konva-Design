@@ -8,7 +8,7 @@
                     <v-card-title>TEST</v-card-title>
                     <v-card-text> test test test test etst etst etst ethsj </v-card-text>
                 </v-card>
-<!-- /////// work is here ////////////////////////////////// -->
+                <!-- /////// work is here ////////////////////////////////// -->
                 <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
                     <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
@@ -23,21 +23,24 @@
                         style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
                     <div class="d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
-                        <img :src="temp.image" width="250px" alt="Text Image" @click="actions.getSelectedTemplate(temp.id)" style="cursor: pointer">
+                        <img :src="temp.image" width="250px" alt="Text Image"
+                            @click="actions.getSelectedTemplate(temp.id)" style="cursor: pointer">
                     </div>
                 </v-card>
-<!-- /////// finish ////////////////////////////////// -->
+                <!-- /////// finish ////////////////////////////////// -->
                 <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos"
                     value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
+                    <v-container class="d-flex">
+                        <v-text-field label="search" v-model="searchQuery"></v-text-field>
+                        <v-icon size="30" class="mt-3 ml-2"icon="mdi-magnify"  @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
+                    </v-container>
                     <div class="imgParent" v-for="(image, index) in images" :key="index">
-                        <img
-                            :src="image.src"
-                            alt=""
-                            @click="actions.addImage(image.src)"
-                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px"
-                        >
-                        <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{image.author}}</a></p>
+                        <img :src="image.src" alt="" @click="actions.addImage(image.src)"
+                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
+                        <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{ image.author
+                                }}</a>
+                        </p>
                     </div>
                 </v-card>
 
@@ -186,14 +189,16 @@
                         </template>
                         <template v-slot:default="{ isActive }">
                             <v-card title="Save as template">
-                                <v-text-field label="Template Name" required v-model="templateName" ></v-text-field>
-                                
-                                <v-select label="Template Type" required v-model="templateType" :items="['Text', 'Invetation', 'Business card']"></v-select>
+                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
+
+                                <v-select label="Template Type" required v-model="templateType"
+                                    :items="['Text', 'Invetation', 'Business card']"></v-select>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
-                                    <v-btn text="Save" @click="actions.saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
+                                    <v-btn text="Save"
+                                        @click="actions.saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -221,11 +226,12 @@
 
         <!-- text buttons -->
         <v-app-bar v-if="SelectedObjectType === 'Text'">
-            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor" @input="actions.fillColor(selectedFillColor)" />
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
+                @input="actions.fillColor(selectedFillColor)" />
             <div class="d-flex">
                 <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
                     v-model="selectedFont" @update:modelValue="actions.changeFontFamily(selectedFont)"
-                    :style="changeFont" width="150px" class=" m-2 mt-5">
+                    :style="`font-type: ${name}`" width="150px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
             <input type="number" v-model="fontSize" @input="actions.textSize(fontSize)"
@@ -347,11 +353,13 @@ export default {
             templateType: '',
 
             unsplashAccessKey: 'LhMEo6peuEizFSw0vjF5kANy-B6dgWvBoNmvxSdOlL0',
-            unsplashUrl: 'https://api.unsplash.com/photos'
+            unsplashUrl: 'https://api.unsplash.com/photos',
+            unsplashSearchUrl: 'https://api.unsplash.com/search/photos',
+            searchQuery: '',
         }
     },
     methods: {
-        fetchUnsplashImages(){
+        fetchUnsplashImages() {
             fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
                 .then(res => res.json())
                 .then(json => {
@@ -363,7 +371,21 @@ export default {
                             author: element.user.name
                         });
                     });
-                    
+                });
+        },
+        searchUnsplashImages(query) {
+            fetch(`${this.unsplashSearchUrl}?client_id=${this.unsplashAccessKey}&query=${query}`)
+                .then(res => res.json())
+                .then(json => {
+                    console.log(this.searchQuery)
+                    json.results.forEach(element => {
+                        //this.images =[];
+                        this.images.unshift({
+                            src: element.urls.full,
+                            portfolio: element.user.portfolio_url,
+                            author: element.user.name
+                        });
+                    });
                 });
         },
         openTemp() {
@@ -387,20 +409,6 @@ export default {
         openLayer() {
             this.selectedOption.layers = !this.selectedOption.layers;
         },
-        // loadImages() {
-        //     for (let i = 1; i <= 5; i++) {
-        //         this.texts.push({
-        //             src: `/images/Text/p${i}.png`,
-        //         });
-        //     }
-        // },
-        // backgroundImages() {
-        //     for (let i = 1; i <= 21; i++) {
-        //         this.images.push({
-        //             src: `/images/backgrounds/p${i}.jpg`,
-        //         });
-        //     }
-        // },
         toggleFontWeight() {
             this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
             this.actions.textStyle(this.fontWeight);
@@ -422,10 +430,15 @@ export default {
         addBodyText() {
             this.actions.addText(bodyText);
         },
+        loadFonts() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/fonts.css';
+            document.head.appendChild(link);
+        },
     },
     mounted() {
-        // this.loadImages();
-        // this.backgroundImages();
+        this.loadFonts();
         this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
     },
@@ -496,24 +509,32 @@ export default {
 .layer {
     box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
 }
-.imgParent{
+
+.imgParent {
     position: relative;
-  display: inline-block; 
+    display: inline-block;
 }
-.imgParent img{
+
+.imgParent img {
     display: block;
     width: 100%;
 }
-.author{
+
+.author {
     position: absolute;
-  bottom: 4%;
-  left: 7%; 
-  color: white; /* Text color */
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  padding: 10px; /* Space around text */
-  border-radius: 5px; /* Rounded corners */
-  font-size: 16px; /* Text size */
-  text-align: center;
-  width: 250px;
+    bottom: 4%;
+    left: 7%;
+    color: white;
+    /* Text color */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
+    padding: 10px;
+    /* Space around text */
+    border-radius: 5px;
+    /* Rounded corners */
+    font-size: 16px;
+    /* Text size */
+    text-align: center;
+    width: 250px;
 }
 </style>
