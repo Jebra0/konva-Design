@@ -48,6 +48,10 @@
                 <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements"
                     value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
+                    <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
+                        <img :src="shape.image" width="70px" alt="Text Image"
+                            @click="actions.getSelectedTemplate(shape.id)" style="cursor: pointer">
+                    </div> -->
                     <v-icon icon="mdi-minus" color="black" size="70"></v-icon>
                     <v-icon icon="mdi-arrow-right-thin" color="black" size="70"></v-icon>
                     <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
@@ -85,6 +89,9 @@
                             </template>
                         </template>
                     </v-file-input>
+                    <!-- this gonna be deleted or be for admin only -->
+                    <v-btn @click="actions.addTemplateImage(imageUrls)">add</v-btn>
+                    <!-- /////////////////////////////////// -->
                     <v-row>
                         <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
                             <v-img @click="actions.addUploadedImage(image)" style="cursor: pointer;":src="image" aspect-ratio="1" class="bg-grey-lighten-2" cover>
@@ -215,7 +222,7 @@
                                 <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
 
                                 <v-select label="Template Type" required v-model="templateType"
-                                    :items="['Text', 'Invetation', 'Business card']"></v-select>
+                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -316,9 +323,10 @@
         </v-app-bar>
         <!-- image buttons -->
         <v-app-bar v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
-            <v-btn>
+            <v-btn @click=" addClip = !addClip; actions.addClippingTool()">
                 <v-icon icon="mdi-crop"></v-icon>
             </v-btn>
+            <v-btn v-if="this.addClip" @click="actions.applyClipping(); addClip = !addClip;">crop</v-btn>
         </v-app-bar>
 
         <v-main class="d-flex align-center justify-center" style="height: 100vh; background-color: #ebebeb;">
@@ -381,6 +389,7 @@ export default {
             searchQuery: '',
 
             imageUrls: [],
+            addClip: false,
         }
     },
     methods: {
@@ -531,6 +540,10 @@ export default {
             required: true,
         },
         textTemplates: {
+            type: Object,
+            required: true,
+        },
+        shapeTemplates: {
             type: Object,
             required: true,
         },

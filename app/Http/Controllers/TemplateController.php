@@ -32,4 +32,9 @@ class TemplateController extends Controller
 
         return $template;
     }
+
+    public function uploadTemplate(Request $request){
+        $file = $request->file('image');
+        $path = $file->store('images/Templates', ['disk' => 'public_images']);
+    }
 }

@@ -1,7 +1,8 @@
 <template>
+
     <Head title="Test"></Head>
     <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected" :fonts="fonts"
-        :textTemplates="textTemplates">
+        :textTemplates="textTemplates" :shapeTemplates="shapeTemplates">
         <div class="my-3" id="container"></div>
         <!-- {{ textTemplates }} -->
         <!-- {{ objectSelected }} -->
@@ -36,6 +37,10 @@ export default {
     props: {
         fonts: Array,
         textTemplates: {
+            type: Object,
+            required: true,
+        },
+        shapeTemplates: {
             type: Object,
             required: true,
         },
@@ -82,6 +87,14 @@ export default {
                 //images
                 addImage: this.addImage,
                 addUploadedImage: this.addUploadedImage,
+                /////// test //////////
+                addClippingTool: this.addClippingTool,
+                applyClipping: this.applyClipping,
+                removeClippingTool: this.removeClippingTool,
+                /////// test //////////
+
+                //ttemplates
+                addTemplateImage: this.addTemplateImage,
             },
             isLayoutReady: false,
             transformer: null,
@@ -90,6 +103,11 @@ export default {
             objectSelected: [],
 
             stage: null,
+            /////// test ///////////////
+            clippingTool: null,
+            clippingRect: null,
+            clippingTransformer: null,
+            /////// test ///////////////
         };
     },
     mounted() {
@@ -872,6 +890,10 @@ export default {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
+                if(type === 'Shapes'){
+                    let blob = await this.resizeImage(dataURL, 200, 200);
+                }
+
                 let blob = await this.resizeImage(dataURL, 300, 300);
 
                 let formData = new FormData();
@@ -885,7 +907,6 @@ export default {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log(res);
 
                 if (res.status === 201) {
                     alert('Template created successfully!');
@@ -987,7 +1008,152 @@ export default {
             }
 
         },
-        
+        ///////////// test crop ///////////////////
+        addClippingTool() {
+            if (this.clippingTool) {
+                this.removeClippingTool();
+            }
+
+            this.clippingTool = new Konva.Layer();
+            this.stage.add(this.clippingTool);
+
+            this.clippingRect = new Konva.Rect({
+                x: 200,
+                y: 200,
+                width: 200,
+                height: 200,
+                draggable: true,
+                fill: 'rgba(255, 0, 0, 0.3)',
+            });
+
+            this.clippingTransformer = new Konva.Transformer({
+                nodes: [this.clippingRect],
+                resizeEnabled: true,
+                rotateEnabled: false,
+                borderStroke: 'blue',
+                borderStrokeWidth: 2,
+                cornerRadius: 6,
+                enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+            });
+
+            this.clippingTool.add(this.clippingRect);
+            this.clippingTool.add(this.clippingTransformer);
+            this.stage.add(this.clippingTool);
+            this.clippingTool.batchDraw();
+        },
+        // applyClipping() {
+        //     if (this.clippingRect && this.clippingTool) {
+        //         const selectedId = this.selectedObjectIds[0];
+        //         const image = this.stage.findOne(`#${selectedId}`);
+
+        //         const { x, y, width, height } = this.clippingRect.attrs;
+
+        //         const imagLayer = image.getLayer();
+
+        //         image.cache();
+        //         imagLayer.clip({
+        //             x: x,
+        //             y: y,
+        //             width: width,
+        //             height: height
+        //         });
+
+        //         imagLayer.batchDraw();
+        //         ///////////////////////
+        //         const cropCanvas = document.createElement('canvas');
+        //         const cropCtx = cropCanvas.getContext('2d');
+
+        //         cropCanvas.width = width;
+        //         cropCanvas.height = height;
+
+        //         const imageObj = image.image();
+
+        //         cropCtx.drawImage(
+        //             imageObj,
+        //             x - image.x(), 
+        //             y - image.y(), 
+        //             width,
+        //             height,
+        //             0, 0,
+        //             width,
+        //             height
+        //         );
+
+        //         const croppedImage = new Image();
+        //         croppedImage.src = cropCanvas.toDataURL();
+        //         croppedImage.onload = () => {
+        //             image.image(croppedImage);
+        //             this.stage.batchDraw();
+        //         };
+        //         ///////////////////////
+        //         this.removeClippingTool();
+
+        //     } else {
+        //         console.error('Clipping tool not initialized.');
+        //     }
+        // },
+        applyClipping() {
+            if (this.clippingRect && this.clippingTool) {
+                const selectedId = this.selectedObjectIds[0];
+                const object = this.stage.findOne(`#${selectedId}`);
+
+                if (!object || object.className !== 'Image') {
+                    console.error('Selected object is not an image.');
+                    return;
+                }
+
+                const { x, y, width, height } = this.clippingRect.attrs;
+                console.log(x, y);
+
+                const imageObj = object.image();
+                if (!imageObj) {
+                    console.error('No image object found.');
+                    return;
+                }
+
+                const cropCanvas = document.createElement('canvas');
+                const cropCtx = cropCanvas.getContext('2d');
+
+                cropCanvas.width = width;
+                cropCanvas.height = height;
+
+                cropCtx.drawImage(
+                    imageObj,
+                    x - object.x(), 
+                    y - object.y(), 
+                    width,
+                    height,
+                    0, 0,
+                    width,
+                    height
+                );
+
+                const croppedImage = new Image();
+                croppedImage.src = cropCanvas.toDataURL();
+                croppedImage.onload = () => {
+                    object.image(croppedImage);
+                    this.stage.batchDraw();
+                };
+
+                this.removeClippingTool();
+
+            } else {
+                console.error('Clipping tool not initialized.');
+            }
+        },
+        removeClippingTool() {
+            if (this.clippingTool) {
+                this.clippingTool.destroy();
+                this.clippingTool = null;
+                this.clippingRect = null;
+                this.clippingTransformer = null;
+                this.stage.batchDraw();
+            }
+        },
+        ///////////// test crop ///////////////////
+        addTemplateImage(imgURL){
+
+        },
     }
 }
 </script>

@@ -40,11 +40,21 @@ Route::get('/test', function () {
         ->orderBy('created_at', 'desc')
         ->get();
 
-    return Inertia::render('Test', ['fonts' => $fontFiles, 'textTemplates'=> $temps]);
+    $shapes = Template::where('type', 'Shapes')
+        ->select(['id', 'image'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return Inertia::render('Test', [
+        'fonts' => $fontFiles, 
+        'textTemplates' => $temps,
+        'shapeTemplates'=> $shapes
+    ]);
 });
 
-Route::get('/template/{template}', [TemplateController::class,'index']);
-Route::post('/template/add', [TemplateController::class,'store']);
+Route::get('/template/{template}', [TemplateController::class, 'index']);
+Route::post('/template/add', [TemplateController::class, 'store']);
+Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
 
 ////////////////////////////////////////////////////////
 
