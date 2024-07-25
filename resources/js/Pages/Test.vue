@@ -1,5 +1,4 @@
 <template>
-
     <Head title="Test"></Head>
     <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected" :fonts="fonts"
         :textTemplates="textTemplates">
@@ -82,6 +81,7 @@ export default {
                 getSelectedTemplate: this.getSelectedTemplate,
                 //images
                 addImage: this.addImage,
+                addUploadedImage: this.addUploadedImage,
             },
             isLayoutReady: false,
             transformer: null,
@@ -168,7 +168,7 @@ export default {
             this.stage.find('.guid-line').forEach((l) => l.destroy());
         },
         //get template from json
-        getTemplate(template) {
+        async getTemplate(template) {
             //if (template.children) {
             template.children.forEach(child => {
                 if (child.className === 'Layer') {
@@ -176,12 +176,29 @@ export default {
                     newLayer.id(uuidv4());
                     this.stage.add(newLayer);
 
-                    child.children.forEach(grandChild => {
+                    child.children.forEach(async grandChild => {
                         // with this condition i create aditional layer with no children
                         if (grandChild.className !== 'Transformer') {
                             const objectConstructor = Konva[grandChild.className];
                             const object = new objectConstructor(grandChild.attrs);
                             object.id(uuidv4());
+
+                            if (object.getClassName() === 'Image') {
+                                const imageUrl = grandChild.attrs.src; // Get the src from JSON
+                                if (imageUrl) {
+                                    const imageObj = new Image();
+                                    imageObj.src = imageUrl;
+                                    imageObj.crossOrigin = 'anonymous';
+
+                                    // Load the image and set it to the Konva image object
+                                    await new Promise((resolve) => {
+                                        imageObj.onload = () => {
+                                            object.image(imageObj);
+                                            resolve();
+                                        };
+                                    });
+                                }
+                            }
 
                             const currentLength = this.layers.length;
                             if (currentLength > 1) {
@@ -814,12 +831,48 @@ export default {
             });
             this.defaultLayer.batchDraw();
         },
+        async resizeImage(dataURL, maxWidth, maxHeight) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = dataURL;
+
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth) {
+                        height = Math.round((maxWidth / width) * height);
+                        width = maxWidth;
+                    }
+
+                    if (height > maxHeight) {
+                        width = Math.round((maxHeight / height) * width);
+                        height = maxHeight;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        resolve(blob);
+                    }, 'image/png');
+                };
+
+                img.onerror = (err) => {
+                    reject(err);
+                };
+            });
+        },
         // templates
         async saveAsTemplate(name, type) {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
-                let blob = await fetch(dataURL).then(res => res.blob());
+                let blob = await this.resizeImage(dataURL, 300, 300);
 
                 let formData = new FormData();
                 formData.append('name', name);
@@ -832,6 +885,7 @@ export default {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
+                console.log(res);
 
                 if (res.status === 201) {
                     alert('Template created successfully!');
@@ -857,12 +911,55 @@ export default {
             newLayer.id(uuidv4());
             this.stage.add(newLayer);
             const imageObj = new Image();
+            imageObj.src = url;
+            imageObj.crossOrigin = 'anonymous';
 
             imageObj.onload = () => {
                 const image = new Konva.Image({
                     image: imageObj,
                     width: width - 100,
                     height: height - 100,
+                    draggable: true,
+                    id: uuidv4(),
+                    src: url
+                });
+
+                const currentLength = this.layers.length;
+                if (currentLength > 1) {
+                    this.layers[currentLength - 1].lastOne = false;
+                }
+                this.layers.push({
+                    'id': newLayer.id(),
+                    'name': image.getClassName(),
+                    'layer': newLayer,
+                    'visible': true,
+                    'firstOne': this.layers.length === 1,
+                    'lastOne': true
+                })
+
+                image.on("click", (e) => {
+                    e.cancelBubble = true;
+                    this.toggleSelection(image.id(), image.getClassName(), image);
+                });
+
+                newLayer.add(image);
+                newLayer.batchDraw();
+            };
+        },
+        addUploadedImage(dataURL) {
+            const newLayer = new Konva.Layer();
+            newLayer.id(uuidv4());
+            this.stage.add(newLayer);
+
+            const imageObj = new Image();
+            imageObj.src = dataURL;
+            imageObj.crossOrigin = 'anonymous'
+
+            imageObj.onload = () => {
+                const image = new Konva.Image({
+                    image: imageObj,
+                    width: 400,
+                    height: 500,
                     draggable: true,
                     id: uuidv4(),
                 });
@@ -887,10 +984,11 @@ export default {
 
                 newLayer.add(image);
                 newLayer.batchDraw();
-            };
-            imageObj.src = url;
-        }
-    },
+            }
+
+        },
+        
+    }
 }
 </script>
 

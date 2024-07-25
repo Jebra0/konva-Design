@@ -17,7 +17,7 @@ class TemplateController extends Controller
             "name" => "required|string",
             "type" => "required|string",
             "data" => "required|json",
-            "image" => "required|image|mimes:png",
+            "image" => "required|image|mimes:png|max:2048",
         ]);
 
         $file = $request->file('image');

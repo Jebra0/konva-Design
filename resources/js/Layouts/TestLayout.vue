@@ -33,7 +33,8 @@
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
                     <v-container class="d-flex">
                         <v-text-field label="search" v-model="searchQuery"></v-text-field>
-                        <v-icon size="30" class="mt-3 ml-2"icon="mdi-magnify"  @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
+                        <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify"
+                            @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
                     </v-container>
                     <div class="imgParent" v-for="(image, index) in images" :key="index">
                         <img :src="image.src" alt="" @click="actions.addImage(image.src)"
@@ -70,9 +71,31 @@
 
                 <v-list-item @click="openUp" prepend-icon="mdi-cloud-upload" title="Upload"
                     value="Upload"></v-list-item>
-                <v-card v-if="selectedOption.upload" elevation="1" outlined>
-                    <v-card-title>TEST</v-card-title>
-                    <v-card-text> test test test test etst etst etst ethsj </v-card-text>
+                <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
+                    <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
+                        <template v-slot:selection="{ fileNames }">
+                            <template v-for="(fileName, index) in fileNames" :key="fileName">
+                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                    {{ fileName }}
+                                </v-chip>
+
+                                <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
+                                    +{{ files.length - 2 }} File(s)
+                                </span>
+                            </template>
+                        </template>
+                    </v-file-input>
+                    <v-row>
+                        <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
+                            <v-img @click="actions.addUploadedImage(image)" style="cursor: pointer;":src="image" aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                <template v-slot:placeholder>
+                                    <v-row align="center" class="fill-height ma-0" justify="center">
+                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                    </v-row>
+                                </template>
+                            </v-img>
+                        </v-col>
+                    </v-row>
                 </v-card>
                 <!--
                 <v-list-item @click="openBack" prepend-icon="mdi-view-grid-compact" title="Background" value="Background"></v-list-item>
@@ -292,7 +315,7 @@
                 @input="actions.fillColor(selectedFillColor)" />
         </v-app-bar>
         <!-- image buttons -->
-        <v-app-bar v-if="SelectedObjectType === 'Image'">
+        <v-app-bar v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
             <v-btn>
                 <v-icon icon="mdi-crop"></v-icon>
             </v-btn>
@@ -356,9 +379,23 @@ export default {
             unsplashUrl: 'https://api.unsplash.com/photos',
             unsplashSearchUrl: 'https://api.unsplash.com/search/photos',
             searchQuery: '',
+
+            imageUrls: [],
         }
     },
     methods: {
+        handleFileUpload(event) {
+            const files = event.target.files;
+            //this.imageUrls = []; // Clear existing images
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imageUrls.push(e.target.result); // Add image URL to the array
+                };
+                reader.readAsDataURL(file); // Read file as Data URL
+            });
+        },
         fetchUnsplashImages() {
             fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
                 .then(res => res.json())
