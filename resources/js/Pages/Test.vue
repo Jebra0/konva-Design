@@ -2,9 +2,9 @@
 
     <Head title="Test"></Head>
     <TestLayout v-if="isLayoutReady" :actions="actions" :layers="layers" :objectSelected="objectSelected" :fonts="fonts"
-        :textTemplates="textTemplates" :shapeTemplates="shapeTemplates">
+        :textTemplates="textTemplates" :shapeTemplates="shapeTemplates" :templates="templates">
         <div class="my-3" id="container"></div>
-        <!-- {{ textTemplates }} -->
+        <!-- {{ fonts }} -->
         <!-- {{ objectSelected }} -->
     </TestLayout>
 </template>
@@ -44,6 +44,10 @@ export default {
             type: Object,
             required: true,
         },
+        templates: {
+            type: Object,
+            required: true,
+        },
     },
     data() {
         return {
@@ -69,7 +73,6 @@ export default {
                 deleteLayer: this.deleteLayer,
                 moveLayer: this.moveLayer,
                 //background
-                //setImageBackground: this.setImageBackground,
                 //text
                 addText: this.addText,
                 //decoration
@@ -254,6 +257,10 @@ export default {
             const ShapeConstructor = Konva[config.type];
             const shape = new ShapeConstructor(config);
 
+            // Create a transformer
+            this.transformer = new Konva.Transformer();
+            newLayer.add(this.transformer);
+
             const currentLength = this.layers.length;
             if (currentLength > 1) {
                 this.layers[currentLength - 1].lastOne = false;
@@ -368,6 +375,11 @@ export default {
                         id: uuidv4(),
                     });
                     newLayer.add(clonedShape);
+
+                    // Create a transformer
+                    this.transformer = new Konva.Transformer();
+                    newLayer.add(this.transformer);
+
                     const currentLength = this.layers.length;
                     if (currentLength > 1) {
                         this.layers[currentLength - 1].lastOne = false;
@@ -582,63 +594,6 @@ export default {
 
             this.stage.batchDraw();
         },
-        //image background
-        /*setImageBackground(url){
-            console.log(this.layers)
-            const newLayer = new Konva.Layer();
-            newLayer.id(uuidv4());
-            this.stage.add(newLayer);
-            const imageObj = new Image();
-
-            const scale = this.stage.scale();
-
-            imageObj.onload = () => {
-                const backgroundImage = new Konva.Image({
-                    image: imageObj,
-                    width: width*scale.x,
-                    height: height*scale.y,
-                });
-                newLayer.add(backgroundImage);
-                newLayer.batchDraw(); 
-            };
-            imageObj.src = url;
-            // checkk if ther is already background 
-            if( this.layers.length >= 2 && this.layers[1].name === 'Background'){
-                this.deleteLayer(this.layers[1].id);
-            }
-            // check if it have other layers 
-            if(this.layers.length >= 2){
-                this.layers[1].firstOne = false;
-            }
-            // creat new element in layers
-            let newElement = ({
-                'id': newLayer.id(),
-                'name': 'Background',
-                'layer': newLayer,
-                'visible': true,
-                'firstOne': true,
-                'lastOne': this.layers.length === 1 ? true : false
-            })
-            // add the new element to the first 
-            this.layers.splice(1, 0, newElement);
-
-            this.defaultLayer = new Konva.Layer();
-            this.stage.add(this.defaultLayer);
-            // Create a transformer
-            this.transformer = new Konva.Transformer();
-            this.defaultLayer.add(this.transformer);
-
-            this.defaultLayer.on("dragmove", this.handleDragMove);
-            this.defaultLayer.on("dragend", this.handleDragEnd);
-
-            // Click outside of shapes to remove the transformer
-            this.stage.on('click', (e) => {
-                if (e.target === this.stage) {
-                    this.clearSelection();
-                }
-            });
-
-        },*/
         //text
         addText(config) {
             const newLayer = new Konva.Layer();
@@ -649,6 +604,10 @@ export default {
 
             const textConstructor = Konva['Text'];
             const text = new textConstructor(config);
+
+            // Create a transformer
+            this.transformer = new Konva.Transformer();
+            newLayer.add(this.transformer);
 
             const currentLength = this.layers.length;
             if (currentLength > 1) {
@@ -890,7 +849,7 @@ export default {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
-                if(type === 'Shapes'){
+                if (type === 'Shapes') {
                     let blob = await this.resizeImage(dataURL, 200, 200);
                 }
 
@@ -945,6 +904,10 @@ export default {
                     src: url
                 });
 
+                // Create a transformer
+                this.transformer = new Konva.Transformer();
+                newLayer.add(this.transformer);
+
                 const currentLength = this.layers.length;
                 if (currentLength > 1) {
                     this.layers[currentLength - 1].lastOne = false;
@@ -975,6 +938,10 @@ export default {
             const imageObj = new Image();
             imageObj.src = dataURL;
             imageObj.crossOrigin = 'anonymous'
+
+            // Create a transformer
+            this.transformer = new Konva.Transformer();
+            newLayer.add(this.transformer);
 
             imageObj.onload = () => {
                 const image = new Konva.Image({
@@ -1119,8 +1086,8 @@ export default {
 
                 cropCtx.drawImage(
                     imageObj,
-                    x - object.x(), 
-                    y - object.y(), 
+                    x - object.x(),
+                    y - object.y(),
                     width,
                     height,
                     0, 0,
@@ -1151,9 +1118,22 @@ export default {
             }
         },
         ///////////// test crop ///////////////////
-        addTemplateImage(imgURL){
+        async addTemplateImage(imgURL, name) {
+            let response = await fetch(imgURL)
+            let blob = await response.blob();
 
+            let formData = new FormData();
+            formData.append('image', blob, `${name}.png`);
+            formData.append('name', name);
+
+            let res = await axios.post('/template/picture/add', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log(res)
         },
+
     }
 }
 </script>

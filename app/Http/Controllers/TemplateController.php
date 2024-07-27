@@ -35,6 +35,9 @@ class TemplateController extends Controller
 
     public function uploadTemplate(Request $request){
         $file = $request->file('image');
-        $path = $file->store('images/Templates', ['disk' => 'public_images']);
+        $newFileName = $request->name.'.' . $file->getClientOriginalExtension();
+
+        $path = $file->storeAs('images/Templates', $newFileName, ['disk' => 'public_images']);
+        return $path;
     }
 }

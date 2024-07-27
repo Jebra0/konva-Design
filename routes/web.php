@@ -45,10 +45,16 @@ Route::get('/test', function () {
         ->orderBy('created_at', 'desc')
         ->get();
 
+    $templates = Template::where('type', 'Fold brochure')
+        ->select(['id', 'image'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
     return Inertia::render('Test', [
         'fonts' => $fontFiles, 
         'textTemplates' => $temps,
-        'shapeTemplates'=> $shapes
+        'shapeTemplates'=> $shapes,
+        'templates'=> $templates,
     ]);
 });
 

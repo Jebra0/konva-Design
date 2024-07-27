@@ -7,6 +7,10 @@
                 src: url('/fonts/DancingScript-VariableFont_wght.ttf') format('truetype');
             }
 @font-face {
+                font-family: 'Khand';
+                src: url('/fonts/Khand-Regular.ttf') format('truetype');
+            }
+@font-face {
                 font-family: 'PlaywriteBEVLG';
                 src: url('/fonts/PlaywriteBEVLG-VariableFont_wght.ttf') format('truetype');
             }

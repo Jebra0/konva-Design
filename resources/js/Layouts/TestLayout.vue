@@ -4,11 +4,12 @@
             <v-list density="compact">
                 <v-list-item @click="openTemp" prepend-icon="mdi-view-dashboard" title="Templates"
                     value="Templates"></v-list-item>
-                <v-card v-if="selectedOption.templates" elevation="1" outlined>
-                    <v-card-title>TEST</v-card-title>
-                    <v-card-text> test test test test etst etst etst ethsj </v-card-text>
+                <v-card class="scroll" v-if="selectedOption.templates" elevation="1" outlined>
+                    <div class="d-flex justify-center" v-for="(temp, id) in templates" :key="id">
+                        <img :src="temp.image" width="250px" alt="Text Image"
+                            @click="actions.getSelectedTemplate(temp.id)" style="cursor: pointer">
+                    </div>
                 </v-card>
-                <!-- /////// work is here ////////////////////////////////// -->
                 <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
                     <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
@@ -27,7 +28,6 @@
                             @click="actions.getSelectedTemplate(temp.id)" style="cursor: pointer">
                     </div>
                 </v-card>
-                <!-- /////// finish ////////////////////////////////// -->
                 <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos"
                     value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
@@ -89,12 +89,10 @@
                             </template>
                         </template>
                     </v-file-input>
-                    <!-- this gonna be deleted or be for admin only -->
-                    <v-btn @click="actions.addTemplateImage(imageUrls)">add</v-btn>
-                    <!-- /////////////////////////////////// -->
                     <v-row>
                         <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
-                            <v-img @click="actions.addUploadedImage(image)" style="cursor: pointer;":src="image" aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                            <v-img @click="actions.addUploadedImage(image)" style="cursor: pointer;" :src="image"
+                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
                                 <template v-slot:placeholder>
                                     <v-row align="center" class="fill-height ma-0" justify="center">
                                         <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
@@ -104,19 +102,6 @@
                         </v-col>
                     </v-row>
                 </v-card>
-                <!--
-                <v-list-item @click="openBack" prepend-icon="mdi-view-grid-compact" title="Background" value="Background"></v-list-item>
-                <v-card v-if="selectedOption.background" elevation="1" outlined class="scroll ml-5">
-                    <div v-for="(image, index) in images" :key="index">
-                        <img
-                            :src="image.src"
-                            alt="Background image"
-                            @click="actions.setImageBackground(image.src)"
-                            style="cursor: pointer; width: 150px; margin-left: 20px; margin-bottom: 15px"
-                        >
-                    </div>
-                </v-card>
--->
                 <v-list-item @click="openLayer" prepend-icon="mdi-layers-triple" title="Layers"
                     value="Layers"></v-list-item>
                 <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
@@ -137,13 +122,60 @@
                         </span>
                     </div>
                 </v-card>
+
+                <v-list-item>
+                    <v-text-field v-model="name"></v-text-field>
+                    <v-file-input label="Upload image" prepend-icon="mdi-camera" @change="handleFileUpload">
+                        <template v-slot:selection="{ fileNames }">
+                            <template v-for="(fileName, index) in fileNames" :key="fileName">
+                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                    {{ fileName }}
+                                </v-chip>
+
+                                <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
+                                    +{{ files.length - 2 }} File(s)
+                                </span>
+                            </template>
+                        </template>
+                    </v-file-input>
+                    <v-row>
+                        <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
+                            <v-img @click="actions.addTemplateImage(image, name)" style="cursor: pointer;" :src="image"
+                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                <template v-slot:placeholder>
+                                    <v-row align="center" class="fill-height ma-0" justify="center">
+                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                    </v-row>
+                                </template>
+                            </v-img>
+                        </v-col>
+                    </v-row>
+                    <hr>
+                    <v-img @click="actions.addImage(image)" style="cursor: pointer;" :src="image" aspect-ratio="1"
+                        class="bg-grey-lighten-2" cover>
+                        <template v-slot:placeholder>
+                            <v-row align="center" class="fill-height ma-0" justify="center">
+                                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                            </v-row>
+                        </template>
+                    </v-img>
+                </v-list-item>
             </v-list>
         </v-navigation-drawer>
         <!-- defualt buttons -->
         <v-app-bar :elevation="1">
             <template v-slot:prepend>
+                <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
+                    v-model="selectedFillColor" @input="actions.fillColor(selectedFillColor)" />
                 <v-btn color="red" icon="mdi-undo" @click="actions.unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click="actions.reDo"></v-btn>
+                <!-- for image -->
+                <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
+                    <v-btn @click=" addClip = !addClip; actions.addClippingTool()">
+                        <v-icon icon="mdi-crop"></v-icon>
+                    </v-btn>
+                    <v-btn v-if="this.addClip" @click="actions.applyClipping(); addClip = !addClip;">crop</v-btn>
+                </div>
             </template>
 
             <span class="ml-20">
@@ -255,7 +287,7 @@
         </v-app-bar>
 
         <!-- text buttons -->
-        <v-app-bar v-if="SelectedObjectType === 'Text'">
+        <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
             <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
                 @input="actions.fillColor(selectedFillColor)" />
             <div class="d-flex">
@@ -316,20 +348,7 @@
                 </v-menu>
             </v-btn>
         </v-app-bar>
-        <!-- shape buttons -->
-        <v-app-bar v-if="SelectedObjectType === 'Shape'">
-            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-                @input="actions.fillColor(selectedFillColor)" />
-        </v-app-bar>
-        <!-- image buttons -->
-        <v-app-bar v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
-            <v-btn @click=" addClip = !addClip; actions.addClippingTool()">
-                <v-icon icon="mdi-crop"></v-icon>
-            </v-btn>
-            <v-btn v-if="this.addClip" @click="actions.applyClipping(); addClip = !addClip;">crop</v-btn>
-        </v-app-bar>
-
-        <v-main class="d-flex align-center justify-center" style="height: 100vh; background-color: #ebebeb;">
+        <v-main class="d-flex align-center justify-center" style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <slot />
         </v-main>
     </v-layout>
@@ -341,6 +360,7 @@ import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
 export default {
     data() {
         return {
+            image: '/images/Templates/fold_brochure_template.png',
             selectedOption: {
                 templates: false,
                 text: false,
@@ -395,14 +415,13 @@ export default {
     methods: {
         handleFileUpload(event) {
             const files = event.target.files;
-            //this.imageUrls = []; // Clear existing images
 
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    this.imageUrls.push(e.target.result); // Add image URL to the array
+                    this.imageUrls.push(e.target.result);
                 };
-                reader.readAsDataURL(file); // Read file as Data URL
+                reader.readAsDataURL(file); 
             });
         },
         fetchUnsplashImages() {
@@ -448,9 +467,6 @@ export default {
         },
         openUp() {
             this.selectedOption.upload = !this.selectedOption.upload;
-        },
-        openBack() {
-            this.selectedOption.background = !this.selectedOption.background;
         },
         openLayer() {
             this.selectedOption.layers = !this.selectedOption.layers;
@@ -547,6 +563,10 @@ export default {
             type: Object,
             required: true,
         },
+        templates: {
+            type: Object,
+            required: true,
+        },
     }
 }
 </script>
@@ -575,15 +595,10 @@ export default {
     bottom: 4%;
     left: 7%;
     color: white;
-    /* Text color */
     background-color: rgba(0, 0, 0, 0.5);
-    /* Semi-transparent background */
     padding: 10px;
-    /* Space around text */
     border-radius: 5px;
-    /* Rounded corners */
     font-size: 16px;
-    /* Text size */
     text-align: center;
     width: 250px;
 }
