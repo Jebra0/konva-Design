@@ -1,413 +1,614 @@
 <template>
-    <Head title="Design" />
-    <GuestLayout
-        :actions="actions"
-    >
-        <div class="stage">
-            <v-stage
-                :config="configKonva"
-                ref="stage"
-                @mousedown="handleStageMouseDown"
-                @touchstart="handleStageMouseDown"
-            >
-                <v-layer ref="layer">
-                    <component
-                        v-for="shape in shapes"
-                        :is="shape.type"
-                        :key="shape.id"
-                        :config="shape"
-                        @transformend="handleTransformEnd"
-                        @click.native="handleShapeClick(shape.id)"
-                    ></component>
-                    <v-transformer ref="transformer" />
-                </v-layer>
-            </v-stage>
-        </div>
-    </GuestLayout>
-</template>
+    <v-app>
+        <Head title="Design"></Head>
+        <v-navigation-drawer permanent width="300">
+            <v-list density="compact">
+                <v-list-item @click="openTemp" prepend-icon="mdi-view-dashboard" title="Templates"
+                    value="Templates"></v-list-item>
+                <v-card class="scroll" v-if="selectedOption.templates" elevation="1" outlined>
+                    <div class="d-flex justify-center" v-for="(temp, id) in templates" :key="id">
+                        <img :src="temp.image" width="250px" alt="Text Image"
+                            @click=" getSelectedTemplate(temp.id)" style="cursor: pointer">
+                    </div>
+                </v-card>
+                <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
+                <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
+                    <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
+                        style=" text-transform: none; font-size: 25px;">
+                        <h1>Create header</h1>
+                    </v-btn>
+                    <v-btn @click="addSubHeader()" elevation="0" width="100%"
+                        style="text-transform: none; font-size: 18px;">
+                        <h4>Create sub header</h4>
+                    </v-btn>
+                    <v-btn @click="addBodyText()" elevation="0" width="100%"
+                        style="text-transform: none; font-size: 14px;">Create Body
+                        Text</v-btn>
+                    <div class="d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
+                        <img :src="temp.image" width="250px" alt="Text Image"
+                            @click=" getSelectedTemplate(temp.id)" style="cursor: pointer">
+                    </div>
+                </v-card>
+                <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos"
+                    value="Photos"></v-list-item>
+                <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
+                    <v-container class="d-flex">
+                        <v-text-field label="search" v-model="searchQuery"></v-text-field>
+                        <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify"
+                            @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
+                    </v-container>
+                    <div class="imgParent" v-for="(image, index) in images" :key="index">
+                        <img :src="image.src" alt="" @click=" addImage(image.src)"
+                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
+                        <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{ image.author
+                                }}</a>
+                        </p>
+                    </div>
+                </v-card>
 
+                <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements"
+                    value="Elements"></v-list-item>
+                <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
+                    <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
+                        <img :src="shape.image" width="70px" alt="Text Image"
+                            @click=" getSelectedTemplate(shape.id)" style="cursor: pointer">
+                    </div> -->
+                    <v-icon icon="mdi-minus" color="black" size="70"></v-icon>
+                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70"></v-icon>
+                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(rectConfig)"></v-icon>
+                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(circleConfig)"></v-icon>
+                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(triangleConfig)"></v-icon>
+                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(hexagonConfig)"></v-icon>
+                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(octagonConfig)"></v-icon>
+                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70"></v-icon>
+                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70"></v-icon>
+                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70"></v-icon>
+                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70"></v-icon>
+                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70"></v-icon>
+                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70"></v-icon>
+                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"></v-icon>
+                </div>
+
+                <v-list-item @click="openUp" prepend-icon="mdi-cloud-upload" title="Upload"
+                    value="Upload"></v-list-item>
+                <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
+                    <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
+                        <template v-slot:selection="{ fileNames }">
+                            <template v-for="(fileName, index) in fileNames" :key="fileName">
+                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                    {{ fileName }}
+                                </v-chip>
+
+                                <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
+                                    +{{ files.length - 2 }} File(s)
+                                </span>
+                            </template>
+                        </template>
+                    </v-file-input>
+                    <v-row>
+                        <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
+                            <v-img @click=" addUploadedImage(image)" style="cursor: pointer;" :src="image"
+                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                <template v-slot:placeholder>
+                                    <v-row align="center" class="fill-height ma-0" justify="center">
+                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                    </v-row>
+                                </template>
+                            </v-img>
+                        </v-col>
+                    </v-row>
+                </v-card>
+                <v-list-item @click="openLayer" prepend-icon="mdi-layers-triple" title="Layers"
+                    value="Layers"></v-list-item>
+                <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
+                    <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
+                        <span v-if="layer.name !== 'Defualt Layer'">
+                            <button @click=" hideLayer(!layer.visible, layer.id)" class="mr-2">
+                                <v-icon :icon="layer.visible ? 'mdi-eye' : 'mdi-eye-closed'"></v-icon>
+                            </button>
+                            <button @click=" deleteLayer(layer.id)"><v-icon icon="mdi-delete"></v-icon></button>
+                        </span>
+                        <span v-text="layer.name" class="ml-1" style="width: 120px;"></span>
+
+                        <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
+                            <button v-if="(!layer.lastOne)" @click=" moveLayer('up', layer.id)"><v-icon
+                                    icon="mdi-arrow-up"></v-icon></button>
+                            <button v-if="(!layer.firstOne)" @click=" moveLayer('down', layer.id)"><v-icon
+                                    icon="mdi-arrow-down"></v-icon></button>
+                        </span>
+                    </div>
+                </v-card>
+
+                <v-list-item>
+                    <v-text-field v-model="name"></v-text-field>
+                    <v-file-input label="Upload image" prepend-icon="mdi-camera" @change="handleFileUpload">
+                        <template v-slot:selection="{ fileNames }">
+                            <template v-for="(fileName, index) in fileNames" :key="fileName">
+                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                    {{ fileName }}
+                                </v-chip>
+
+                                <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
+                                    +{{ files.length - 2 }} File(s)
+                                </span>
+                            </template>
+                        </template>
+                    </v-file-input>
+                    <v-row>
+                        <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
+                            <v-img @click=" addTemplateImage(image, name)" style="cursor: pointer;" :src="image"
+                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                <template v-slot:placeholder>
+                                    <v-row align="center" class="fill-height ma-0" justify="center">
+                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                    </v-row>
+                                </template>
+                            </v-img>
+                        </v-col>
+                    </v-row>
+                    <hr>
+                    <v-img @click=" addImage(image)" style="cursor: pointer;" :src="image" aspect-ratio="1"
+                        class="bg-grey-lighten-2" cover>
+                        <template v-slot:placeholder>
+                            <v-row align="center" class="fill-height ma-0" justify="center">
+                                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                            </v-row>
+                        </template>
+                    </v-img>
+                </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
+        <!-- defualt buttons -->
+        <v-app-bar :elevation="1">
+            <template v-slot:prepend>
+                <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
+                    v-model="selectedFillColor" @input=" fillColor(selectedFillColor)" />
+                <v-btn color="red" icon="mdi-undo" @click=" unDo"></v-btn>
+                <v-btn color="red" icon="mdi-redo" @click=" reDo"></v-btn>
+                <!-- for image -->
+                <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
+                    <v-btn @click=" addClip = !addClip;  addClippingTool()">
+                        <v-icon icon="mdi-crop"></v-icon>
+                    </v-btn>
+                    <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
+                </div>
+            </template>
+
+            <span class="ml-20">
+                <v-btn @click=" zoomFunction('in')">
+                    <v-icon icon="mdi-magnify-plus-outline" size="25px"></v-icon>
+                    <v-tooltip activator="parent" location="bottom">Zoom In</v-tooltip>
+                </v-btn>
+                <v-btn @click=" zoomFunction('out')">
+                    <v-icon icon="mdi-magnify-minus-outline" size="25px"></v-icon>
+                    <v-tooltip activator="parent" location="bottom">Zoom Out</v-tooltip>
+                </v-btn>
+            </span>
+
+            <template v-slot:append>
+                <div style="">
+                    <v-btn>
+                        <v-icon color="red" icon="mdi-layers"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Position</v-tooltip>
+                        <v-menu activator="parent">
+                            <v-list style="width: 200px">
+                                <v-list-item>
+                                    <v-list-item-title>Position</v-list-item-title>
+                                    <v-btn class="mr-9" @click=" alignLeft">
+                                        <v-icon icon="mdi-align-horizontal-left"></v-icon>
+                                        <v-tooltip activator="parent" location="bottom">Align Left</v-tooltip>
+                                    </v-btn>
+                                    <v-btn @click=" alignRight">
+                                        <v-icon icon="mdi-align-horizontal-right"></v-icon>
+                                        <v-tooltip activator="parent" location="bottom">Align Right</v-tooltip>
+                                    </v-btn>
+                                    <v-btn class="mr-9" @click=" alignTop">
+                                        <v-icon icon="mdi-align-vertical-top"></v-icon>
+                                        <v-tooltip activator="parent" location="bottom">Align Top</v-tooltip>
+                                    </v-btn>
+                                    <v-btn @click=" alignBottom">
+                                        <v-icon icon="mdi-align-vertical-bottom"></v-icon>
+                                        <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>
+                                    </v-btn>
+                                    <v-btn class="mr-9">
+                                        <v-icon icon="mdi-align-horizontal-center"></v-icon>
+                                        <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>
+                                    </v-btn>
+                                    <v-btn>
+                                        <v-icon icon="mdi-align-vertical-center"></v-icon>
+                                        <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>
+                                    </v-btn>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+                    <v-btn>
+                        <v-icon icon="mdi-opacity"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Opacity</v-tooltip>
+                        <v-menu activator="parent">
+                            <v-list>
+                                <v-list-item>
+                                    <v-list-item-title>Transparency</v-list-item-title>
+                                    <v-slider @mouseout=" objectOpacity(opacity)" v-model="opacity" :max="max"
+                                        :min="min" style="width: 250px" class="align-center" hide-details>
+                                    </v-slider>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-btn>
+
+                    <!-- ///////////////// -->
+                    <v-dialog max-width="500">
+                        <template v-slot:activator="{ props: activatorProps }">
+                            <v-btn v-bind="activatorProps">
+                                <v-icon icon="mdi-content-save"></v-icon>
+                                <v-tooltip activator="parent" location="bottom">Save As Template</v-tooltip>
+                            </v-btn>
+                        </template>
+                        <template v-slot:default="{ isActive }">
+                            <v-card title="Save as template">
+                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
+
+                                <v-select label="Template Type" required v-model="templateType"
+                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+
+                                    <v-btn text="Save"
+                                        @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </template>
+                    </v-dialog>
+                    <!-- /////////////// -->
+                    <v-btn @click=" saveAsJson">
+                        <v-icon icon="mdi-content-save"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Save As json</v-tooltip>
+                    </v-btn>
+                    <v-btn @click=" duplicateObjects">
+                        <v-icon icon="mdi-content-copy"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
+                    </v-btn>
+                    <v-btn @click=" destroyObjects">
+                        <v-icon icon="mdi-delete"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Delete</v-tooltip>
+                    </v-btn>
+                    <v-btn @click=" exportImage">
+                        <v-icon icon="mdi-download"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Download As Image</v-tooltip>
+                    </v-btn>
+                </div>
+            </template>
+        </v-app-bar>
+
+        <!-- text buttons -->
+        <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
+                @input=" fillColor(selectedFillColor)" />
+            <div class="d-flex">
+                <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
+                    v-model="selectedFont" @update:modelValue=" changeFontFamily(selectedFont)"
+                    :style="`font-type: ${name}`" width="150px" class=" m-2 mt-5">
+                </v-combobox>
+            </div>
+            <input type="number" v-model="fontSize" @input=" textSize(fontSize)"
+                style="width: 100px; border: 1px solid #ddd;" />
+            <v-btn>
+                <v-icon icon="mdi-format-align-center"></v-icon>
+                <v-menu activator="parent">
+                    <v-list>
+                        <v-list-item>
+                            <v-btn class="" @click=" alignText('justify')">
+                                <v-icon icon="mdi-format-align-justify"></v-icon>
+                            </v-btn>
+                            <v-btn @click=" alignText('right')">
+                                <v-icon icon="mdi-format-align-right"></v-icon>
+                            </v-btn>
+                            <v-btn class="" @click=" alignText('left')">
+                                <v-icon icon="mdi-format-align-left"></v-icon>
+                            </v-btn>
+                            <v-btn @click=" alignText('center')">
+                                <v-icon icon="mdi-format-align-center"></v-icon>
+                            </v-btn>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-btn>
+            <v-btn @click="toggleFOntCase()">
+                <v-icon icon="mdi-format-letter-case-upper"></v-icon>
+            </v-btn>
+            <v-btn @click="toggleFontWeight">
+                <v-icon icon="mdi-format-bold"></v-icon>
+            </v-btn>
+            <v-btn @click="toggleFontItalic()">
+                <v-icon icon="mdi-format-italic"></v-icon>
+            </v-btn>
+            <v-btn>
+                <v-icon icon="mdi-format-line-spacing"></v-icon>
+                <v-menu activator="parent">
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-title>Spacing</v-list-item-title>
+                            <v-slider @mouseout=" textCharSpacing(charSpacing)" :max="sMax" :min="sMin"
+                                v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
+                            </v-slider>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-title>line height</v-list-item-title>
+                            <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin"
+                                v-model="lineHight" style="width: 250px" class="align-center" hide-details>
+                            </v-slider>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-btn>
+        </v-app-bar>
+        <v-main class="d-flex align-center justify-center"
+            style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
+            <div class="my-3" id="container"></div>
+        </v-main>
+    </v-app>
+</template>
 <script>
-import GuestLayout from "../Layouts/GuestLayout.vue";
-import { Head } from '@inertiajs/vue3';
-import { v4 as uuidv4 } from 'uuid';
-const width = 500 ;
-const height = 500 ;
+import allFunctions from '@/Utils/allFunctions.js';
+import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
+import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
+
 export default {
-    components: {
-        GuestLayout,
-        Head,
-    },
+    mixins: [allFunctions],
     data() {
         return {
-            configKonva: {
-                width: width,
-                height: height,
+            image: '/images/Templates/fold_brochure_template.png',
+            selectedOption: {
+                templates: false,
+                text: false,
+                photos: false,
+                elements: false,
+                upload: false,
+                background: false,
+                layers: false,
             },
-            shapes: [],
-            selectedShapeId: null,
-            history: [],
-            historyStep: -1,
-            actions: {
-                zoomIn: this.zoomIn,
-                zoomOut: this.zoomOut,
-                addShape: this.addShape,
-                exportShape: this.exportShape,
-                saveJson: this.saveJson,
-                destroyShape: this.destroyShape,
-                duplicateShape: this.duplicateShape,
-                shapeOpacity: this.shapeOpacity,
-                undoAction: this.undoAction,
-                redoAction: this.redoAction,
-                AlignLeft: this.AlignLeft,
-                AlignRight: this.AlignRight,
-                AlignTop: this.AlignTop,
-                AlignBottom: this.AlignBottom,
-                AlignCenter: this.AlignCenter,
-                AlignMiddle: this.AlignMiddle,
-                handleImageClick1: this.handleImageClick1,
-                updateStageFill: this.updateStageFill,
-                updateStageBackgroundImage: this.updateStageBackgroundImage,
-            },
-        };
+            rectConfig,
+            circleConfig,
+            triangleConfig,
+            hexagonConfig,
+            octagonConfig,
+            ////opacity/////
+            min: 0,
+            max: 1,
+            opacity: 1,
+            ////////////////
+            texts: [],
+            selectedFillColor: 'white',
+            images: [],
+            hide: true,
+            fontSize: 30,
+            fontWeight: 'normal',
+            fontItalic: 'normal',
+            fontCase: 'lower',
+            //// lineHight /////
+            lMin: 0,
+            lMax: 3,
+            lineHight: 1,
+            //// charspacing /////
+            sMin: -10,
+            sMax: 50,
+            charSpacing: 1,
+
+            selectedFont: 'cairo',
+            fontFamilies: [],
+
+            templateName: '',
+            templateType: '',
+
+            unsplashAccessKey: 'LhMEo6peuEizFSw0vjF5kANy-B6dgWvBoNmvxSdOlL0',
+            unsplashUrl: 'https://api.unsplash.com/photos',
+            unsplashSearchUrl: 'https://api.unsplash.com/search/photos',
+            searchQuery: '',
+
+            imageUrls: [],
+            addClip: false,
+        }
     },
     methods: {
-        handleImageClick1(){console.log('test')},
-        zoomIn() {
-            let scaleBy = 70;
-            let oldScale = this.configKonva.width;
-            this.configKonva.width = oldScale + scaleBy;
-            this.configKonva.height = oldScale + scaleBy;
-        },
-        zoomOut() {
-            let scaleBy = 70;
-            let oldScale = this.configKonva.width;
-            this.configKonva.height = oldScale - scaleBy;
-            this.configKonva.width = oldScale - scaleBy;
-        },
-        addShape(shapeConfig) {
-            const newShape = { ...shapeConfig, id: uuidv4() };
-            this.shapes.push(newShape);
-            this.saveHistory();
-        },
-        handleTransformEnd(e) {
-            const shape = this.findShape(e.target.id());
-            if (shape) {
-                shape.x = e.target.x();
-                shape.y = e.target.y();
-                shape.rotation = e.target.rotation();
-                shape.scaleX = e.target.scaleX();
-                shape.scaleY = e.target.scaleY();
-                this.saveHistory();
-            }
-        },
-        handleStageMouseDown(e) {
-            if (e.target === e.target.getStage()) {
-                this.selectedShapeId = null;
-                this.updateTransformer();
-                return;
-            }
-            const clickedOnTransformer = e.target.getParent().className === 'Transformer';
-            if (clickedOnTransformer) {
-                return;
-            }
-            const id = e.target.id();
-            if (id) {
-                this.selectedShapeId = id;
-            } else {
-                this.selectedShapeId = null;
-            }
-            this.updateTransformer();
-        },
-        updateTransformer() {
-            const transformerNode = this.$refs.transformer.getNode();
-            const stage = transformerNode.getStage();
-            const { selectedShapeId } = this;
-            const selectedNode = stage.findOne('#' + selectedShapeId);
-            if (selectedNode === transformerNode.node()) {
-                return;
-            }
-            if (selectedNode) {
-                transformerNode.nodes([selectedNode]);
-            } else {
-                transformerNode.nodes([]);
-            }
-        },
-        findShape(id) {
-            return this.shapes.find(shape => shape.id === id);
-        },
-        handleShapeClick(id) {
-            this.selectedShapeId = id;
-            this.updateTransformer();
-        },
-///////////////////////////////////////////
-////////// Background ///////////////////
-        updateStageFill(color) {
-            const stageContainer = this.$refs.stage.getNode().container();
-            stageContainer.style.backgroundColor = color;
-        },
-        updateStageBackgroundImage(imageUrl){
-            const layer = this.$refs.layer.getNode();
-            const imageObj = new Image();
-            imageObj.onload = () => {
-                // Check if the background image already exists
-                let existingBackground = layer.findOne('.background-image');
+        handleFileUpload(event) {
+            const files = event.target.files;
 
-                if (existingBackground) {
-                    existingBackground.image(imageObj); // Update the existing background image
-                } else {
-                    const backgroundImage = new Konva.Image({
-                        image: imageObj,
-                        width: this.configKonva.width,
-                        height: this.configKonva.height,
-                        listening: false, // to prevent it from capturing events
-                        name: 'background-image'
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imageUrls.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        },
+        fetchUnsplashImages() {
+            fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
+                .then(res => res.json())
+                .then(json => {
+                    // console.log(json[0].urls.full)
+                    json.forEach(element => {
+                        this.images.push({
+                            src: element.urls.full,
+                            portfolio: element.user.portfolio_url,
+                            author: element.user.name
+                        });
                     });
-
-                    layer.add(backgroundImage);
-                    backgroundImage.moveToBottom();
-                }
-
-                this.$refs.layer.getNode().batchDraw();
-            };
-
-            imageObj.src = imageUrl;
-            console.log(imageObj)
+                });
         },
-////////////////////////////////////////////
-///////////// Default Functionality ////////
-        saveHistory() {
-            const shapesCopy = JSON.parse(JSON.stringify(this.shapes));
-            if (this.historyStep < this.history.length - 1) {
-                this.history = this.history.slice(0, this.historyStep + 1);
-            }
-            this.history.push(shapesCopy);
-            this.historyStep++;
+        searchUnsplashImages(query) {
+            fetch(`${this.unsplashSearchUrl}?client_id=${this.unsplashAccessKey}&query=${query}`)
+                .then(res => res.json())
+                .then(json => {
+                    console.log(this.searchQuery)
+                    json.results.forEach(element => {
+                        //this.images =[];
+                        this.images.unshift({
+                            src: element.urls.full,
+                            portfolio: element.user.portfolio_url,
+                            author: element.user.name
+                        });
+                    });
+                });
         },
-        undoAction() {
-            if (this.historyStep > 0) {
-                this.historyStep--;
-                this.shapes = JSON.parse(JSON.stringify(this.history[this.historyStep]));
-            }
+        openTemp() {
+            this.selectedOption.templates = !this.selectedOption.templates;
         },
-        redoAction() {
-            if (this.historyStep < this.history.length - 1) {
-                this.historyStep++;
-                this.shapes = JSON.parse(JSON.stringify(this.history[this.historyStep]));
-            }
+        openText() {
+            this.selectedOption.text = !this.selectedOption.text;
         },
-        destroyShape() {
-            if (this.selectedShapeId) {
-                const layer = this.$refs.layer.getNode();
-                const shape = layer.findOne(`#${this.selectedShapeId}`);
-                if (shape) {
-                    shape.destroy();
-                    layer.batchDraw();
-                    this.shapes = this.shapes.filter(shape => shape.id !== this.selectedShapeId);
-                    this.selectedShapeId = null;
-                    this.saveHistory();
-                }
-            }
+        openPhotos() {
+            this.selectedOption.photos = !this.selectedOption.photos;
         },
-        duplicateShape() {
-            if (this.selectedShapeId) {
-                const shape = this.shapes.find(shape => shape.id === this.selectedShapeId);
-                if (shape) {
-                    const newShape = { ...shape, id: `shape-${Date.now()}`, x: shape.x + 10, y: shape.y + 10 };
-                    this.shapes.push(newShape);
-                    this.$refs.layer.getNode().batchDraw();
-                    this.saveHistory();
-                }
-            }
+        openElement() {
+            this.selectedOption.elements = !this.selectedOption.elements;
         },
-        shapeOpacity(opacity) {
-            const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-            if (shapeIndex !== -1) {
-                this.shapes[shapeIndex].opacity = opacity;
-                const layer = this.$refs.layer.getNode();
-                const shape = layer.findOne(`#${this.selectedShapeId}`);
-                if (shape) {
-                    shape.opacity(opacity);
-                    layer.batchDraw();
-                    this.saveHistory();
-                }
-            }
+        openUp() {
+            this.selectedOption.upload = !this.selectedOption.upload;
         },
-        download(uri, name) {
-            let link = document.createElement('a');
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        openLayer() {
+            this.selectedOption.layers = !this.selectedOption.layers;
         },
-        exportShape() {
-            let stage = this.$refs.stage.getNode();
-            let dataURL = stage.toDataURL({ pixelRatio: 3 });
-            this.download(dataURL, 'Design.png');
+        toggleFontWeight() {
+            this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
+            this. textStyle(this.fontWeight);
         },
-        saveJson() {
-            const stage = this.$refs.stage.getNode();
-            const json = stage.toJSON();
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            this.download(url, 'stage.json');
-            URL.revokeObjectURL(url);
+        toggleFontItalic() {
+            this.fontItalic = this.fontItalic === 'normal' ? 'italic' : 'normal';
+            this. textStyle(this.fontItalic);
         },
-        //position functions
-        AlignLeft() {
-            if (this.selectedShapeId) {
-                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-                if (shapeIndex !== -1) {
-                    const shape = this.shapes[shapeIndex];
-                    if (shape.type === 'v-rect') {
-                        shape.x = 1;
-                    } else {
-                        shape.x = 50;
-                    }
-
-                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
-                    if (konvaShape) {
-                        konvaShape.x(50);
-                    }
-
-                    this.$refs.layer.getNode().draw();
-                    this.saveHistory();
-                }
-            }
+        toggleFOntCase() {
+            this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
+            this. textCase(this.fontCase);
         },
-        AlignRight() {
-            if (this.selectedShapeId) {
-                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-                if (shapeIndex !== -1) {
-                    const shape = this.shapes[shapeIndex];
-
-                    const stage = this.$refs.stage.getNode();
-                    const scale = stage.scaleX();
-
-                    const scaledWidth = stage.width() * scale;
-
-                    const newX = shape.type === 'v-rect' ? (scaledWidth - 101) : (scaledWidth - 50);
-
-                    shape.x = newX;
-
-                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
-                    if (konvaShape) {
-                        konvaShape.x(newX);
-                    }
-
-                    this.$refs.layer.getNode().draw();
-                    this.saveHistory();
-                }
-            }
+        addHeader() {
+            this. addText(headerText);
         },
-        AlignTop(){
-            if (this.selectedShapeId) {
-                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-                if (shapeIndex !== -1) {
-                    const shape = this.shapes[shapeIndex];
-                        if (shape.type === 'v-rect') {
-                            shape.y = 1;
-                        } else {
-                            shape.y = 50;
-                        }
-
-                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
-                    if (konvaShape) {
-                        if (shape.type === 'v-rect') {
-                            konvaShape.y(1);
-                        }else {
-                            konvaShape.y(50);
-                        }
-                    }
-
-                    this.$refs.layer.getNode().draw();
-                    this.saveHistory();
-                }
-            }
+        addSubHeader() {
+            this. addText(subHeaderText);
         },
-        AlignBottom() {
-            if (this.selectedShapeId) {
-                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-                if (shapeIndex !== -1) {
-                    const shape = this.shapes[shapeIndex];
-
-                    const stage = this.$refs.stage.getNode();
-                    const scale = stage.scaleX();
-
-                    const scaledHeight = stage.height() * scale;
-
-                    const newY = shape.type === 'v-rect' ? scaledHeight - 101 : scaledHeight - 50;
-
-                    shape.y = newY;
-
-                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
-                    if (konvaShape) {
-                        konvaShape.y(newY);
-                    }
-
-                    this.$refs.layer.getNode().draw();
-                    this.saveHistory();
-                }
-            }
+        addBodyText() {
+            this. addText(bodyText);
         },
-        AlignCenter() {
-            if (this.selectedShapeId) {
-                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-                if (shapeIndex !== -1) {
-                    const shape = this.shapes[shapeIndex];
-
-                    const stage = this.$refs.stage.getNode();
-                    const scale = stage.scaleX();
-
-                    const scaledWidth = stage.width() * scale;
-
-                    const newX = shape.type === 'v-rect' ? (scaledWidth - 101) / 2 : (scaledWidth - 50) / 2;
-
-                    shape.x = newX;
-
-                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
-                    if (konvaShape) {
-                        konvaShape.x(newX);
-                    }
-
-                    this.$refs.layer.getNode().draw();
-                    this.saveHistory();
-                }
-            }
+        loadFonts() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/fonts.css';
+            document.head.appendChild(link);
         },
-        AlignMiddle() {
-            if (this.selectedShapeId) {
-                const shapeIndex = this.shapes.findIndex(shape => shape.id === this.selectedShapeId);
-                if (shapeIndex !== -1) {
-                    const shape = this.shapes[shapeIndex];
-
-                    const stage = this.$refs.stage.getNode();
-                    const scale = stage.scaleY();
-
-                    const scaledHeight = stage.height() * scale;
-
-                    const newY = shape.type === 'v-rect' ? (scaledHeight - 101) / 2 : (scaledHeight - 50) / 2;
-
-                    shape.y = newY;
-
-                    const konvaShape = this.$refs.layer.getNode().findOne(`#${this.selectedShapeId}`);
-                    if (konvaShape) {
-                        konvaShape.y(newY);
-                    }
-
-                    this.$refs.layer.getNode().draw();
-                    this.saveHistory();
-                }
-            }
-        },
-//////////////////////////////////////////////
     },
-};
-</script>
+    mounted() {
+        this.loadFonts();
+        this.fontFamilies = this.fonts.map(font => font.name);
+        this.fetchUnsplashImages();
+    },
+    computed: {
+        reversedLayers() {
+            return [...this.layers].reverse();
+        },
+        SelectedObjectType() {
+            if (this.objectSelected.length === 1) {
+                if (this.objectSelected[0].objectType === 'Text') {
+                    return 'Text';
+                } else if (this.objectSelected[0].objectType === 'Image') {
+                    return 'Image';
+                } else {
+                    return 'Shape';
+                }
+            }
+            if (this.objectSelected.length > 1) {
+                const firstType = this.objectSelected[0].objectType;
+                const allSameType = this.objectSelected.every(obj => obj.objectType === firstType);
 
-<style>
-.stage {
+                if (allSameType) {
+                    if (firstType === 'Text' || firstType === 'Image') {
+                        return firstType;
+                    } else {
+                        return 'Shape';
+                    }
+                } else {
+                    const hasTextOrImage = this.objectSelected.some(obj => obj.objectType === 'Text' || obj.objectType === 'Image');
+                    if (hasTextOrImage) {
+                        return null;
+                    }
+                    return 'Shape';
+                }
+            }
+        }
+    },
+    props: {
+        actions: {
+            type: Object,
+            required: true,
+        },
+        layers: {
+            type: Array,
+            default: () => [],
+        },
+        objectSelected: {
+            type: Array,
+            default: () => [],
+        },
+        fonts: {
+            type: Array,
+            required: true,
+        },
+        textTemplates: {
+            type: Object,
+            required: true,
+        },
+        shapeTemplates: {
+            type: Object,
+            required: true,
+        },
+        templates: {
+            type: Object,
+            required: true,
+        },
+    }
+}
+</script>
+<style scoped>
+#container {
     background-color: white;
     border: 1px solid rgba(184, 184, 184, 0.78);
+}
+
+.scroll {
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.layer {
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+
+.imgParent {
+    position: relative;
+    display: inline-block;
+}
+
+.imgParent img {
+    display: block;
+    width: 100%;
+}
+
+.author {
+    position: absolute;
+    bottom: 4%;
+    left: 7%;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    width: 250px;
 }
 </style>
