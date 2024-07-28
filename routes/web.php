@@ -12,7 +12,7 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
     ]);
 });
-////////////////////////////// TEST ////////////////////////
+////////////////////////////// my routes ////////////////////////
 
 Route::get('/test', function () {
     // get the font families
@@ -54,6 +54,7 @@ Route::get('/test', function () {
         'templates'=> $templates,
     ]);
 });
+
 Route::get('/design', function () {
     // get the font families
     $fontFiles = [];

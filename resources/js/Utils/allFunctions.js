@@ -1,6 +1,4 @@
-import { Head } from '@inertiajs/vue3';
 import Konva from "konva";
-import { nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 // Import the snapping functions
@@ -17,23 +15,7 @@ const ZOOM_STEP = 0.1;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2;
 
-
 const allFunctions = {
-    props: {
-        fonts: Array,
-        textTemplates: {
-            type: Object,
-            required: true,
-        },
-        shapeTemplates: {
-            type: Object,
-            required: true,
-        },
-        templates: {
-            type: Object,
-            required: true,
-        },
-    },
     data() {
         return {
             transformer: null,
@@ -48,10 +30,6 @@ const allFunctions = {
             clippingTransformer: null,
             /////// test ///////////////
         };
-    },
-    mounted() {
-        this.initializeKonva();
-        this.loadFonts();
     },
     methods: {
         initializeKonva(template = null) {

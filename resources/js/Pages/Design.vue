@@ -3,7 +3,8 @@
         <Head title="Design"></Head>
         <v-navigation-drawer permanent width="300">
             <v-list density="compact">
-                <v-list-item @click="openTemp" prepend-icon="mdi-view-dashboard" title="Templates"
+
+                <v-list-item @click="this.selectedOption.templates = !this.selectedOption.templates" prepend-icon="mdi-view-dashboard" title="Templates"
                     value="Templates"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.templates" elevation="1" outlined>
                     <div class="d-flex justify-center" v-for="(temp, id) in templates" :key="id">
@@ -11,7 +12,8 @@
                             @click=" getSelectedTemplate(temp.id)" style="cursor: pointer">
                     </div>
                 </v-card>
-                <v-list-item @click="openText" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
+
+                <v-list-item @click="this.selectedOption.text = !this.selectedOption.text" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
                     <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
                         style=" text-transform: none; font-size: 25px;">
@@ -29,7 +31,8 @@
                             @click=" getSelectedTemplate(temp.id)" style="cursor: pointer">
                     </div>
                 </v-card>
-                <v-list-item @click="openPhotos" prepend-icon="mdi-image-outline" title="Photos"
+                
+                <v-list-item @click="this.selectedOption.photos = !this.selectedOption.photos" prepend-icon="mdi-image-outline" title="Photos"
                     value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
                     <v-container class="d-flex">
@@ -46,7 +49,7 @@
                     </div>
                 </v-card>
 
-                <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements"
+                <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements" prepend-icon="mdi-shape" title="Elements"
                     value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
                     <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
@@ -74,7 +77,7 @@
                     <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"></v-icon>
                 </div>
 
-                <v-list-item @click="openUp" prepend-icon="mdi-cloud-upload" title="Upload"
+                <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload" prepend-icon="mdi-cloud-upload" title="Upload"
                     value="Upload"></v-list-item>
                 <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
                     <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
@@ -103,7 +106,8 @@
                         </v-col>
                     </v-row>
                 </v-card>
-                <v-list-item @click="openLayer" prepend-icon="mdi-layers-triple" title="Layers"
+
+                <v-list-item @click=" this.selectedOption.layers = !this.selectedOption.layers" prepend-icon="mdi-layers-triple" title="Layers"
                     value="Layers"></v-list-item>
                 <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
                     <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
@@ -124,6 +128,7 @@
                     </div>
                 </v-card>
 
+<!-- ordenary elementt for add templates//////////////////////////////////////// -->
                 <v-list-item>
                     <v-text-field v-model="name"></v-text-field>
                     <v-file-input label="Upload image" prepend-icon="mdi-camera" @change="handleFileUpload">
@@ -161,15 +166,20 @@
                         </template>
                     </v-img>
                 </v-list-item>
+<!-- ///////////////////////////////////////////////////////////// -->
             </v-list>
         </v-navigation-drawer>
         <!-- defualt buttons -->
         <v-app-bar :elevation="1">
+            
             <template v-slot:prepend>
+
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input=" fillColor(selectedFillColor)" />
+
                 <v-btn color="red" icon="mdi-undo" @click=" unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click=" reDo"></v-btn>
+
                 <!-- for image -->
                 <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
                     <v-btn @click=" addClip = !addClip;  addClippingTool()">
@@ -177,21 +187,27 @@
                     </v-btn>
                     <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
                 </div>
+
             </template>
 
             <span class="ml-20">
+
                 <v-btn @click=" zoomFunction('in')">
                     <v-icon icon="mdi-magnify-plus-outline" size="25px"></v-icon>
                     <v-tooltip activator="parent" location="bottom">Zoom In</v-tooltip>
                 </v-btn>
+
                 <v-btn @click=" zoomFunction('out')">
                     <v-icon icon="mdi-magnify-minus-outline" size="25px"></v-icon>
                     <v-tooltip activator="parent" location="bottom">Zoom Out</v-tooltip>
                 </v-btn>
+
             </span>
 
             <template v-slot:append>
+
                 <div style="">
+                    <!-- positions -->
                     <v-btn>
                         <v-icon color="red" icon="mdi-layers"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Position</v-tooltip>
@@ -227,6 +243,8 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
+
+                    <!-- opacity -->
                     <v-btn>
                         <v-icon icon="mdi-opacity"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Opacity</v-tooltip>
@@ -242,7 +260,7 @@
                         </v-menu>
                     </v-btn>
 
-                    <!-- ///////////////// -->
+                    <!-- save as template -->
                     <v-dialog max-width="500">
                         <template v-slot:activator="{ props: activatorProps }">
                             <v-btn v-bind="activatorProps">
@@ -266,39 +284,51 @@
                             </v-card>
                         </template>
                     </v-dialog>
-                    <!-- /////////////// -->
+
+                    <!-- save As Json -->
                     <v-btn @click=" saveAsJson">
                         <v-icon icon="mdi-content-save"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Save As json</v-tooltip>
                     </v-btn>
+
+                    <!-- duplicate -->
                     <v-btn @click=" duplicateObjects">
                         <v-icon icon="mdi-content-copy"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
                     </v-btn>
+
+                    <!-- delete -->
                     <v-btn @click=" destroyObjects">
                         <v-icon icon="mdi-delete"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Delete</v-tooltip>
                     </v-btn>
+
+                    <!-- export as image -->
                     <v-btn @click=" exportImage">
                         <v-icon icon="mdi-download"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Download As Image</v-tooltip>
                     </v-btn>
+
                 </div>
             </template>
         </v-app-bar>
 
         <!-- text buttons -->
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
+            
             <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
                 @input=" fillColor(selectedFillColor)" />
+
             <div class="d-flex">
                 <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
                     v-model="selectedFont" @update:modelValue=" changeFontFamily(selectedFont)"
                     :style="`font-type: ${name}`" width="150px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
+
             <input type="number" v-model="fontSize" @input=" textSize(fontSize)"
                 style="width: 100px; border: 1px solid #ddd;" />
+
             <v-btn>
                 <v-icon icon="mdi-format-align-center"></v-icon>
                 <v-menu activator="parent">
@@ -320,15 +350,19 @@
                     </v-list>
                 </v-menu>
             </v-btn>
+
             <v-btn @click="toggleFOntCase()">
                 <v-icon icon="mdi-format-letter-case-upper"></v-icon>
             </v-btn>
+
             <v-btn @click="toggleFontWeight">
                 <v-icon icon="mdi-format-bold"></v-icon>
             </v-btn>
+
             <v-btn @click="toggleFontItalic()">
                 <v-icon icon="mdi-format-italic"></v-icon>
             </v-btn>
+
             <v-btn>
                 <v-icon icon="mdi-format-line-spacing"></v-icon>
                 <v-menu activator="parent">
@@ -348,7 +382,9 @@
                     </v-list>
                 </v-menu>
             </v-btn>
+
         </v-app-bar>
+
         <v-main class="d-flex align-center justify-center"
             style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
@@ -457,24 +493,6 @@ export default {
                     });
                 });
         },
-        openTemp() {
-            this.selectedOption.templates = !this.selectedOption.templates;
-        },
-        openText() {
-            this.selectedOption.text = !this.selectedOption.text;
-        },
-        openPhotos() {
-            this.selectedOption.photos = !this.selectedOption.photos;
-        },
-        openElement() {
-            this.selectedOption.elements = !this.selectedOption.elements;
-        },
-        openUp() {
-            this.selectedOption.upload = !this.selectedOption.upload;
-        },
-        openLayer() {
-            this.selectedOption.layers = !this.selectedOption.layers;
-        },
         toggleFontWeight() {
             this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
             this. textStyle(this.fontWeight);
@@ -507,6 +525,8 @@ export default {
         this.loadFonts();
         this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
+        this.initializeKonva();
+        this.loadFonts();
     },
     computed: {
         reversedLayers() {
@@ -543,18 +563,6 @@ export default {
         }
     },
     props: {
-        actions: {
-            type: Object,
-            required: true,
-        },
-        layers: {
-            type: Array,
-            default: () => [],
-        },
-        objectSelected: {
-            type: Array,
-            default: () => [],
-        },
         fonts: {
             type: Array,
             required: true,
