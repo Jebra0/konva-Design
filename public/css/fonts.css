@@ -3,6 +3,10 @@
                 src: url('/fonts/AbrilFatface-Regular.ttf') format('truetype');
             }
 @font-face {
+                font-family: 'Cairo';
+                src: url('/fonts/Cairo-VariableFont_slnt,wght.ttf') format('truetype');
+            }
+@font-face {
                 font-family: 'DancingScript';
                 src: url('/fonts/DancingScript-VariableFont_wght.ttf') format('truetype');
             }

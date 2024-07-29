@@ -45,12 +45,12 @@ const allFunctions = {
                 this.layers.push({ 'id': 0, 'name': 'Defualt Layer' });
                 this.stage.add(this.defaultLayer);
 
-                // Create a transformer
-                this.transformer = new Konva.Transformer();
-                this.defaultLayer.add(this.transformer);
+                // // Create a transformer
+                // this.transformer = new Konva.Transformer();
+                // this.defaultLayer.add(this.transformer);
 
-                this.defaultLayer.on("dragmove", this.handleDragMove);
-                this.defaultLayer.on("dragend", this.handleDragEnd);
+                // this.defaultLayer.on("dragmove", this.handleDragMove);
+                // this.defaultLayer.on("dragend", this.handleDragEnd);
 
                 // Click outside of shapes to remove the transformer
                 this.stage.on('click', (e) => {
@@ -60,14 +60,18 @@ const allFunctions = {
                 });
                 this.defaultLayer.draw();
 
-                ///////
-                if (template !== null) {
-                    this.getTemplate(template);
-                }
             } else {
                 // Retry initializing after a short delay if the container is not found
                 setTimeout(this.initializeKonva, 100);
             }
+        },
+        addTransformer(layer) {
+            // Create a transformer
+            this.transformer = new Konva.Transformer();
+            layer.add(this.transformer);
+
+            layer.on("dragmove", this.handleDragMove);
+            layer.on("dragend", this.handleDragEnd);
         },
         // snap objects
         handleDragMove(e) {
@@ -107,6 +111,8 @@ const allFunctions = {
                     const newLayer = new Konva.Layer();
                     newLayer.id(uuidv4());
                     this.stage.add(newLayer);
+                    // transformer
+                    this.addTransformer(newLayer);
 
                     child.children.forEach(async grandChild => {
                         // with this condition i create aditional layer with no children
@@ -130,6 +136,9 @@ const allFunctions = {
                                         };
                                     });
                                 }
+                            }
+                            if (object.getClassName() === 'Text') {
+                                this.editText(object);
                             }
 
                             const currentLength = this.layers.length;
@@ -168,9 +177,7 @@ const allFunctions = {
             const ShapeConstructor = Konva[config.type];
             const shape = new ShapeConstructor(config);
 
-            // Create a transformer
-            this.transformer = new Konva.Transformer();
-            newLayer.add(this.transformer);
+            this.addTransformer(newLayer);
 
             const currentLength = this.layers.length;
             if (currentLength > 1) {
@@ -205,7 +212,7 @@ const allFunctions = {
                 this.objectSelected.push({
                     objectId: id,
                     objectType: type,
-                    congig: config
+                    config: config
                 });
             }
             this.updateTransformer();
@@ -262,10 +269,10 @@ const allFunctions = {
             this.selectedObjectIds.forEach((id) => {
                 const shape = this.stage.findOne(`#${id}`);
                 if (shape) {
-                    shape
                     const layer = shape.getLayer();
+                    this.transformer.destroy();
                     this.deleteLayer(layer.id());
-                    shape.destroy();
+                    layer.destroy();
                 }
             });
             this.clearSelection();
@@ -274,46 +281,39 @@ const allFunctions = {
         duplicateObjects() {
             const newSelectedIds = [];
             this.selectedObjectIds.forEach((id) => {
-                const newLayer = new Konva.Layer();
-                newLayer.id(uuidv4());
-                this.stage.add(newLayer);
-
                 const shape = this.stage.findOne(`#${id}`);
                 if (shape) {
-                    const clonedShape = shape.clone({
-                        x: shape.x() + 20,
-                        y: shape.y() + 20,
-                        id: uuidv4(),
-                    });
-                    newLayer.add(clonedShape);
-
-                    // Create a transformer
-                    this.transformer = new Konva.Transformer();
-                    newLayer.add(this.transformer);
+                    const objLayer = shape.getLayer();
+                    const layer = objLayer.clone({ id: uuidv4() });
+                    this.stage.add(layer);
+                    const object = layer.children[1];
+                    object.id(uuidv4());
+                    object.x(object.x() + 20)
+                    object.y(object.y() + 20)
 
                     const currentLength = this.layers.length;
                     if (currentLength > 1) {
                         this.layers[currentLength - 1].lastOne = false;
                     }
                     this.layers.push({
-                        'id': newLayer.id(),
-                        'name': clonedShape.getClassName(),
-                        'layer': newLayer,
+                        'id': layer.id(),
+                        'name': object.getClassName(),
+                        'layer': layer,
                         'visible': true,
                         'firstOne': this.layers.length === 1,
                         'lastOne': true
                     });
-                    newSelectedIds.push(clonedShape.id());
 
-                    clonedShape.on("click", (e) => {
+                    object.on("click", (e) => {
                         e.cancelBubble = true;
-                        this.toggleSelection(clonedShape.id(), clonedShape.getClassName(), clonedShape);
+                        this.toggleSelection(object.id(), object.getClassName(), object);
                     });
-
+                    newSelectedIds.push(object.id());
+                    layer.batchDraw();
                 }
-                newLayer.batchDraw();
-                this.selectedObjectIds = newSelectedIds;
             });
+            this.selectedObjectIds = newSelectedIds;
+            this.updateTransformer();
         },
         objectOpacity(opacity) {
             this.selectedObjectIds.forEach((id) => {
@@ -517,8 +517,7 @@ const allFunctions = {
             const text = new textConstructor(config);
 
             // Create a transformer
-            this.transformer = new Konva.Transformer();
-            newLayer.add(this.transformer);
+            this.addTransformer(newLayer);
 
             const currentLength = this.layers.length;
             if (currentLength > 1) {
@@ -812,12 +811,12 @@ const allFunctions = {
                     height: height - 100,
                     draggable: true,
                     id: uuidv4(),
-                    src: url
+                    src: url,
+                    name: 'object',
                 });
 
                 // Create a transformer
-                this.transformer = new Konva.Transformer();
-                newLayer.add(this.transformer);
+                this.addTransformer(newLayer);
 
                 const currentLength = this.layers.length;
                 if (currentLength > 1) {

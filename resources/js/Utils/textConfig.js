@@ -3,10 +3,11 @@ export const headerText = {
     y:  250,
     text: 'Heading',
     fontSize: 45,
-    fontFamily: 'cairo',
-    fill: 'black',
+    fontFamily: 'brush',
+    fill: '#FF0000',
     id: '',
-    draggable: true
+    draggable: true,
+    name: 'object',
 };
 
 export const subHeaderText = {
@@ -14,10 +15,11 @@ export const subHeaderText = {
     y:  250,
     text: 'Subheading',
     fontSize: 28,
-    fontFamily: 'cairo',
-    fill: 'black',
+    fontFamily: 'Cairo',
+    fill: '#000000',
     id: '',
-    draggable: true
+    draggable: true,
+    name: 'object',
 };
 
 export const bodyText = {
@@ -25,18 +27,9 @@ export const bodyText = {
     y:  250,
     text: 'Add a little bit of body text',
     fontSize: 20,
-    fontFamily: 'cairo',
-    fill: 'black',
+    fontFamily: 'Cairo',
+    fill: '#000000',
     id: '',
-    draggable: true
-};
-export const text_0 = {
-    x:  150,
-    y:  250,
-    text: 'Horizon',
-    fontSize: 40,
-    fontFamily: 'brush',
-    fill: 'red',
-    id: '',
-    draggable: true
+    draggable: true,
+    name: 'object',
 };

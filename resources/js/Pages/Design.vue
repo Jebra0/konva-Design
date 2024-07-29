@@ -1,19 +1,21 @@
 <template>
     <v-app>
+
         <Head title="Design"></Head>
         <v-navigation-drawer permanent width="300">
             <v-list density="compact">
 
-                <v-list-item @click="this.selectedOption.templates = !this.selectedOption.templates" prepend-icon="mdi-view-dashboard" title="Templates"
-                    value="Templates"></v-list-item>
+                <v-list-item @click="this.selectedOption.templates = !this.selectedOption.templates"
+                    prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.templates" elevation="1" outlined>
                     <div class="d-flex justify-center" v-for="(temp, id) in templates" :key="id">
-                        <img :src="temp.image" width="250px" alt="Text Image"
-                            @click=" getSelectedTemplate(temp.id)" style="cursor: pointer">
+                        <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
+                            style="cursor: pointer">
                     </div>
                 </v-card>
 
-                <v-list-item @click="this.selectedOption.text = !this.selectedOption.text" prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
+                <v-list-item @click="this.selectedOption.text = !this.selectedOption.text"
+                    prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
                     <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
                         style=" text-transform: none; font-size: 25px;">
@@ -27,13 +29,13 @@
                         style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
                     <div class="d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
-                        <img :src="temp.image" width="250px" alt="Text Image"
-                            @click=" getSelectedTemplate(temp.id)" style="cursor: pointer">
+                        <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
+                            style="cursor: pointer">
                     </div>
                 </v-card>
-                
-                <v-list-item @click="this.selectedOption.photos = !this.selectedOption.photos" prepend-icon="mdi-image-outline" title="Photos"
-                    value="Photos"></v-list-item>
+
+                <v-list-item @click="this.selectedOption.photos = !this.selectedOption.photos"
+                    prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
                     <v-container class="d-flex">
                         <v-text-field label="search" v-model="searchQuery"></v-text-field>
@@ -49,8 +51,8 @@
                     </div>
                 </v-card>
 
-                <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements" prepend-icon="mdi-shape" title="Elements"
-                    value="Elements"></v-list-item>
+                <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements"
+                    prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
                     <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
                         <img :src="shape.image" width="70px" alt="Text Image"
@@ -77,8 +79,8 @@
                     <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"></v-icon>
                 </div>
 
-                <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload" prepend-icon="mdi-cloud-upload" title="Upload"
-                    value="Upload"></v-list-item>
+                <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload"
+                    prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
                 <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
                     <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                         <template v-slot:selection="{ fileNames }">
@@ -107,15 +109,15 @@
                     </v-row>
                 </v-card>
 
-                <v-list-item @click=" this.selectedOption.layers = !this.selectedOption.layers" prepend-icon="mdi-layers-triple" title="Layers"
-                    value="Layers"></v-list-item>
+                <v-list-item @click=" this.selectedOption.layers = !this.selectedOption.layers"
+                    prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
                 <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
                     <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
                         <span v-if="layer.name !== 'Defualt Layer'">
                             <button @click=" hideLayer(!layer.visible, layer.id)" class="mr-2">
                                 <v-icon :icon="layer.visible ? 'mdi-eye' : 'mdi-eye-closed'"></v-icon>
                             </button>
-                            <button @click=" deleteLayer(layer.id)"><v-icon icon="mdi-delete"></v-icon></button>
+                            <button @click="deleteLayer(layer.layer.id())"><v-icon icon="mdi-delete"></v-icon></button>
                         </span>
                         <span v-text="layer.name" class="ml-1" style="width: 120px;"></span>
 
@@ -128,7 +130,7 @@
                     </div>
                 </v-card>
 
-<!-- ordenary elementt for add templates//////////////////////////////////////// -->
+                <!-- ordenary elementt for add templates//////////////////////////////////////// -->
                 <v-list-item>
                     <v-text-field v-model="name"></v-text-field>
                     <v-file-input label="Upload image" prepend-icon="mdi-camera" @change="handleFileUpload">
@@ -166,23 +168,24 @@
                         </template>
                     </v-img>
                 </v-list-item>
-<!-- ///////////////////////////////////////////////////////////// -->
+                <!-- ///////////////////////////////////////////////////////////// -->
             </v-list>
         </v-navigation-drawer>
         <!-- defualt buttons -->
         <v-app-bar :elevation="1">
-            
+
             <template v-slot:prepend>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
-                    v-model="selectedFillColor" @input=" fillColor(selectedFillColor)" />
+                    :value="selectedFillColor"
+                    v-model="colorFill" @input="fillColor(colorFill)" />
 
-                <v-btn color="red" icon="mdi-undo" @click=" unDo"></v-btn>
-                <v-btn color="red" icon="mdi-redo" @click=" reDo"></v-btn>
+                <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
+                <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
 
                 <!-- for image -->
                 <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
-                    <v-btn @click=" addClip = !addClip;  addClippingTool()">
+                    <v-btn @click=" addClip = !addClip; addClippingTool()">
                         <v-icon icon="mdi-crop"></v-icon>
                     </v-btn>
                     <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
@@ -215,19 +218,19 @@
                             <v-list style="width: 200px">
                                 <v-list-item>
                                     <v-list-item-title>Position</v-list-item-title>
-                                    <v-btn class="mr-9" @click=" alignLeft">
+                                    <v-btn class="mr-9" @click="alignLeft">
                                         <v-icon icon="mdi-align-horizontal-left"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Left</v-tooltip>
                                     </v-btn>
-                                    <v-btn @click=" alignRight">
+                                    <v-btn @click="alignRight">
                                         <v-icon icon="mdi-align-horizontal-right"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Right</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9" @click=" alignTop">
+                                    <v-btn class="mr-9" @click="alignTop">
                                         <v-icon icon="mdi-align-vertical-top"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Top</v-tooltip>
                                     </v-btn>
-                                    <v-btn @click=" alignBottom">
+                                    <v-btn @click="alignBottom">
                                         <v-icon icon="mdi-align-vertical-bottom"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>
                                     </v-btn>
@@ -286,25 +289,25 @@
                     </v-dialog>
 
                     <!-- save As Json -->
-                    <v-btn @click=" saveAsJson">
+                    <v-btn @click="saveAsJson">
                         <v-icon icon="mdi-content-save"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Save As json</v-tooltip>
                     </v-btn>
 
                     <!-- duplicate -->
-                    <v-btn @click=" duplicateObjects">
+                    <v-btn @click="duplicateObjects">
                         <v-icon icon="mdi-content-copy"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
                     </v-btn>
 
                     <!-- delete -->
-                    <v-btn @click=" destroyObjects">
+                    <v-btn @click="destroyObjects()">
                         <v-icon icon="mdi-delete"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Delete</v-tooltip>
                     </v-btn>
 
                     <!-- export as image -->
-                    <v-btn @click=" exportImage">
+                    <v-btn @click="exportImage">
                         <v-icon icon="mdi-download"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Download As Image</v-tooltip>
                     </v-btn>
@@ -315,18 +318,19 @@
 
         <!-- text buttons -->
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
-            
-            <input class="ml-2" type="color" style="width: 40px; height: 40px" v-model="selectedFillColor"
-                @input=" fillColor(selectedFillColor)" />
+
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" 
+                :value="selectedFillColor"
+              v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
                 <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
-                    v-model="selectedFont" @update:modelValue=" changeFontFamily(selectedFont)"
-                    :style="`font-type: ${name}`" width="150px" class=" m-2 mt-5">
+                      :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)" width="200px"
+                    class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
-            <input type="number" v-model="fontSize" @input=" textSize(fontSize)"
+            <input type="number" v-model="fontSize" @input=" textSize($event.target.value)"
                 style="width: 100px; border: 1px solid #ddd;" />
 
             <v-btn>
@@ -375,8 +379,8 @@
                         </v-list-item>
                         <v-list-item>
                             <v-list-item-title>line height</v-list-item-title>
-                            <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin"
-                                v-model="lineHight" style="width: 250px" class="align-center" hide-details>
+                            <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin" v-model="lineHight"
+                                style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                     </v-list>
@@ -388,6 +392,7 @@
         <v-main class="d-flex align-center justify-center"
             style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
+            <!-- {{ selectedObjectIds }} -->
         </v-main>
     </v-app>
 </template>
@@ -421,10 +426,9 @@ export default {
             opacity: 1,
             ////////////////
             texts: [],
-            selectedFillColor: 'white',
             images: [],
             hide: true,
-            fontSize: 30,
+            // fontSize: 30,
             fontWeight: 'normal',
             fontItalic: 'normal',
             fontCase: 'lower',
@@ -437,7 +441,7 @@ export default {
             sMax: 50,
             charSpacing: 1,
 
-            selectedFont: 'cairo',
+            // selectedFont: 'Cairo',
             fontFamilies: [],
 
             templateName: '',
@@ -450,6 +454,11 @@ export default {
 
             imageUrls: [],
             addClip: false,
+
+            name: '',
+            colorFill: null,
+            fontSelected: '',
+            sizeFont: '',
         }
     },
     methods: {
@@ -495,24 +504,24 @@ export default {
         },
         toggleFontWeight() {
             this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
-            this. textStyle(this.fontWeight);
+            this.textStyle(this.fontWeight);
         },
         toggleFontItalic() {
             this.fontItalic = this.fontItalic === 'normal' ? 'italic' : 'normal';
-            this. textStyle(this.fontItalic);
+            this.textStyle(this.fontItalic);
         },
         toggleFOntCase() {
             this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
-            this. textCase(this.fontCase);
+            this.textCase(this.fontCase);
         },
         addHeader() {
-            this. addText(headerText);
+            this.addText(headerText);
         },
         addSubHeader() {
-            this. addText(subHeaderText);
+            this.addText(subHeaderText);
         },
         addBodyText() {
-            this. addText(bodyText);
+            this.addText(bodyText);
         },
         loadFonts() {
             const link = document.createElement('link');
@@ -520,13 +529,16 @@ export default {
             link.href = '/css/fonts.css';
             document.head.appendChild(link);
         },
+        test() {
+            this.selectedFillColor = this.objectSelected[0].config.attrs.fill;
+        }
     },
     mounted() {
         this.loadFonts();
         this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
         this.initializeKonva();
-        this.loadFonts();
+
     },
     computed: {
         reversedLayers() {
@@ -559,6 +571,27 @@ export default {
                     }
                     return 'Shape';
                 }
+            }
+        },
+        selectedFont() {
+            if (this.objectSelected.length === 1) {
+                return this.objectSelected[0].config.attrs.fontFamily;
+            } else {
+                return 'Cairo';
+            }
+        },
+        selectedFillColor() {
+            if (this.objectSelected.length === 1) {
+                return this.objectSelected[0].config.attrs.fill;
+            } else {
+                return '#0000';
+            }
+        },
+        fontSize() {
+            if (this.objectSelected.length === 1) {
+                return this.objectSelected[0].config.attrs.fontSize;
+            } else {
+                return '11';
             }
         }
     },

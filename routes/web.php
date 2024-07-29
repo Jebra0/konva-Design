@@ -69,7 +69,7 @@ Route::get('/design', function () {
 
         $fontFiles[] = [
             'name' => $cleanedFilename,
-            'src' => 'fonts/' . $cleanedFilename . '.ttf'
+            'src' => 'fonts/' . $filenameWithoutExtension . '.ttf'
         ];
     }
     // templates
