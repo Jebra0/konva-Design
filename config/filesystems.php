@@ -60,6 +60,10 @@ return [
             'driver' => 'local',
             'root' => public_path(),
         ],
+        'public_fonts' => [
+            'driver' => 'local',
+            'root' => public_path(),
+        ],
 
     ],
 

@@ -19,6 +19,10 @@
                 src: url('/fonts/PlaywriteBEVLG-VariableFont_wght.ttf') format('truetype');
             }
 @font-face {
+                font-family: 'PlaywriteDKLoopet';
+                src: url('/fonts/PlaywriteDKLoopet-VariableFont_wght.ttf') format('truetype');
+            }
+@font-face {
                 font-family: 'PlaywriteHU';
                 src: url('/fonts/PlaywriteHU-VariableFont_wght.ttf') format('truetype');
             }

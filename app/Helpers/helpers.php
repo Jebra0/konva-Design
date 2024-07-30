@@ -23,11 +23,12 @@ function getFonts(): array
     return $fontFiles;
 }
 
-function getTemplates($type){
+function getTemplates($type)
+{
     return Template::where('type', $type)
-            ->select(['id', 'image'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        ->select(['id', 'image'])
+        ->orderBy('created_at', 'desc')
+        ->get();
 }
 
 function getTemplateImages(): array
@@ -45,4 +46,26 @@ function getTemplateImages(): array
         ];
     }
     return $fontFiles;
+}
+
+function loadFonts()
+{
+    $cssContent = '';
+    $directory = public_path('fonts');
+
+    $files = glob($directory . '/*.ttf');
+
+    foreach ($files as $file) {
+        $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
+
+        $parts = explode('-', $filenameWithoutExtension);
+        $cleanedFilename = $parts[0];
+
+        $cssContent .= "@font-face {
+                font-family: '$cleanedFilename';
+                src: url('/fonts/$filenameWithoutExtension.ttf') format('truetype');
+            }\n";
+    }
+    file_put_contents(public_path('css/fonts.css'), $cssContent);
+
 }

@@ -5,6 +5,8 @@ use App\Http\Controllers\TemplateController;
 use App\Models\Template;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -26,8 +28,8 @@ Route::get('/Arabian-Geeks', function () {
     return Inertia::render('index', [
         'fonts' => $fontFiles,
         'textTemplates' => $temps,
-        'shapeTemplates'=> $shapes,
-        'templates'=> $templates,
+        'shapeTemplates' => $shapes,
+        'templates' => $templates,
     ]);
 });
 
@@ -45,8 +47,8 @@ Route::get('/admin-panel', function () {
     return Inertia::render('AdminPanel', [
         'fonts' => $fontFiles,
         'textTemplates' => $temps,
-        'shapeTemplates'=> $shapes,
-        'templates'=> $templates,
+        'shapeTemplates' => $shapes,
+        'templates' => $templates,
         'templateImages' => $tmplateImages,
     ]);
 });
@@ -63,8 +65,8 @@ Route::get('/design', function () {
     return Inertia::render('Design', [
         'fonts' => $fontFiles,
         'textTemplates' => $temps,
-        'shapeTemplates'=> $shapes,
-        'templates'=> $templates,
+        'shapeTemplates' => $shapes,
+        'templates' => $templates,
     ]);
 });
 Route::get('/test', function () {
@@ -79,14 +81,15 @@ Route::get('/test', function () {
     return Inertia::render('Test', [
         'fonts' => $fontFiles,
         'textTemplates' => $temps,
-        'shapeTemplates'=> $shapes,
-        'templates'=> $templates,
+        'shapeTemplates' => $shapes,
+        'templates' => $templates,
     ]);
 });
 
 Route::get('/template/{template}', [TemplateController::class, 'index']);
 Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
+Route::post('/font/add', [TemplateController::class,'addFont']);
 
 ////////////////////////////////////////////////////////
 
