@@ -8,6 +8,7 @@ import {
     getGuides,
     drawGuides,
 } from '@/Utils/snapping.js';
+import {bodyText, headerText, subHeaderText} from "@/Utils/textConfig.js";
 
 const width = 600;
 const height = 500;
@@ -1051,20 +1052,94 @@ const allFunctions = {
             }
         },
         ///////////// test crop ///////////////////
-        async addTemplateImage(imgURL, name) {
-            let response = await fetch(imgURL)
-            let blob = await response.blob();
-
+        async addTemplateImages(images) {
             let formData = new FormData();
-            formData.append('image', blob, `${name}.png`);
-            formData.append('name', name);
-
-            let res = await axios.post('/template/picture/add', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+            let fetchPromises = images.map(async (image, index) => {
+                try {
+                    let response = await fetch(image);
+                    let blob = await response.blob();
+        
+                    let fileName = `temp-${index}-${Date.now()}.png`;
+                    formData.append('images[]', blob, fileName);
+                } catch (error) {
+                    console.error(`Failed to fetch image from ${image}:`, error);
                 }
             });
-            console.log(res)
+        
+            // Wait for all fetch operations to complete
+            await Promise.all(fetchPromises);
+        
+            try {
+                let res = await axios.post('/template/picture/add', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            } catch (error) {
+                console.error('Error uploading images:', error);
+            }
+        },        
+        /////////////////////////
+        handleFileUpload(event) {
+            const files = event.target.files;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imageUrls.unshift(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        },
+        fetchUnsplashImages() {
+            fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
+                .then(res => res.json())
+                .then(json => {
+                    // console.log(json[0].urls.full)
+                    json.forEach(element => {
+                        this.images.push({
+                            src: element.urls.full,
+                            portfolio: element.user.portfolio_url,
+                            author: element.user.name
+                        });
+                    });
+                });
+        },
+        searchUnsplashImages(query) {
+            fetch(`${this.unsplashSearchUrl}?client_id=${this.unsplashAccessKey}&query=${query}`)
+                .then(res => res.json())
+                .then(json => {
+                    console.log(this.searchQuery)
+                    json.results.forEach(element => {
+                        //this.images =[];
+                        this.images.unshift({
+                            src: element.urls.full,
+                            portfolio: element.user.portfolio_url,
+                            author: element.user.name
+                        });
+                    });
+                });
+        },
+        toggleFontWeight() {
+            this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
+            this.textStyle(this.fontWeight);
+        },
+        toggleFontItalic() {
+            this.fontItalic = this.fontItalic === 'normal' ? 'italic' : 'normal';
+            this.textStyle(this.fontItalic);
+        },
+        toggleFOntCase() {
+            this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
+            this.textCase(this.fontCase);
+        },
+        addHeader() {
+            this.addText(headerText);
+        },
+        addSubHeader() {
+            this.addText(subHeaderText);
+        },
+        addBodyText() {
+            this.addText(bodyText);
         },
 
     }

@@ -21,7 +21,7 @@ class TemplateController extends Controller
         ]);
 
         $file = $request->file('image');
-        $path = $file->store('images/'.$request->type, ['disk' => 'public_images']);
+        $path = $file->store('images/' . $request->type, ['disk' => 'public_images']);
 
         $template = new Template();
         $template->name = $request->name;
@@ -33,11 +33,27 @@ class TemplateController extends Controller
         return $template;
     }
 
-    public function uploadTemplate(Request $request){
-        $file = $request->file('image');
-        $newFileName = $request->name.'.' . $file->getClientOriginalExtension();
+    public function uploadTemplate(Request $request)
+    {
+        $files = $request->file('images');
 
-        $path = $file->storeAs('images/Templates', $newFileName, ['disk' => 'public_images']);
-        return $path;
+        if (!is_array($files)) {
+            return response()->json(['error' => 'No files provided or invalid data'], 400);
+        }
+
+        $paths = [];
+
+        foreach ($files as $file) {
+            try {
+                $newFileName = time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('images/Templates', $newFileName, ['disk' => 'public_images']);
+                $paths[] = $path;
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error uploading file: ' . $e->getMessage()], 500);
+            }
+        }
+
+        return response()->json(['paths' => $paths]);
     }
+
 }

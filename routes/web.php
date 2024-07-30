@@ -31,6 +31,26 @@ Route::get('/Arabian-Geeks', function () {
     ]);
 });
 
+Route::get('/admin-panel', function () {
+    $fontFiles = getFonts();
+
+    $temps = getTemplates('Text');
+
+    $shapes = getTemplates('Shapes');
+
+    $templates = getTemplates('Fold brochure');
+
+    $tmplateImages = getTemplateImages();
+
+    return Inertia::render('AdminPanel', [
+        'fonts' => $fontFiles,
+        'textTemplates' => $temps,
+        'shapeTemplates'=> $shapes,
+        'templates'=> $templates,
+        'templateImages' => $tmplateImages,
+    ]);
+});
+
 Route::get('/design', function () {
     $fontFiles = getFonts();
 

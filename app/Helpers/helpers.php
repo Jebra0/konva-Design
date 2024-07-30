@@ -29,3 +29,20 @@ function getTemplates($type){
             ->orderBy('created_at', 'desc')
             ->get();
 }
+
+function getTemplateImages(): array
+{
+    $images = [];
+    $directory = public_path('images/Templates');
+
+    $files = glob($directory . '/*.png');
+
+    foreach ($files as $file) {
+        $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
+
+        $fontFiles[] = [
+            'src' => 'images/Templates/' . $filenameWithoutExtension . '.png'
+        ];
+    }
+    return $fontFiles;
+}
