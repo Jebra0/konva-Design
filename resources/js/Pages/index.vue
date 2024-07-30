@@ -1,58 +1,60 @@
 <template>
-    <v-app>
-
-        <Head title="Design"><title>Design</title></Head>
+    <v-layout>
+        <Head ><title>Design Tool</title></Head>
         <v-navigation-drawer permanent width="300">
             <v-list density="compact">
 
                 <v-list-item @click="this.selectedOption.templates = !this.selectedOption.templates"
-                    prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
+                             prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.templates" elevation="1" outlined>
                     <div class="d-flex justify-center" v-for="(temp, id) in templates" :key="id">
                         <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
-                            style="cursor: pointer">
+                             style="cursor: pointer">
                     </div>
                 </v-card>
 
                 <v-list-item @click="this.selectedOption.text = !this.selectedOption.text"
-                    prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
+                             prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
-                    <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
-                        style=" text-transform: none; font-size: 25px;">
+                    <v-btn v-on:click.native="addText(headerText)" elevation="0" width="100%"
+                           style=" text-transform: none; font-size: 25px;">
                         <h1>Create header</h1>
                     </v-btn>
-                    <v-btn @click="addSubHeader()" elevation="0" width="100%"
-                        style="text-transform: none; font-size: 18px;">
+                    <v-btn @click="this.addText(subHeaderText)" elevation="0" width="100%"
+                           style="text-transform: none; font-size: 18px;">
                         <h4>Create sub header</h4>
                     </v-btn>
-                    <v-btn @click="addBodyText()" elevation="0" width="100%"
-                        style="text-transform: none; font-size: 14px;">Create Body
+                    <v-btn @click=" this.addText(bodyText)" elevation="0" width="100%"
+                           style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
                     <div class="d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
                         <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
-                            style="cursor: pointer">
+                             style="cursor: pointer">
                     </div>
                 </v-card>
 
                 <v-list-item @click="this.selectedOption.photos = !this.selectedOption.photos"
-                    prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
+                             prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
                     <v-container class="d-flex">
                         <v-text-field label="search" v-model="searchQuery"></v-text-field>
                         <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify"
-                            @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
+                                @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
                     </v-container>
                     <div class="imgParent" v-for="(image, index) in images" :key="index">
                         <img :src="image.src" alt="" @click=" addImage(image.src)"
-                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
-                        <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{ image.author
-                                }}</a>
+                             style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
+                        <p class="author">
+                            Photo by
+                            <a style="color: blue;" :href="image.portfolio">
+                                {{ image.author }}
+                            </a>
                         </p>
                     </div>
                 </v-card>
 
                 <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements"
-                    prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
+                             prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
                     <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
                         <img :src="shape.image" width="70px" alt="Text Image"
@@ -61,15 +63,15 @@
                     <v-icon icon="mdi-minus" color="black" size="70"></v-icon>
                     <v-icon icon="mdi-arrow-right-thin" color="black" size="70"></v-icon>
                     <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(rectConfig)"></v-icon>
+                            @click=" addShape(rectConfig)"></v-icon>
                     <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(circleConfig)"></v-icon>
+                            @click=" addShape(circleConfig)"></v-icon>
                     <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(triangleConfig)"></v-icon>
+                            @click=" addShape(triangleConfig)"></v-icon>
                     <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(hexagonConfig)"></v-icon>
+                            @click=" addShape(hexagonConfig)"></v-icon>
                     <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(octagonConfig)"></v-icon>
+                            @click=" addShape(octagonConfig)"></v-icon>
                     <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70"></v-icon>
                     <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70"></v-icon>
                     <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70"></v-icon>
@@ -80,7 +82,7 @@
                 </div>
 
                 <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload"
-                    prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
+                             prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
                 <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
                     <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                         <template v-slot:selection="{ fileNames }">
@@ -98,7 +100,7 @@
                     <v-row>
                         <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
                             <v-img @click=" addUploadedImage(image)" style="cursor: pointer;" :src="image"
-                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                   aspect-ratio="1" class="bg-grey-lighten-2" cover>
                                 <template v-slot:placeholder>
                                     <v-row align="center" class="fill-height ma-0" justify="center">
                                         <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
@@ -110,7 +112,7 @@
                 </v-card>
 
                 <v-list-item @click=" this.selectedOption.layers = !this.selectedOption.layers"
-                    prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
+                             prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
                 <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
                     <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
                         <span v-if="layer.name !== 'Defualt Layer'">
@@ -123,9 +125,9 @@
 
                         <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
                             <button v-if="(!layer.lastOne)" @click=" moveLayer('up', layer.id)"><v-icon
-                                    icon="mdi-arrow-up"></v-icon></button>
+                                icon="mdi-arrow-up"></v-icon></button>
                             <button v-if="(!layer.firstOne)" @click=" moveLayer('down', layer.id)"><v-icon
-                                    icon="mdi-arrow-down"></v-icon></button>
+                                icon="mdi-arrow-down"></v-icon></button>
                         </span>
                     </div>
                 </v-card>
@@ -149,7 +151,7 @@
                     <v-row>
                         <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
                             <v-img @click=" addTemplateImage(image, name)" style="cursor: pointer;" :src="image"
-                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                   aspect-ratio="1" class="bg-grey-lighten-2" cover>
                                 <template v-slot:placeholder>
                                     <v-row align="center" class="fill-height ma-0" justify="center">
                                         <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
@@ -160,7 +162,7 @@
                     </v-row>
                     <hr>
                     <v-img @click=" addImage(image)" style="cursor: pointer;" :src="image" aspect-ratio="1"
-                        class="bg-grey-lighten-2" cover>
+                           class="bg-grey-lighten-2" cover>
                         <template v-slot:placeholder>
                             <v-row align="center" class="fill-height ma-0" justify="center">
                                 <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
@@ -177,8 +179,8 @@
             <template v-slot:prepend>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
-                    :value="selectedFillColor"
-                    v-model="colorFill" @input="fillColor(colorFill)" />
+                       :value="selectedFillColor"
+                       v-model="colorFill" @input="fillColor(colorFill)" />
 
                 <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
@@ -212,7 +214,7 @@
                 <div style="">
                     <!-- positions -->
                     <v-btn>
-                        <v-icon color="red" icon="mdi-layers"></v-icon>
+                        <v-icon icon="mdi-layers"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Position</v-tooltip>
                         <v-menu activator="parent">
                             <v-list style="width: 200px">
@@ -234,11 +236,11 @@
                                         <v-icon icon="mdi-align-vertical-bottom"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9">
+                                    <v-btn class="mr-9" @click="alignCenter()">
                                         <v-icon icon="mdi-align-horizontal-center"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>
                                     </v-btn>
-                                    <v-btn>
+                                    <v-btn @click="alignMiddle()">
                                         <v-icon icon="mdi-align-vertical-center"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>
                                     </v-btn>
@@ -256,7 +258,7 @@
                                 <v-list-item>
                                     <v-list-item-title>Transparency</v-list-item-title>
                                     <v-slider @mouseout=" objectOpacity(opacity)" v-model="opacity" :max="max"
-                                        :min="min" style="width: 250px" class="align-center" hide-details>
+                                              :min="min" style="width: 250px" class="align-center" hide-details>
                                     </v-slider>
                                 </v-list-item>
                             </v-list>
@@ -276,13 +278,13 @@
                                 <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
 
                                 <v-select label="Template Type" required v-model="templateType"
-                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
+                                          :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
                                     <v-btn text="Save"
-                                        @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
+                                           @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -315,23 +317,22 @@
                 </div>
             </template>
         </v-app-bar>
-
         <!-- text buttons -->
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
 
             <input class="ml-2" type="color" style="width: 40px; height: 40px"
-                :value="selectedFillColor"
-              v-model="colorFill" @input="fillColor(colorFill)" />
+                   :value="selectedFillColor"
+                   v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
                 <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
-                      :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)" width="200px"
-                    class=" m-2 mt-5">
+                            :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)" width="200px"
+                            class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
             <input type="number" v-model="fontSize" @input=" textSize($event.target.value)"
-                style="width: 100px; border: 1px solid #ddd;" />
+                   style="width: 100px; border: 1px solid #ddd;" />
 
             <v-btn>
                 <v-icon icon="mdi-format-align-center"></v-icon>
@@ -374,13 +375,13 @@
                         <v-list-item>
                             <v-list-item-title>Spacing</v-list-item-title>
                             <v-slider @mouseout=" textCharSpacing(charSpacing)" :max="sMax" :min="sMin"
-                                v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
+                                      v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                         <v-list-item>
                             <v-list-item-title>line height</v-list-item-title>
                             <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin" v-model="lineHight"
-                                style="width: 250px" class="align-center" hide-details>
+                                      style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                     </v-list>
@@ -390,20 +391,22 @@
         </v-app-bar>
 
         <v-main class="d-flex align-center justify-center"
-            style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
+                style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
             <!-- {{ selectedObjectIds }} -->
         </v-main>
-    </v-app>
+    </v-layout>
 </template>
 <script>
-import allFunctions from '@/Utils/allFunctions.js';
 import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
 import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
+import allFunctions from "@/Utils/allFunctions.js";
+import { Head } from '@inertiajs/vue3';
 
 export default {
     mixins: [allFunctions],
-    data() {
+    components: {Head},
+    data(){
         return {
             image: '/images/Templates/fold_brochure_template.png',
             selectedOption: {
@@ -420,6 +423,10 @@ export default {
             triangleConfig,
             hexagonConfig,
             octagonConfig,
+
+            headerText,
+            subHeaderText,
+            bodyText,
             ////opacity/////
             min: 0,
             max: 1,
@@ -514,31 +521,12 @@ export default {
             this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
             this.textCase(this.fontCase);
         },
-        addHeader() {
-            this.addText(headerText);
-        },
-        addSubHeader() {
-            this.addText(subHeaderText);
-        },
-        addBodyText() {
-            this.addText(bodyText);
-        },
-        loadFonts() {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = '/css/fonts.css';
-            document.head.appendChild(link);
-        },
-        test() {
-            this.selectedFillColor = this.objectSelected[0].config.attrs.fill;
-        }
     },
     mounted() {
         this.loadFonts();
         this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
         this.initializeKonva();
-
     },
     computed: {
         reversedLayers() {

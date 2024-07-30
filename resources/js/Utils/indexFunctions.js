@@ -9,7 +9,7 @@ import {
     drawGuides,
 } from '@/Utils/snapping.js';
 
-const width = 600;
+const width = 700;
 const height = 500;
 const ZOOM_STEP = 0.1;
 const MIN_ZOOM = 0.5;
@@ -29,10 +29,11 @@ const allFunctions = {
             clippingRect: null,
             clippingTransformer: null,
             /////// test ///////////////
+            defaultLayer: null,
         };
     },
     methods: {
-        initializeKonva(template = null) {
+        initializeKonva() {
             const container = document.getElementById('container');
             if (container) {
                 this.stage = new Konva.Stage({
@@ -41,32 +42,20 @@ const allFunctions = {
                     height: height,
                 });
 
-                this.defaultLayer = new Konva.Layer();
-                this.layers.push({ 'id': 0, 'name': 'Defualt Layer' });
-                this.stage.add(this.defaultLayer);
+                // this.defaultLayer = new Konva.Layer();
+                // this.stage.add(this.defaultLayer);
 
-                // // Create a transformer
-                // this.transformer = new Konva.Transformer();
-                // this.defaultLayer.add(this.transformer);
-                //
-                // this.defaultLayer.on("dragmove", this.handleDragMove);
-                // this.defaultLayer.on("dragend", this.handleDragEnd);
-
-                // Click outside of shapes to remove the transformer
                 this.stage.on('click', (e) => {
                     if (e.target === this.stage) {
                         this.clearSelection();
                     }
                 });
-                this.defaultLayer.draw();
-
             } else {
                 // Retry initializing after a short delay if the container is not found
                 setTimeout(this.initializeKonva, 100);
             }
         },
         addTransformer(layer) {
-            // Create a transformer
             this.transformer = new Konva.Transformer();
             layer.add(this.transformer);
 
@@ -113,7 +102,7 @@ const allFunctions = {
                 'name': name,
                 'layer': newLayer,
                 'visible': true,
-                'firstOne': this.layers.length === 1,
+                'firstOne': this.layers.length === 0,
                 'lastOne': true
             })
 
@@ -143,10 +132,14 @@ const allFunctions = {
         updateTransformer() {
             const selectedShapes = this.selectedObjectIds.map((id) =>
                 this.stage.findOne(`#${id}`)
-            ).filter(Boolean); // Ensure no undefined objects are included
+            );
             this.transformer.nodes(selectedShapes);
-            this.defaultLayer.batchDraw(); // Ensure the layer is redrawn
+            selectedShapes.forEach((shape) => {
+                const layer = shape.getLayer();
+                layer.batchDraw();
+            });
         },
+        //load fonts
         loadFonts() {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
@@ -165,46 +158,42 @@ const allFunctions = {
                     this.addTransformer(newLayer);
 
                     child.children.forEach(async grandChild => {
-                        // with this condition i create aditional layer with no children
-                        if (grandChild.className !== 'Transformer') {
-                            const objectConstructor = Konva[grandChild.className];
-                            const object = new objectConstructor(grandChild.attrs);
-                            object.id(uuidv4());
+                        const objectConstructor = Konva[grandChild.className];
+                        const object = new objectConstructor(grandChild.attrs);
+                        object.id(uuidv4());
 
-                            if (object.getClassName() === 'Image') {
-                                const imageUrl = grandChild.attrs.src; // Get the src from JSON
-                                if (imageUrl) {
-                                    const imageObj = new Image();
-                                    imageObj.src = imageUrl;
-                                    imageObj.crossOrigin = 'anonymous';
+                        if (object.getClassName() === 'Image') {
+                            const imageUrl = grandChild.attrs.src; // Get the src from JSON
+                            if (imageUrl) {
+                                const imageObj = new Image();
+                                imageObj.src = imageUrl;
+                                imageObj.crossOrigin = 'anonymous';
 
-                                    // Load the image and set it to the Konva image object
-                                    await new Promise((resolve) => {
-                                        imageObj.onload = () => {
-                                            object.image(imageObj);
-                                            resolve();
-                                        };
-                                    });
-                                }
+                                // Load the image and set it to the Konva image object
+                                await new Promise((resolve) => {
+                                    imageObj.onload = () => {
+                                        object.image(imageObj);
+                                        resolve();
+                                    };
+                                });
                             }
-                            if (object.getClassName() === 'Text') {
-                                this.editText(object);
-                            }
-                            // layers order
-                            this.handleLayersOrder(newLayer, object.getClassName());
-
-                            object.on("click", (e) => {
-                                e.cancelBubble = true;
-                                this.toggleSelection(object.id(), object.getClassName(), object);
-                            });
-
-                            newLayer.add(object);
                         }
+                        if (object.getClassName() === 'Text') {
+                            this.editText(object);
+                        }
+                        // handel layers ordering
+                        this.handleLayersOrder(newLayer, object.getClassName());
+
+                        object.on("click", (e) => {
+                            e.cancelBubble = true;
+                            this.toggleSelection(object.id(), object.getClassName(), object);
+                        });
+
+                        newLayer.add(object);
                     });
                     newLayer.batchDraw();
                 }
             });
-            // }
         },
         addShape(config) {
             const newLayer = new Konva.Layer();
@@ -217,8 +206,19 @@ const allFunctions = {
             const shape = new ShapeConstructor(config);
 
             this.addTransformer(newLayer);
-            // layers order
-            this.handleLayersOrder(newLayer, shape.getClassName());
+
+            const currentLength = this.layers.length;
+            if (currentLength > 1) {
+                this.layers[currentLength - 1].lastOne = false;
+            }
+            this.layers.push({
+                'id': newLayer.id(),
+                'name': shape.getClassName(),
+                'layer': newLayer,
+                'visible': true,
+                'firstOne': this.layers.length === 1,
+                'lastOne': true
+            })
 
             shape.on("click", (e) => {
                 e.cancelBubble = true;
@@ -240,7 +240,7 @@ const allFunctions = {
         saveAsJson() {
             const blob = new Blob([this.stage.toJSON()], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-            this.download(url, 'stage.json');
+            this.download(url, 'Design.json');
             URL.revokeObjectURL(url);
         },
         zoomFunction(inOrOut) {
@@ -270,14 +270,19 @@ const allFunctions = {
                 if (shape) {
                     const layer = shape.getLayer();
 
-                    this.deleteLayer(layer.id());
+                    const childrenToDestroy = layer.getChildren().filter(child => shouldDelete(child));
+                    childrenToDestroy.forEach(child => child.destroy());
 
-                    layer.getChildren().forEach(child => child.destroy());
+                    // shape.off('click')
+                    //this.transformer.destroy();
+                    this.deleteLayer(layer.id());
+                    //layer.destroy();
+                } else {
+                    console.log('no objected selected to delete!')
                 }
             });
-            this.selectedObjectIds = [];
             this.clearSelection();
-            this.defaultLayer.batchDraw();
+            this.updateTransformer();
         },
         duplicateObjects() {
             const newSelectedIds = [];
@@ -285,48 +290,26 @@ const allFunctions = {
                 const shape = this.stage.findOne(`#${id}`);
                 if (shape) {
                     const objLayer = shape.getLayer();
-                    const newLayer = new Konva.Layer({ id: uuidv4() });
-                    objLayer.getChildren().forEach(child => {
-                        const clonedChild = child.clone({
-                            id: uuidv4()
-                        });
-                        newLayer.add(clonedChild);
-                    });
-                    this.stage.add(newLayer);
-
-                    const object = newLayer.children[1];
+                    const layer = objLayer.clone({ id: uuidv4() });
+                    this.stage.add(layer);
+                    const object = layer.children[1];
+                    object.id(uuidv4());
                     object.x(object.x() + 20)
                     object.y(object.y() + 20)
 
-                    //layers order
-                    this.handleLayersOrder(newLayer, object.getClassName());
+                    // layers order
+                    this.handleLayersOrder(layer, object.getClassName());
 
                     object.on("click", (e) => {
                         e.cancelBubble = true;
                         this.toggleSelection(object.id(), object.getClassName(), object);
                     });
                     newSelectedIds.push(object.id());
-                    newLayer.batchDraw();
+                    layer.batchDraw();
                 }
             });
             this.selectedObjectIds = newSelectedIds;
             this.updateTransformer();
-        },
-        deleteLayer(layerId) {
-            const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
-            const layerObj = this.layers[layerIndex];
-            if (layerObj.firstOne) {
-                if (!layerObj.lastOne) {
-                    this.layers[layerIndex + 1].firstOne = true;
-                }
-            }
-            if (layerObj.lastOne) {
-                if (!layerObj.firstOne) {
-                    this.layers[layerIndex - 1].lastOne = true;
-                }
-            }
-            layerObj.layer.destroy();
-            this.layers.splice(layerIndex, 1);
         },
         objectOpacity(opacity) {
             this.selectedObjectIds.forEach((id) => {
@@ -454,64 +437,28 @@ const allFunctions = {
 
             this.defaultLayer.batchDraw();
         },
-        alignMiddle() {
-            if (this.selectedObjectIds.length === 0) return;
-
-            const stageHeight = this.stage.height();
-
-            if (this.selectedObjectIds.length === 1) {
-                const shape = this.stage.findOne(`#${this.selectedObjectIds[0]}`);
-                if (shape) {
-                    shape.y((stageHeight - shape.height() * shape.scaleY()) / 2);
-                }
-            } else {
-                const middleY = Math.min(...this.selectedObjectIds.map((id) => {
-                    const shape = this.stage.findOne(`#${id}`);
-                    return shape ? shape.y() : Infinity;
-                }));
-
-                this.selectedObjectIds.forEach((id) => {
-                    const shape = this.stage.findOne(`#${id}`);
-                    if (shape) {
-                        shape.y(middleY + (stageHeight / 2 - shape.height() * shape.scaleY() / 2));
-                    }
-                });
-            }
-
-            this.defaultLayer.batchDraw();
-        },
-        alignCenter() {
-            if (this.selectedObjectIds.length === 0) return;
-
-            const stageWidth = this.stage.width();
-
-            if (this.selectedObjectIds.length === 1) {
-                const shape = this.stage.findOne(`#${this.selectedObjectIds[0]}`);
-                if (shape) {
-                    shape.x((stageWidth - shape.width() * shape.scaleX()) / 2);
-                }
-            } else {
-                const centerX = Math.min(...this.selectedObjectIds.map((id) => {
-                    const shape = this.stage.findOne(`#${id}`);
-                    return shape ? shape.x() : Infinity;
-                }));
-
-                this.selectedObjectIds.forEach((id) => {
-                    const shape = this.stage.findOne(`#${id}`);
-                    if (shape) {
-                        shape.x(centerX + (stageWidth / 2 - shape.width() * shape.scaleX() / 2));
-                    }
-                });
-            }
-
-            this.defaultLayer.batchDraw();
-        },
         // Layering //////////////
         hideLayer(action, layerId) {
             const layerObj = this.layers.find(layerObj => layerObj.id === layerId);
             layerObj.layer.visible(action);
             layerObj.visible = action;
             layerObj.layer.batchDraw();
+        },
+        deleteLayer(layerId) {
+            const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
+            const layerObj = this.layers[layerIndex];
+            if (layerObj.firstOne) {
+                if (!layerObj.lastOne) {
+                    this.layers[layerIndex + 1].firstOne = true;
+                }
+            }
+            if (layerObj.lastOne) {
+                if (!layerObj.firstOne) {
+                    this.layers[layerIndex - 1].lastOne = true;
+                }
+            }
+            layerObj.layer.destroy();
+            this.layers.splice(layerIndex, 1);
         },
         moveLayer(action, layerId) {
             const layerIndex = this.layers.findIndex(layerObj => layerObj.id === layerId);
@@ -568,7 +515,7 @@ const allFunctions = {
             // Create a transformer
             this.addTransformer(newLayer);
 
-            //layers order
+            // layers order
             this.handleLayersOrder(newLayer, text.getClassName());
 
             text.on("click", (e) => {
@@ -851,7 +798,7 @@ const allFunctions = {
                 // Create a transformer
                 this.addTransformer(newLayer);
 
-                // lsyers order
+                //layers order
                 this.handleLayersOrder(newLayer, image.getClassName());
 
                 image.on("click", (e) => {
@@ -873,8 +820,7 @@ const allFunctions = {
             imageObj.crossOrigin = 'anonymous'
 
             // Create a transformer
-            this.transformer = new Konva.Transformer();
-            newLayer.add(this.transformer);
+            this.addTransformer(newLayer);
 
             imageObj.onload = () => {
                 const image = new Konva.Image({
@@ -883,20 +829,11 @@ const allFunctions = {
                     height: 500,
                     draggable: true,
                     id: uuidv4(),
+                    name: 'object',
                 });
 
-                const currentLength = this.layers.length;
-                if (currentLength > 1) {
-                    this.layers[currentLength - 1].lastOne = false;
-                }
-                this.layers.push({
-                    'id': newLayer.id(),
-                    'name': image.getClassName(),
-                    'layer': newLayer,
-                    'visible': true,
-                    'firstOne': this.layers.length === 1,
-                    'lastOne': true
-                })
+                //layers order
+                this.handleLayersOrder(newLayer, image.getClassName());
 
                 image.on("click", (e) => {
                     e.cancelBubble = true;

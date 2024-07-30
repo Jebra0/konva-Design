@@ -14,41 +14,17 @@ Route::get('/', function () {
 });
 ////////////////////////////// my routes ////////////////////////
 
-Route::get('/test', function () {
-    // get the font families
-    $fontFiles = [];
-    $directory = public_path('fonts');
+Route::get('/Arabian-Geeks', function () {
+    $fontFiles = getFonts();
 
-    $files = glob($directory . '/*.ttf');
+    $temps = getTemplates('Text');
 
-    foreach ($files as $file) {
-        $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
-        $parts = explode('-', $filenameWithoutExtension);
-        $cleanedFilename = $parts[0];
+    $shapes = getTemplates('Shapes');
 
-        $fontFiles[] = [
-            'name' => $cleanedFilename,
-            'src' => 'fonts/' . $cleanedFilename . '.ttf'
-        ];
-    }
-    // templates
-    $temps = Template::where('type', 'Text')
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
+    $templates = getTemplates('Fold brochure');
 
-    $shapes = Template::where('type', 'Shapes')
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    $templates = Template::where('type', 'Fold brochure')
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return Inertia::render('Test', [
-        'fonts' => $fontFiles, 
+    return Inertia::render('index', [
+        'fonts' => $fontFiles,
         'textTemplates' => $temps,
         'shapeTemplates'=> $shapes,
         'templates'=> $templates,
@@ -56,40 +32,32 @@ Route::get('/test', function () {
 });
 
 Route::get('/design', function () {
-    // get the font families
-    $fontFiles = [];
-    $directory = public_path('fonts');
+    $fontFiles = getFonts();
 
-    $files = glob($directory . '/*.ttf');
+    $temps = getTemplates('Text');
 
-    foreach ($files as $file) {
-        $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
-        $parts = explode('-', $filenameWithoutExtension);
-        $cleanedFilename = $parts[0];
+    $shapes = getTemplates('Shapes');
 
-        $fontFiles[] = [
-            'name' => $cleanedFilename,
-            'src' => 'fonts/' . $filenameWithoutExtension . '.ttf'
-        ];
-    }
-    // templates
-    $temps = Template::where('type', 'Text')
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    $shapes = Template::where('type', 'Shapes')
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    $templates = Template::where('type', 'Fold brochure')
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
+    $templates = getTemplates('Fold brochure');
 
     return Inertia::render('Design', [
-        'fonts' => $fontFiles, 
+        'fonts' => $fontFiles,
+        'textTemplates' => $temps,
+        'shapeTemplates'=> $shapes,
+        'templates'=> $templates,
+    ]);
+});
+Route::get('/test', function () {
+    $fontFiles = getFonts();
+
+    $temps = getTemplates('Text');
+
+    $shapes = getTemplates('Shapes');
+
+    $templates = getTemplates('Fold brochure');
+
+    return Inertia::render('Test', [
+        'fonts' => $fontFiles,
         'textTemplates' => $temps,
         'shapeTemplates'=> $shapes,
         'templates'=> $templates,
