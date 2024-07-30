@@ -1,6 +1,9 @@
 <template>
     <v-app>
-        <Head title="Design"><title>Design</title></Head>
+
+        <Head title="Design">
+            <title>Design</title>
+        </Head>
         <v-navigation-drawer permanent width="300">
             <v-list density="compact">
 
@@ -53,29 +56,13 @@
                 <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements"
                     prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
-                    <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
-                        <img :src="shape.image" width="70px" alt="Text Image"
-                            @click=" getSelectedTemplate(shape.id)" style="cursor: pointer">
-                    </div> -->
-                    <v-icon icon="mdi-minus" color="black" size="70"></v-icon>
-                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70"></v-icon>
-                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(rectConfig)"></v-icon>
-                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(circleConfig)"></v-icon>
-                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(triangleConfig)"></v-icon>
-                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(hexagonConfig)"></v-icon>
-                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(octagonConfig)"></v-icon>
-                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"></v-icon>
+                    <div class=" d-flex justify-center"
+                        v-for="(shape, id) in shapeTemplates" :key="id">
+                        <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
+                            style="cursor: pointer">
+                    </div>
+                    <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(rectConfig)"></v-icon> -->
                 </div>
 
                 <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload"
@@ -127,47 +114,7 @@
                                     icon="mdi-arrow-down"></v-icon></button>
                         </span>
                     </div>
-                </v-card>
-
-                <!-- ordenary elementt for add templates//////////////////////////////////////// -->
-                <v-list-item>
-                    <v-text-field v-model="name"></v-text-field>
-                    <v-file-input label="Upload image" prepend-icon="mdi-camera" @change="handleFileUpload">
-                        <template v-slot:selection="{ fileNames }">
-                            <template v-for="(fileName, index) in fileNames" :key="fileName">
-                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
-                                    {{ fileName }}
-                                </v-chip>
-
-                                <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
-                                    +{{ files.length - 2 }} File(s)
-                                </span>
-                            </template>
-                        </template>
-                    </v-file-input>
-                    <v-row>
-                        <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
-                            <v-img @click=" addTemplateImage(image, name)" style="cursor: pointer;" :src="image"
-                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
-                                <template v-slot:placeholder>
-                                    <v-row align="center" class="fill-height ma-0" justify="center">
-                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                                    </v-row>
-                                </template>
-                            </v-img>
-                        </v-col>
-                    </v-row>
-                    <hr>
-                    <v-img @click=" addImage(image)" style="cursor: pointer;" :src="image" aspect-ratio="1"
-                        class="bg-grey-lighten-2" cover>
-                        <template v-slot:placeholder>
-                            <v-row align="center" class="fill-height ma-0" justify="center">
-                                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                            </v-row>
-                        </template>
-                    </v-img>
-                </v-list-item>
-                <!-- ///////////////////////////////////////////////////////////// -->
+                </v-card>    
             </v-list>
         </v-navigation-drawer>
         <!-- defualt buttons -->
@@ -176,8 +123,7 @@
             <template v-slot:prepend>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
-                    :value="selectedFillColor"
-                    v-model="colorFill" @input="fillColor(colorFill)" />
+                    :value="selectedFillColor" v-model="colorFill" @input="fillColor(colorFill)" />
 
                 <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
@@ -211,7 +157,7 @@
                 <div style="">
                     <!-- positions -->
                     <v-btn>
-                        <v-icon color="red" icon="mdi-layers"></v-icon>
+                        <v-icon icon="mdi-layers"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Position</v-tooltip>
                         <v-menu activator="parent">
                             <v-list style="width: 200px">
@@ -233,11 +179,11 @@
                                         <v-icon icon="mdi-align-vertical-bottom"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9">
+                                    <v-btn @click="alignCenter" class="mr-9">
                                         <v-icon icon="mdi-align-horizontal-center"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>
                                     </v-btn>
-                                    <v-btn>
+                                    <v-btn @click="alignMiddle" >
                                         <v-icon icon="mdi-align-vertical-center"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>
                                     </v-btn>
@@ -261,31 +207,6 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-
-                    <!-- save as template -->
-                    <v-dialog max-width="500">
-                        <template v-slot:activator="{ props: activatorProps }">
-                            <v-btn v-bind="activatorProps">
-                                <v-icon icon="mdi-content-save"></v-icon>
-                                <v-tooltip activator="parent" location="bottom">Save As Template</v-tooltip>
-                            </v-btn>
-                        </template>
-                        <template v-slot:default="{ isActive }">
-                            <v-card title="Save as template">
-                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
-
-                                <v-select label="Template Type" required v-model="templateType"
-                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
-
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-
-                                    <v-btn text="Save"
-                                        @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </template>
-                    </v-dialog>
 
                     <!-- save As Json -->
                     <v-btn @click="saveAsJson">
@@ -318,14 +239,13 @@
         <!-- text buttons -->
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
 
-            <input class="ml-2" type="color" style="width: 40px; height: 40px"
-                :value="selectedFillColor"
-              v-model="colorFill" @input="fillColor(colorFill)" />
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" :value="selectedFillColor"
+                v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
                 <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
-                      :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)" width="200px"
-                    class=" m-2 mt-5">
+                    :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)"
+                    width="200px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
@@ -397,7 +317,6 @@
 </template>
 <script>
 import allFunctions from '@/Utils/allFunctions.js';
-import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
 import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
 
 export default {
@@ -414,11 +333,6 @@ export default {
                 background: false,
                 layers: false,
             },
-            rectConfig,
-            circleConfig,
-            triangleConfig,
-            hexagonConfig,
-            octagonConfig,
             ////opacity/////
             min: 0,
             max: 1,

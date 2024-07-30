@@ -794,7 +794,7 @@ const allFunctions = {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
                 if (type === 'Shapes') {
-                    let blob = await this.resizeImage(dataURL, 200, 200);
+                    let blob = await this.resizeImage(dataURL, 300, 200);
                 }
 
                 let blob = await this.resizeImage(dataURL, 300, 300);

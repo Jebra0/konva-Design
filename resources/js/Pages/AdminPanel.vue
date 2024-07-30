@@ -60,29 +60,14 @@
                 <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements"
                     prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
-                    <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
-                        <img :src="shape.image" width="70px" alt="Text Image"
-                            @click=" getSelectedTemplate(shape.id)" style="cursor: pointer">
-                    </div> -->
-                    <v-icon icon="mdi-minus" color="black" size="70"></v-icon>
-                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70"></v-icon>
-                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(rectConfig)"></v-icon>
-                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(circleConfig)"></v-icon>
-                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(triangleConfig)"></v-icon>
-                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(hexagonConfig)"></v-icon>
-                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(octagonConfig)"></v-icon>
-                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"></v-icon>
+                    <div style="position: relative;" class=" d-flex justify-center"
+                        v-for="(shape, id) in shapeTemplates" :key="id">
+                        <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
+                            style="cursor: pointer">
+                        <v-icon size="25" style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red" icon="mdi-delete"></v-icon>
+                    </div>
+                    <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(rectConfig)"></v-icon> -->
                 </div>
 
                 <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload"
@@ -195,9 +180,35 @@
             <template v-slot:append>
 
                 <div style="">
+                    <!-- save as template -->
+                    <v-dialog max-width="500">
+                        <template v-slot:activator="{ props: activatorProps }">
+                            <v-btn-group color="#b2d7ef" density="comfortable" rounded="pill" divided>
+                                <v-btn v-bind="activatorProps">
+                                    save as template
+                                </v-btn>
+                            </v-btn-group>
+                        </template>
+                        <template v-slot:default="{ isActive }">
+                            <v-card title="Save as template">
+                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
+
+                                <v-select label="Template Type" required v-model="templateType"
+                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
+
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+
+                                    <v-btn text="Save"
+                                        @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </template>
+                    </v-dialog>
+
                     <!-- positions -->
                     <v-btn>
-                        <v-icon color="red" icon="mdi-layers"></v-icon>
+                        <v-icon icon="mdi-layers"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Position</v-tooltip>
                         <v-menu activator="parent">
                             <v-list style="width: 200px">
@@ -219,11 +230,11 @@
                                         <v-icon icon="mdi-align-vertical-bottom"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>
                                     </v-btn>
-                                    <v-btn class="mr-9">
+                                    <v-btn @click="alignCenter" class="mr-9">
                                         <v-icon icon="mdi-align-horizontal-center"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>
                                     </v-btn>
-                                    <v-btn>
+                                    <v-btn @click="alignMiddle">
                                         <v-icon icon="mdi-align-vertical-center"></v-icon>
                                         <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>
                                     </v-btn>
@@ -247,31 +258,6 @@
                             </v-list>
                         </v-menu>
                     </v-btn>
-
-                    <!-- save as template -->
-                    <v-dialog max-width="500">
-                        <template v-slot:activator="{ props: activatorProps }">
-                            <v-btn v-bind="activatorProps">
-                                <v-icon icon="mdi-content-save"></v-icon>
-                                <v-tooltip activator="parent" location="bottom">Save As Template</v-tooltip>
-                            </v-btn>
-                        </template>
-                        <template v-slot:default="{ isActive }">
-                            <v-card title="Save as template">
-                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
-
-                                <v-select label="Template Type" required v-model="templateType"
-                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
-
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-
-                                    <v-btn text="Save"
-                                        @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </template>
-                    </v-dialog>
 
                     <!-- save As Json -->
                     <v-btn @click="saveAsJson">
@@ -382,7 +368,7 @@
 </template>
 <script>
 import allFunctions from '@/Utils/allFunctions.js';
-import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
+import { rectConfig } from '../Utils/shapesConfig.js';
 import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
 import { Head } from '@inertiajs/vue3';
 
@@ -404,10 +390,6 @@ export default {
                 addCategory: false,
             },
             rectConfig,
-            circleConfig,
-            triangleConfig,
-            hexagonConfig,
-            octagonConfig,
             ////opacity/////
             min: 0,
             max: 1,
