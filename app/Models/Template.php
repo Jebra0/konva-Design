@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Template extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         "name",
-        "type",
+        "category_id",
         "data",
         "image",
     ];
@@ -21,5 +20,9 @@ class Template extends Model
         return [
             'data' => 'json',
         ];
+    }
+
+    public function category(){
+        return $this->belongsTo(TemplateCategory::class, 'category_id');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Console\Commands\AddFonts;
 use App\Models\Template;
+use App\Models\Font;
 use Illuminate\Http\Request;
 
 class TemplateController extends Controller
@@ -59,29 +60,31 @@ class TemplateController extends Controller
 
     public function addFont(Request $request)
     {
-        $files = $request->file('fonts');
+        $file = $request->file('font');
+        $name = $request->name;
 
-        if (!is_array($files)) {
-            return response()->json(['error' => 'No files provided or invalid data'], 400);
-        }
+        $path = '';
 
-        $paths = [];
+        try {
+            $originalName = $file->getClientOriginalName();
 
-        foreach ($files as $file) {
-            try {
-                $originalName = $file->getClientOriginalName();
-                //$uniqueName = uniqid() . '_' . $originalName;
-
-                $path = $file->storeAs('fonts/', $originalName, ['disk' => 'public_fonts']);
-                $paths[] = $path;
-            } catch (\Exception $e) {
-                return response()->json(['error' => 'Error uploading file: ' . $e->getMessage()], 500);
-            }
+            $path = $file->storeAs('fonts/', $originalName, ['disk' => 'public_fonts']);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error uploading file: ' . $e->getMessage()], 500);
         }
         // to add the font src to the fonts.css
         loadFonts();
+        $fontImage = pngFont($name, $path);
 
-        return response()->json(['paths' => $paths]);
+        //add to DB
+        Font::create([
+            'name'=> $name,
+            'font_file' => $path,
+            'font_image' => $fontImage,
+        ]);
+
+        return response()->json(['paths' => $path]);
     }
 
 }

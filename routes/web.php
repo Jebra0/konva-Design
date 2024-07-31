@@ -15,6 +15,10 @@ Route::get('/', function () {
     ]);
 });
 ////////////////////////////// my routes ////////////////////////
+Route::get('/test-png', function () {
+    $path = pngFont();
+    return response()->json(['image_path' => $path]);
+});
 
 Route::get('/Arabian-Geeks', function () {
     $fontFiles = getFonts();
@@ -23,7 +27,7 @@ Route::get('/Arabian-Geeks', function () {
 
     $shapes = getTemplates('Shapes');
 
-    $templates = getTemplates('Fold brochure');
+    $templates = getTemplates('Fold brochre');
 
     return Inertia::render('index', [
         'fonts' => $fontFiles,
@@ -40,7 +44,7 @@ Route::get('/admin-panel', function () {
 
     $shapes = getTemplates('Shapes');
 
-    $templates = getTemplates('Fold brochure');
+    $templates = getTemplates('Fold brochre');
 
     $tmplateImages = getTemplateImages();
 

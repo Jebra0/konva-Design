@@ -102,9 +102,11 @@
                 <v-list-item @click="this.selectedOption.addFonts = !this.selectedOption.addFonts"
                     prepend-icon="mdi-format-font" title="Add Font" value="addFonts"></v-list-item>
                 <v-card v-if="selectedOption.addFonts" elevation="0" class=" m-2">
-                    <v-file-input v-model="fontFiles" accept="application/x-font-ttf" label="Font"></v-file-input>
+                    <label class="ml-10">File in <span style="color: red;">.ttf</span> extention</label>
+                    <v-file-input v-model="fontFile" accept="application/x-font-ttf" label="Font"></v-file-input>
+                    <v-text-field v-model="fontName" label="font name" class="ml-10"></v-text-field>
                     <div class="d-flex justify-center mt-3">
-                        <v-btn @click="addFont(fontFiles)">Add</v-btn>
+                        <v-btn @click="addFont(fontFile, fontName)">Add</v-btn>
                     </div>
                 </v-card>
 
@@ -430,7 +432,8 @@ export default {
             fontSelected: '',
             sizeFont: '',
 
-            fontFiles: [],
+            fontFile: null,
+            fontName: '',
         }
     },
     mounted() {
@@ -441,12 +444,11 @@ export default {
 
     },
     methods: {
-        async addFont(fonts) {
+        async addFont(font, name) {
             let formData = new FormData();
 
-            fonts.forEach((font) => {
-                formData.append('fonts[]', font);
-            });
+            formData.append('font', font);
+            formData.append('name', name);
 
             try {
                 let res = await axios.post('/font/add', formData, {
@@ -454,9 +456,9 @@ export default {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log('Fonts uploaded successfully:', res.data);
+                console.log('Font uploaded successfully:', res.data);
             } catch (error) {
-                console.error('Error uploading fonts:', error);
+                console.error('Error uploading font:', error);
             }
         },
     },

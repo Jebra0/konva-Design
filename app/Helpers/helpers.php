@@ -25,10 +25,12 @@ function getFonts(): array
 
 function getTemplates($type)
 {
-    return Template::where('type', $type)
-        ->select(['id', 'image'])
-        ->orderBy('created_at', 'desc')
-        ->get();
+    return Template::whereHas('category', function ($query) use($type) {
+        $query->where('name', $type);
+    })->select(['id', 'image'])
+    ->orderBy('created_at', 'desc')
+    ->get();
+    
 }
 
 function getTemplateImages(): array
@@ -68,4 +70,29 @@ function loadFonts()
     }
     file_put_contents(public_path('css/fonts.css'), $cssContent);
 
+}
+
+function pngFont($fontName, $fontFilePath)
+{
+    // $fontName = 'DancingScript';
+    // $fontFilePath = public_path('fonts/DancingScript-VariableFont_wght.ttf');
+
+    // Create an image with GD
+    $width = 100;
+    $height = 50;
+    $im = imagecreatetruecolor($width, $height);
+    $bgColor = imagecolorallocate($im, 255, 255, 255);
+    imagefill($im, 0, 0, $bgColor);
+    $textColor = imagecolorallocate($im, 0, 0, 0);
+
+    // Load the font
+    $fontSize = 12;
+    imagettftext($im, $fontSize, 0, 10, 15, $textColor, $fontFilePath, $fontName);
+
+    // Save the image as PNG
+    $pngPath = 'fonts/' . uniqid() . '.png';
+    $pngFullPath = public_path('images/' . $pngPath);
+    imagepng($im, $pngFullPath);
+    imagedestroy($im);
+    return $pngPath;
 }
