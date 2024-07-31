@@ -2,10 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
-use App\Models\Template;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 
 Route::get('/', function () {
@@ -15,13 +13,7 @@ Route::get('/', function () {
     ]);
 });
 ////////////////////////////// my routes ////////////////////////
-Route::get('/test-png', function () {
-    $path = pngFont();
-    return response()->json(['image_path' => $path]);
-});
-
 Route::get('/Arabian-Geeks', function () {
-    $fontFiles = getFonts();
 
     $temps = getTemplates('Text');
 
@@ -30,7 +22,6 @@ Route::get('/Arabian-Geeks', function () {
     $templates = getTemplates('Fold brochre');
 
     return Inertia::render('index', [
-        'fonts' => $fontFiles,
         'textTemplates' => $temps,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
@@ -38,7 +29,6 @@ Route::get('/Arabian-Geeks', function () {
 });
 
 Route::get('/admin-panel', function () {
-    $fontFiles = getFonts();
 
     $temps = getTemplates('Text');
 
@@ -49,44 +39,10 @@ Route::get('/admin-panel', function () {
     $tmplateImages = getTemplateImages();
 
     return Inertia::render('AdminPanel', [
-        'fonts' => $fontFiles,
         'textTemplates' => $temps,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
         'templateImages' => $tmplateImages,
-    ]);
-});
-
-Route::get('/design', function () {
-    $fontFiles = getFonts();
-
-    $temps = getTemplates('Text');
-
-    $shapes = getTemplates('Shapes');
-
-    $templates = getTemplates('Fold brochure');
-
-    return Inertia::render('Design', [
-        'fonts' => $fontFiles,
-        'textTemplates' => $temps,
-        'shapeTemplates' => $shapes,
-        'templates' => $templates,
-    ]);
-});
-Route::get('/test', function () {
-    $fontFiles = getFonts();
-
-    $temps = getTemplates('Text');
-
-    $shapes = getTemplates('Shapes');
-
-    $templates = getTemplates('Fold brochure');
-
-    return Inertia::render('Test', [
-        'fonts' => $fontFiles,
-        'textTemplates' => $temps,
-        'shapeTemplates' => $shapes,
-        'templates' => $templates,
     ]);
 });
 

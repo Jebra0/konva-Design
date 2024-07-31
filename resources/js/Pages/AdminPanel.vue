@@ -64,7 +64,8 @@
                         v-for="(shape, id) in shapeTemplates" :key="id">
                         <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
                             style="cursor: pointer">
-                        <v-icon size="25" style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red" icon="mdi-delete"></v-icon>
+                        <v-icon size="25" style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;"
+                            color="red" icon="mdi-delete"></v-icon>
                     </div>
                     <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
                         @click=" addShape(rectConfig)"></v-icon> -->
@@ -296,9 +297,8 @@
                 v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
-                <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
-                    :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)"
-                    width="200px" class=" m-2 mt-5">
+                <v-combobox clearable label="font style" :items="GoogleFonts" item-title="name" item-value="file"
+                    v-model="selectedFont" @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
@@ -365,6 +365,7 @@
             style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
             <!-- {{ selectedObjectIds }} -->
+            <!-- {{ selectedFont }} -->
         </v-main>
     </v-app>
 </template>
@@ -379,7 +380,6 @@ export default {
     components: { Head },
     data() {
         return {
-            image: '/images/Templates/fold_brochure_template.png',
             selectedOption: {
                 templates: false,
                 text: false,
@@ -400,7 +400,6 @@ export default {
             texts: [],
             images: [],
             hide: true,
-            // fontSize: 30,
             fontWeight: 'normal',
             fontItalic: 'normal',
             fontCase: 'lower',
@@ -413,7 +412,6 @@ export default {
             sMax: 50,
             charSpacing: 1,
 
-            // selectedFont: 'Cairo',
             fontFamilies: [],
 
             templateName: '',
@@ -434,16 +432,73 @@ export default {
 
             fontFile: null,
             fontName: '',
+            fontsKey: 'AIzaSyATi0D1tPNKzPRhsEJVJ-0Ikv4SPlBD9uY',
+            fontUrl: 'https://www.googleapis.com/webfonts/v1/webfonts',
+            GoogleFonts: [],
+
+            selectedFont: null,
+            fonts: [],
+            // isFontLoaded: false,
         }
     },
-    mounted() {
+    async mounted() {
         this.loadFonts();
         this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
         this.initializeKonva();
 
+        this.fetchFonts();
+        // console.log(this.GoogleFonts)
     },
     methods: {
+            async fetchFonts() {
+                await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
+                    .then(res => res.json())
+                    .then(json => {
+                        json.items.forEach(font => {
+                            this.GoogleFonts.push({
+                                name: font.family,
+                                file: font.files.regular
+                            });
+                        });
+                    });
+            },
+            // whenFontIsLoaded(callback, attemptCount) {
+            //     if (attemptCount === undefined) {
+            //         attemptCount = 0;
+            //     }
+            //     if (attemptCount >= 20) {
+            //         callback();
+            //         return;
+            //     }
+            //     if (this.isFontLoaded) {
+            //         callback();
+            //         return;
+            //     }
+            //     let text = this.objectSelected[0].config.attrs.text;
+            //     const metrics = ctx.measureText(text);
+            //     const width = metrics.width;
+            //     if (width !== initialWidth) {
+            //         isFontLoaded = true;
+            //         callback();
+            //     } else {
+            //         setTimeout(function () {
+            //             whenFontIsLoaded(callback, attemptCount + 1);
+            //         }, 1000);
+            //     }
+            // },
+            onFontChange() {
+                this.loadGoogleFont(this.selectedFont);
+                this.changeFontFamily(this.selectedFont);
+                // this.whenFontIsLoaded(function () {
+                // });
+            },
+            loadGoogleFont(font) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = `https://fonts.googleapis.com/css?family=${font.name}&display=swap`;
+                document.head.appendChild(link);
+            },
         async addFont(font, name) {
             let formData = new FormData();
 
@@ -456,7 +511,7 @@ export default {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                console.log('Font uploaded successfully:', res.data);
+                alert('Font uploaded successfully!');
             } catch (error) {
                 console.error('Error uploading font:', error);
             }
@@ -495,13 +550,13 @@ export default {
                 }
             }
         },
-        selectedFont() {
-            if (this.objectSelected.length === 1) {
-                return this.objectSelected[0].config.attrs.fontFamily;
-            } else {
-                return 'Cairo';
-            }
-        },
+        // selectedFont() {
+        //     if (this.objectSelected.length === 1) {
+        //         return this.objectSelected[0].config.attrs.fontFamily;
+        //     } else {
+        //         return 'Cairo';
+        //     }
+        // },
         selectedFillColor() {
             if (this.objectSelected.length === 1) {
                 return this.objectSelected[0].config.attrs.fill;
@@ -518,10 +573,10 @@ export default {
         }
     },
     props: {
-        fonts: {
-            type: Array,
-            required: true,
-        },
+        // fonts: {
+        //     type: Object,
+        //     required: true,
+        // },
         textTemplates: {
             type: Object,
             required: true,

@@ -8,7 +8,7 @@ import {
     getGuides,
     drawGuides,
 } from '@/Utils/snapping.js';
-import {bodyText, headerText, subHeaderText} from "@/Utils/textConfig.js";
+import { bodyText, headerText, subHeaderText } from "@/Utils/textConfig.js";
 
 const width = 600;
 const height = 500;
@@ -1058,17 +1058,17 @@ const allFunctions = {
                 try {
                     let response = await fetch(image);
                     let blob = await response.blob();
-        
+
                     let fileName = `temp-${index}-${Date.now()}.png`;
                     formData.append('images[]', blob, fileName);
                 } catch (error) {
                     console.error(`Failed to fetch image from ${image}:`, error);
                 }
             });
-        
+
             // Wait for all fetch operations to complete
             await Promise.all(fetchPromises);
-        
+
             try {
                 let res = await axios.post('/template/picture/add', formData, {
                     headers: {
@@ -1078,7 +1078,7 @@ const allFunctions = {
             } catch (error) {
                 console.error('Error uploading images:', error);
             }
-        },        
+        },
         /////////////////////////
         handleFileUpload(event) {
             const files = event.target.files;
@@ -1109,7 +1109,6 @@ const allFunctions = {
             fetch(`${this.unsplashSearchUrl}?client_id=${this.unsplashAccessKey}&query=${query}`)
                 .then(res => res.json())
                 .then(json => {
-                    console.log(this.searchQuery)
                     json.results.forEach(element => {
                         //this.images =[];
                         this.images.unshift({
