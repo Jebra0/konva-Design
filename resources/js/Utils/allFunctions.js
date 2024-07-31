@@ -148,12 +148,6 @@ const allFunctions = {
             this.transformer.nodes(selectedShapes);
             this.defaultLayer.batchDraw(); // Ensure the layer is redrawn
         },
-        loadFonts() {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = '/css/fonts.css';
-            document.head.appendChild(link);
-        },
         //get template from json
         async getTemplate(template) {
             //if (template.children) {
@@ -1140,7 +1134,16 @@ const allFunctions = {
         addBodyText() {
             this.addText(bodyText);
         },
-
+        //////////////////
+        async addTemplateCategory(name) {
+            try {
+                const response = await axios.post('/category/add', { name });
+                alert('Created successfully!')
+            } catch (error) {
+                alert('Error while creating');
+                console.error(error);
+            }
+        }        
     }
 };
 

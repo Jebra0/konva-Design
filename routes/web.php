@@ -49,7 +49,8 @@ Route::get('/admin-panel', function () {
 Route::get('/template/{template}', [TemplateController::class, 'index']);
 Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
-Route::post('/font/add', [TemplateController::class,'addFont']);
+// Route::post('/font/add', [TemplateController::class,'addFont']);
+Route::post('/category/add', [TemplateController::class,'addCategory']);
 
 ////////////////////////////////////////////////////////
 

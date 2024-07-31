@@ -1,49 +1,58 @@
 <template>
     <v-layout>
-        <Head ><title>Design Tool</title></Head>
+
+        <Head>
+            <title>Design Tool</title>
+        </Head>
         <v-navigation-drawer permanent width="300">
             <v-list density="compact">
-
+                <!-- //////////////////////////// -->
+                <!-- /////// TEMPLATES DONE  //////////-->
+                <!-- //////////////////////////// -->
                 <v-list-item @click="this.selectedOption.templates = !this.selectedOption.templates"
-                             prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
+                    prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.templates" elevation="1" outlined>
                     <div class="d-flex justify-center" v-for="(temp, id) in templates" :key="id">
                         <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
-                             style="cursor: pointer">
+                            style="cursor: pointer">
                     </div>
                 </v-card>
-
+                <!-- //////////////////////////// -->
+                <!-- /////// TEXT DONE  //////////-->
+                <!-- //////////////////////////// -->
                 <v-list-item @click="this.selectedOption.text = !this.selectedOption.text"
-                             prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
+                    prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
                 <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
-                    <v-btn v-on:click.native="addText(headerText)" elevation="0" width="100%"
-                           style=" text-transform: none; font-size: 25px;">
+                    <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
+                        style=" text-transform: none; font-size: 25px;">
                         <h1>Create header</h1>
                     </v-btn>
-                    <v-btn @click="this.addText(subHeaderText)" elevation="0" width="100%"
-                           style="text-transform: none; font-size: 18px;">
+                    <v-btn @click="addSubHeader()" elevation="0" width="100%"
+                        style="text-transform: none; font-size: 18px;">
                         <h4>Create sub header</h4>
                     </v-btn>
-                    <v-btn @click=" this.addText(bodyText)" elevation="0" width="100%"
-                           style="text-transform: none; font-size: 14px;">Create Body
+                    <v-btn @click="addBodyText()" elevation="0" width="100%"
+                        style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
                     <div class="d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
                         <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
-                             style="cursor: pointer">
+                            style="cursor: pointer">
                     </div>
                 </v-card>
-
+                <!-- //////////////////////////// -->
+                <!-- /////// IMAGE DONE  //////////-->
+                <!-- //////////////////////////// -->
                 <v-list-item @click="this.selectedOption.photos = !this.selectedOption.photos"
-                             prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
+                    prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
                 <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
                     <v-container class="d-flex">
                         <v-text-field label="search" v-model="searchQuery"></v-text-field>
                         <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify"
-                                @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
+                            @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
                     </v-container>
                     <div class="imgParent" v-for="(image, index) in images" :key="index">
                         <img :src="image.src" alt="" @click=" addImage(image.src)"
-                             style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
+                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
                         <p class="author">
                             Photo by
                             <a style="color: blue;" :href="image.portfolio">
@@ -52,37 +61,22 @@
                         </p>
                     </div>
                 </v-card>
-
+                <!-- //////////////////////////// -->
+                <!-- /////// SHAPES DONE  //////////-->
+                <!-- //////////////////////////// -->
                 <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements"
-                             prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
+                    prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
                 <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
-                    <!-- <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
-                        <img :src="shape.image" width="70px" alt="Text Image"
-                            @click=" getSelectedTemplate(shape.id)" style="cursor: pointer">
-                    </div> -->
-                    <v-icon icon="mdi-minus" color="black" size="70"></v-icon>
-                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70"></v-icon>
-                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
-                            @click=" addShape(rectConfig)"></v-icon>
-                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70"
-                            @click=" addShape(circleConfig)"></v-icon>
-                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70"
-                            @click=" addShape(triangleConfig)"></v-icon>
-                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70"
-                            @click=" addShape(hexagonConfig)"></v-icon>
-                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70"
-                            @click=" addShape(octagonConfig)"></v-icon>
-                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70"></v-icon>
-                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70"></v-icon>
+                    <div class="d-flex justify-center" v-for="(shape, id) in shapeTemplates" :key="id">
+                        <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
+                            style="cursor: pointer">
+                    </div>
                 </div>
-
+                <!-- //////////////////////////// -->
+                <!-- /////// UPLOAD DONE  //////////-->
+                <!-- //////////////////////////// -->
                 <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload"
-                             prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
+                    prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
                 <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
                     <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                         <template v-slot:selection="{ fileNames }">
@@ -100,7 +94,7 @@
                     <v-row>
                         <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
                             <v-img @click=" addUploadedImage(image)" style="cursor: pointer;" :src="image"
-                                   aspect-ratio="1" class="bg-grey-lighten-2" cover>
+                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
                                 <template v-slot:placeholder>
                                     <v-row align="center" class="fill-height ma-0" justify="center">
                                         <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
@@ -110,9 +104,11 @@
                         </v-col>
                     </v-row>
                 </v-card>
-
+                <!-- //////////////////////////// -->
+                <!-- /////// LAYER DONE  //////////-->
+                <!-- //////////////////////////// -->
                 <v-list-item @click=" this.selectedOption.layers = !this.selectedOption.layers"
-                             prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
+                    prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
                 <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
                     <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
                         <span v-if="layer.name !== 'Defualt Layer'">
@@ -125,52 +121,12 @@
 
                         <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
                             <button v-if="(!layer.lastOne)" @click=" moveLayer('up', layer.id)"><v-icon
-                                icon="mdi-arrow-up"></v-icon></button>
+                                    icon="mdi-arrow-up"></v-icon></button>
                             <button v-if="(!layer.firstOne)" @click=" moveLayer('down', layer.id)"><v-icon
-                                icon="mdi-arrow-down"></v-icon></button>
+                                    icon="mdi-arrow-down"></v-icon></button>
                         </span>
                     </div>
                 </v-card>
-
-                <!-- ordenary elementt for add templates//////////////////////////////////////// -->
-                <v-list-item>
-                    <v-text-field v-model="name"></v-text-field>
-                    <v-file-input label="Upload image" prepend-icon="mdi-camera" @change="handleFileUpload">
-                        <template v-slot:selection="{ fileNames }">
-                            <template v-for="(fileName, index) in fileNames" :key="fileName">
-                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
-                                    {{ fileName }}
-                                </v-chip>
-
-                                <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
-                                    +{{ files.length - 2 }} File(s)
-                                </span>
-                            </template>
-                        </template>
-                    </v-file-input>
-                    <v-row>
-                        <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
-                            <v-img @click=" addTemplateImage(image, name)" style="cursor: pointer;" :src="image"
-                                   aspect-ratio="1" class="bg-grey-lighten-2" cover>
-                                <template v-slot:placeholder>
-                                    <v-row align="center" class="fill-height ma-0" justify="center">
-                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                                    </v-row>
-                                </template>
-                            </v-img>
-                        </v-col>
-                    </v-row>
-                    <hr>
-                    <v-img @click=" addImage(image)" style="cursor: pointer;" :src="image" aspect-ratio="1"
-                           class="bg-grey-lighten-2" cover>
-                        <template v-slot:placeholder>
-                            <v-row align="center" class="fill-height ma-0" justify="center">
-                                <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                            </v-row>
-                        </template>
-                    </v-img>
-                </v-list-item>
-                <!-- ///////////////////////////////////////////////////////////// -->
             </v-list>
         </v-navigation-drawer>
         <!-- defualt buttons -->
@@ -179,8 +135,7 @@
             <template v-slot:prepend>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
-                       :value="selectedFillColor"
-                       v-model="colorFill" @input="fillColor(colorFill)" />
+                    :value="selectedFillColor" v-model="colorFill" @input="fillColor(colorFill)" />
 
                 <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
@@ -258,37 +213,12 @@
                                 <v-list-item>
                                     <v-list-item-title>Transparency</v-list-item-title>
                                     <v-slider @mouseout=" objectOpacity(opacity)" v-model="opacity" :max="max"
-                                              :min="min" style="width: 250px" class="align-center" hide-details>
+                                        :min="min" style="width: 250px" class="align-center" hide-details>
                                     </v-slider>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </v-btn>
-
-                    <!-- save as template -->
-                    <v-dialog max-width="500">
-                        <template v-slot:activator="{ props: activatorProps }">
-                            <v-btn v-bind="activatorProps">
-                                <v-icon icon="mdi-content-save"></v-icon>
-                                <v-tooltip activator="parent" location="bottom">Save As Template</v-tooltip>
-                            </v-btn>
-                        </template>
-                        <template v-slot:default="{ isActive }">
-                            <v-card title="Save as template">
-                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
-
-                                <v-select label="Template Type" required v-model="templateType"
-                                          :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
-
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-
-                                    <v-btn text="Save"
-                                           @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </template>
-                    </v-dialog>
 
                     <!-- save As Json -->
                     <v-btn @click="saveAsJson">
@@ -320,19 +250,17 @@
         <!-- text buttons -->
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
 
-            <input class="ml-2" type="color" style="width: 40px; height: 40px"
-                   :value="selectedFillColor"
-                   v-model="colorFill" @input="fillColor(colorFill)" />
+            <input class="ml-2" type="color" style="width: 40px; height: 40px" :value="selectedFillColor"
+                v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
-                <v-combobox clearable label="font style" :items="fonts" item-title="name" item-value="name"
-                            :value="selectedFont" v-model="fontSelected" @update:modelValue=" changeFontFamily(fontSelected)" width="200px"
-                            class=" m-2 mt-5">
+                <v-combobox clearable label="font style" :items="GoogleFonts" item-title="name" item-value="file"
+                    v-model="selectedFont" @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
             <input type="number" v-model="fontSize" @input=" textSize($event.target.value)"
-                   style="width: 100px; border: 1px solid #ddd;" />
+                style="width: 100px; border: 1px solid #ddd;" />
 
             <v-btn>
                 <v-icon icon="mdi-format-align-center"></v-icon>
@@ -375,13 +303,13 @@
                         <v-list-item>
                             <v-list-item-title>Spacing</v-list-item-title>
                             <v-slider @mouseout=" textCharSpacing(charSpacing)" :max="sMax" :min="sMin"
-                                      v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
+                                v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                         <v-list-item>
                             <v-list-item-title>line height</v-list-item-title>
                             <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin" v-model="lineHight"
-                                      style="width: 250px" class="align-center" hide-details>
+                                style="width: 250px" class="align-center" hide-details>
                             </v-slider>
                         </v-list-item>
                     </v-list>
@@ -391,24 +319,23 @@
         </v-app-bar>
 
         <v-main class="d-flex align-center justify-center"
-                style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
+            style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
             <!-- {{ selectedObjectIds }} -->
         </v-main>
     </v-layout>
 </template>
 <script>
-import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Utils/shapesConfig.js';
+import allFunctions from '@/Utils/allFunctions.js';
+import { rectConfig } from '../Utils/shapesConfig.js';
 import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
-import allFunctions from "@/Utils/allFunctions.js";
 import { Head } from '@inertiajs/vue3';
 
 export default {
     mixins: [allFunctions],
-    components: {Head},
-    data(){
+    components: { Head },
+    data() {
         return {
-            image: '/images/Templates/fold_brochure_template.png',
             selectedOption: {
                 templates: false,
                 text: false,
@@ -417,16 +344,10 @@ export default {
                 upload: false,
                 background: false,
                 layers: false,
+                addFonts: false,
+                addCategory: false,
             },
             rectConfig,
-            circleConfig,
-            triangleConfig,
-            hexagonConfig,
-            octagonConfig,
-
-            headerText,
-            subHeaderText,
-            bodyText,
             ////opacity/////
             min: 0,
             max: 1,
@@ -435,7 +356,6 @@ export default {
             texts: [],
             images: [],
             hide: true,
-            // fontSize: 30,
             fontWeight: 'normal',
             fontItalic: 'normal',
             fontCase: 'lower',
@@ -448,7 +368,6 @@ export default {
             sMax: 50,
             charSpacing: 1,
 
-            // selectedFont: 'Cairo',
             fontFamilies: [],
 
             templateName: '',
@@ -466,67 +385,53 @@ export default {
             colorFill: null,
             fontSelected: '',
             sizeFont: '',
+
+            fontFile: null,
+            fontName: '',
+            fontsKey: 'AIzaSyATi0D1tPNKzPRhsEJVJ-0Ikv4SPlBD9uY',
+            fontUrl: 'https://www.googleapis.com/webfonts/v1/webfonts',
+            GoogleFonts: [],
+
+            selectedFont: null,
         }
     },
     methods: {
-        handleFileUpload(event) {
-            const files = event.target.files;
-
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.imageUrls.push(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            });
-        },
-        fetchUnsplashImages() {
-            fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
+        async fetchFonts() {
+            await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
                 .then(res => res.json())
                 .then(json => {
-                    // console.log(json[0].urls.full)
-                    json.forEach(element => {
-                        this.images.push({
-                            src: element.urls.full,
-                            portfolio: element.user.portfolio_url,
-                            author: element.user.name
+                    json.items.forEach(font => {
+                        this.GoogleFonts.push({
+                            name: font.family,
+                            file: font.files.regular
                         });
                     });
                 });
         },
-        searchUnsplashImages(query) {
-            fetch(`${this.unsplashSearchUrl}?client_id=${this.unsplashAccessKey}&query=${query}`)
-                .then(res => res.json())
-                .then(json => {
-                    console.log(this.searchQuery)
-                    json.results.forEach(element => {
-                        //this.images =[];
-                        this.images.unshift({
-                            src: element.urls.full,
-                            portfolio: element.user.portfolio_url,
-                            author: element.user.name
-                        });
-                    });
-                });
+        async loadGoogleFont(font) {
+            const fontFace = new FontFace(font.name, `url(${font.file})`);
+            try {
+                await fontFace.load();
+                document.fonts.add(fontFace);
+                return true;
+            } catch (error) {
+                console.error(`Failed to load font: ${font.name}`, error);
+                return false;
+            }
         },
-        toggleFontWeight() {
-            this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
-            this.textStyle(this.fontWeight);
-        },
-        toggleFontItalic() {
-            this.fontItalic = this.fontItalic === 'normal' ? 'italic' : 'normal';
-            this.textStyle(this.fontItalic);
-        },
-        toggleFOntCase() {
-            this.fontCase = this.fontCase === 'lower' ? 'upper' : 'lower';
-            this.textCase(this.fontCase);
+        async onFontChange() {
+            const fontLoaded = await this.loadGoogleFont(this.selectedFont);
+            if (fontLoaded) {
+                this.changeFontFamily(this.selectedFont);
+            } else {
+                console.error("Font failed to load, can't change font family.");
+            }
         },
     },
     mounted() {
-        this.loadFonts();
-        this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
         this.initializeKonva();
+        this.fetchFonts();
     },
     computed: {
         reversedLayers() {
@@ -561,13 +466,13 @@ export default {
                 }
             }
         },
-        selectedFont() {
-            if (this.objectSelected.length === 1) {
-                return this.objectSelected[0].config.attrs.fontFamily;
-            } else {
-                return 'Cairo';
-            }
-        },
+        // selectedFont() {
+        //     if (this.objectSelected.length === 1) {
+        //         return this.objectSelected[0].config.attrs.fontFamily;
+        //     } else {
+        //         return 'Cairo';
+        //     }
+        // },
         selectedFillColor() {
             if (this.objectSelected.length === 1) {
                 return this.objectSelected[0].config.attrs.fill;
@@ -584,10 +489,6 @@ export default {
         }
     },
     props: {
-        fonts: {
-            type: Array,
-            required: true,
-        },
         textTemplates: {
             type: Object,
             required: true,

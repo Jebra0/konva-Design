@@ -1,6 +1,5 @@
 <template>
     <v-app>
-
         <Head>
             <title>Admin Panel</title>
         </Head>
@@ -99,26 +98,14 @@
                         </v-col>
                     </v-row>
                 </v-card>
-                <!--                add font-->
-                <v-list-item @click="this.selectedOption.addFonts = !this.selectedOption.addFonts"
-                    prepend-icon="mdi-format-font" title="Add Font" value="addFonts"></v-list-item>
-                <v-card v-if="selectedOption.addFonts" elevation="0" class=" m-2">
-                    <label class="ml-10">File in <span style="color: red;">.ttf</span> extention</label>
-                    <v-file-input v-model="fontFile" accept="application/x-font-ttf" label="Font"></v-file-input>
-                    <v-text-field v-model="fontName" label="font name" class="ml-10"></v-text-field>
-                    <div class="d-flex justify-center mt-3">
-                        <v-btn @click="addFont(fontFile, fontName)">Add</v-btn>
-                    </div>
-                </v-card>
-
                 <!--                add category-->
                 <v-list-item @click="this.selectedOption.addCategory = !this.selectedOption.addCategory"
                     prepend-icon="mdi-format-list-bulleted-square" title="Add Category"
                     value="addCategory"></v-list-item>
                 <v-card v-if="selectedOption.addCategory" elevation="0" class=" m-2">
-                    <v-text-field label="category name"></v-text-field>
+                    <v-text-field v-model="categoryName" label="category name"></v-text-field>
                     <div class="d-flex justify-center mt-3">
-                        <v-btn>Add</v-btn>
+                        <v-btn @click="addTemplateCategory(categoryName)">Add</v-btn>
                     </div>
                 </v-card>
 
@@ -437,85 +424,64 @@ export default {
             GoogleFonts: [],
 
             selectedFont: null,
-            fonts: [],
-            // isFontLoaded: false,
+
+            categoryName: ''
         }
     },
     async mounted() {
-        this.loadFonts();
-        this.fontFamilies = this.fonts.map(font => font.name);
         this.fetchUnsplashImages();
         this.initializeKonva();
-
         this.fetchFonts();
-        // console.log(this.GoogleFonts)
     },
     methods: {
-            async fetchFonts() {
-                await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
-                    .then(res => res.json())
-                    .then(json => {
-                        json.items.forEach(font => {
-                            this.GoogleFonts.push({
-                                name: font.family,
-                                file: font.files.regular
-                            });
+        async fetchFonts() {
+            await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
+                .then(res => res.json())
+                .then(json => {
+                    json.items.forEach(font => {
+                        this.GoogleFonts.push({
+                            name: font.family,
+                            file: font.files.regular
                         });
                     });
-            },
-            // whenFontIsLoaded(callback, attemptCount) {
-            //     if (attemptCount === undefined) {
-            //         attemptCount = 0;
-            //     }
-            //     if (attemptCount >= 20) {
-            //         callback();
-            //         return;
-            //     }
-            //     if (this.isFontLoaded) {
-            //         callback();
-            //         return;
-            //     }
-            //     let text = this.objectSelected[0].config.attrs.text;
-            //     const metrics = ctx.measureText(text);
-            //     const width = metrics.width;
-            //     if (width !== initialWidth) {
-            //         isFontLoaded = true;
-            //         callback();
-            //     } else {
-            //         setTimeout(function () {
-            //             whenFontIsLoaded(callback, attemptCount + 1);
-            //         }, 1000);
-            //     }
-            // },
-            onFontChange() {
-                this.loadGoogleFont(this.selectedFont);
-                this.changeFontFamily(this.selectedFont);
-                // this.whenFontIsLoaded(function () {
-                // });
-            },
-            loadGoogleFont(font) {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = `https://fonts.googleapis.com/css?family=${font.name}&display=swap`;
-                document.head.appendChild(link);
-            },
-        async addFont(font, name) {
-            let formData = new FormData();
-
-            formData.append('font', font);
-            formData.append('name', name);
-
-            try {
-                let res = await axios.post('/font/add', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
                 });
-                alert('Font uploaded successfully!');
+        },
+        async loadGoogleFont(font) {
+            const fontFace = new FontFace(font.name, `url(${font.file})`);
+            try {
+                await fontFace.load();
+                document.fonts.add(fontFace);
+                return true;
             } catch (error) {
-                console.error('Error uploading font:', error);
+                console.error(`Failed to load font: ${font.name}`, error);
+                return false;
             }
         },
+        async onFontChange() {
+            const fontLoaded = await this.loadGoogleFont(this.selectedFont);
+            if (fontLoaded) {
+                this.changeFontFamily(this.selectedFont);
+            } else {
+                console.error("Font failed to load, can't change font family.");
+            }
+        },
+        // async addFont(font, name) {
+        //     let formData = new FormData();
+
+        //     formData.append('font', font);
+        //     formData.append('name', name);
+
+        //     try {
+        //         let res = await axios.post('/font/add', formData, {
+        //             headers: {
+        //                 'Content-Type': 'multipart/form-data'
+        //             }
+        //         });
+        //         alert('Font uploaded successfully!');
+        //     } catch (error) {
+        //         console.error('Error uploading font:', error);
+        //     }
+        // },
     },
     computed: {
         reversedLayers() {
@@ -573,10 +539,6 @@ export default {
         }
     },
     props: {
-        // fonts: {
-        //     type: Object,
-        //     required: true,
-        // },
         textTemplates: {
             type: Object,
             required: true,
