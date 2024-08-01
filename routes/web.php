@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
+use App\Models\TemplateCategory;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -12,7 +12,9 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
     ]);
 });
+
 ////////////////////////////// my routes ////////////////////////
+
 Route::get('/Arabian-Geeks', function () {
 
     $temps = getTemplates('Text');
@@ -29,6 +31,7 @@ Route::get('/Arabian-Geeks', function () {
 });
 
 Route::get('/admin-panel', function () {
+    $categories = TemplateCategory::select('id', 'name')->get(); 
 
     $temps = getTemplates('Text');
 
@@ -39,6 +42,7 @@ Route::get('/admin-panel', function () {
     $tmplateImages = getTemplateImages();
 
     return Inertia::render('AdminPanel', [
+        'categories'=> $categories,
         'textTemplates' => $temps,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
@@ -48,11 +52,13 @@ Route::get('/admin-panel', function () {
 
 Route::get('/template/{template}', [TemplateController::class, 'index']);
 Route::post('/template/add', [TemplateController::class, 'store']);
+Route::post('/template/edit/{template}', [TemplateController::class, 'edit']);
+Route::post('/template/delete/{template}', [TemplateController::class, 'destroy']);
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
 // Route::post('/font/add', [TemplateController::class,'addFont']);
 Route::post('/category/add', [TemplateController::class,'addCategory']);
 
-////////////////////////////////////////////////////////
+////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

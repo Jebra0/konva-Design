@@ -7,6 +7,7 @@ use App\Models\Template;
 use App\Models\Font;
 use App\Models\TemplateCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TemplateController extends Controller
 {
@@ -18,19 +19,20 @@ class TemplateController extends Controller
     {
         $request->validate([
             "name" => "required|string",
-            "type" => "required|string",
             "data" => "required|json",
+            "category_id" => "required|exists:templates_categories,id",
             "image" => "required|image|mimes:png|max:2048",
         ]);
+        $category = TemplateCategory::findOrFail($request->category_id);
 
         $file = $request->file('image');
-        $path = $file->store('images/' . $request->type, ['disk' => 'public_images']);
+        $path = $file->store('images/' . $category->name, ['disk' => 'public_images']);
 
         $template = new Template();
         $template->name = $request->name;
-        $template->type = $request->type;
         $template->data = $request->data;
         $template->image = $path;
+        $template->category_id = $request->category_id;
         $template->save();
 
         return $template;
@@ -70,7 +72,7 @@ class TemplateController extends Controller
     //         $originalName = $file->getClientOriginalName();
 
     //         $path = $file->storeAs('fonts/', $originalName, ['disk' => 'public_fonts']);
-            
+
     //     } catch (\Exception $e) {
     //         return response()->json(['error' => 'Error uploading file: ' . $e->getMessage()], 500);
     //     }
@@ -89,11 +91,40 @@ class TemplateController extends Controller
     // }
 
 
-    public function addCategory(Request $request){
+    public function addCategory(Request $request)
+    {
         $category = new TemplateCategory();
         $category->name = $request->name;
         $category->save();
-        
+
         return $category;
+    }
+
+    public function edit(Template $template, Request $request)
+    {
+        $request->validate([
+            "data" => "required|json",
+            "image" => "required|image|mimes:png|max:2048",
+        ]);
+        $category = TemplateCategory::findOrFail($template->category_id);
+        // return $category;
+        
+        $oldImage = $template->image;
+        Storage::disk('public_images')->delete($oldImage);
+
+        $file = $request->file('image');
+        $path = $file->store('images/' . $category->name, ['disk' => 'public_images']);
+        
+        return $template->update([
+            'data' => $request->data,
+            'image' => $path,
+        ]);
+
+    }
+
+    public function destroy(Template $template){
+        $image = $template->image;
+        Storage::disk('public_images')->delete($image);
+        $template->delete();
     }
 }

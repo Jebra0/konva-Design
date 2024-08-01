@@ -29,7 +29,8 @@ const allFunctions = {
             clippingTool: null,
             clippingRect: null,
             clippingTransformer: null,
-            /////// test ///////////////
+            /////// //// ///////////////
+            selectedFillColor: null,
         };
     },
     methods: {
@@ -133,6 +134,16 @@ const allFunctions = {
                     objectType: type,
                     config: config
                 });
+                if(type === 'Text'){
+                    if (this.selectedFont === null) {
+                        if (this.objectSelected.length === 1) {
+                            this.selectedFont = config.attrs.fontFamily;
+                        }
+                    }
+                }
+                if (this.objectSelected.length === 1 && this.selectedFillColor === null) {
+                    this.selectedFillColor = config.attrs.fill;
+                }
             }
             this.updateTransformer();
         },
@@ -192,6 +203,13 @@ const allFunctions = {
                                 e.cancelBubble = true;
                                 this.toggleSelection(object.id(), object.getClassName(), object);
                             });
+
+                            if (object.getClassName() === 'Text') {
+                                const fontLoaded = await this.fetchFont(object.fontFamily());
+                                if (fontLoaded) {
+                                    newLayer.add(object);
+                                }
+                            }
 
                             newLayer.add(object);
                         }
@@ -560,6 +578,8 @@ const allFunctions = {
             const textConstructor = Konva['Text'];
             const text = new textConstructor(config);
 
+            console.log(text.fontFamily());
+
             // Create a transformer
             this.addTransformer(newLayer);
 
@@ -783,20 +803,17 @@ const allFunctions = {
             });
         },
         // templates
-        async saveAsTemplate(name, type) {
+        async saveAsTemplate(name, category_id) {
+            // console.log(name, category_id)
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
-
-                if (type === 'Shapes') {
-                    let blob = await this.resizeImage(dataURL, 300, 200);
-                }
 
                 let blob = await this.resizeImage(dataURL, 300, 300);
 
                 let formData = new FormData();
                 formData.append('name', name);
                 formData.append('data', this.stage.toJSON());
-                formData.append('type', type);
+                formData.append('category_id', category_id);
                 formData.append('image', blob, `${name}.png`);
 
                 let res = await axios.post('/template/add', formData, {
@@ -1104,7 +1121,6 @@ const allFunctions = {
                 .then(res => res.json())
                 .then(json => {
                     json.results.forEach(element => {
-                        //this.images =[];
                         this.images.unshift({
                             src: element.urls.full,
                             portfolio: element.user.portfolio_url,
@@ -1143,7 +1159,50 @@ const allFunctions = {
                 alert('Error while creating');
                 console.error(error);
             }
-        }        
+        },
+        //////////////////////////
+        async fetchFonts() {
+            await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
+                .then(res => res.json())
+                .then(json => {
+                    json.items.forEach(font => {
+                        this.GoogleFonts.push({
+                            name: font.family,
+                            file: font.files.regular
+                        });
+                    });
+                });
+        },
+        async fetchFont(family) {
+            await fetch(`${this.fontUrl}?key=${this.fontsKey}&family=${family}`)
+                .then(res => res.json())
+                .then(json => {
+                    let font = {
+                        name: json.items[0].family,
+                        file: json.items[0].files.regular
+                    }
+                    return this.loadGoogleFont(font);
+                });
+        },
+        async loadGoogleFont(font) {
+            const fontFace = new FontFace(font.name, `url(${font.file})`);
+            try {
+                await fontFace.load();
+                document.fonts.add(fontFace);
+                return true;
+            } catch (error) {
+                console.error(`Failed to load font: ${font.name}`, error);
+                return false;
+            }
+        },
+        async onFontChange() {
+            const fontLoaded = await this.loadGoogleFont(this.selectedFont);
+            if (fontLoaded) {
+                this.changeFontFamily(this.selectedFont);
+            } else {
+                console.error("Font failed to load, can't change font family.");
+            }
+        },
     }
 };
 

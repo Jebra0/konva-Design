@@ -1,5 +1,6 @@
 <template>
     <v-app>
+
         <Head>
             <title>Admin Panel</title>
         </Head>
@@ -12,8 +13,9 @@
                     <div class="imgParent d-flex justify-center" v-for="(temp, id) in templates" :key="id">
                         <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
                             style="cursor: pointer">
-                        <v-btn class="edit-btn" icon="mdi-pencil"></v-btn>
-                        <v-btn class="delete-btn" color="red" icon="mdi-delete"></v-btn>
+                        <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
+                        <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red"
+                            icon="mdi-delete"></v-btn>
                     </div>
                 </v-card>
 
@@ -32,10 +34,11 @@
                         style="text-transform: none; font-size: 14px;">Create Body
                         Text</v-btn>
                     <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
-                        <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
+                        <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id)"
                             style="cursor: pointer">
-                        <v-btn class="edit-btn" icon="mdi-pencil"></v-btn>
-                        <v-btn class="delete-btn" color="red" icon="mdi-delete"></v-btn>
+                        <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
+                        <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red"
+                            icon="mdi-delete"></v-btn>
                     </div>
                 </v-card>
 
@@ -63,8 +66,9 @@
                         v-for="(shape, id) in shapeTemplates" :key="id">
                         <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
                             style="cursor: pointer">
-                        <v-icon size="25" style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;"
-                            color="red" icon="mdi-delete"></v-icon>
+                        <v-icon @click="deleteTemplate(shape.id)" size="25"
+                            style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
+                            icon="mdi-delete"></v-icon>
                     </div>
                     <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
                         @click=" addShape(rectConfig)"></v-icon> -->
@@ -138,8 +142,8 @@
             <template v-slot:prepend>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
-                    :value="selectedFillColor" v-model="colorFill" @input="fillColor(colorFill)" />
-
+                    v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
+                    
                 <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
 
@@ -171,7 +175,7 @@
 
                 <div style="">
                     <!-- save as template -->
-                    <v-dialog max-width="500">
+                    <v-dialog v-if="!this.editingTemp" max-width="500">
                         <template v-slot:activator="{ props: activatorProps }">
                             <v-btn-group color="#b2d7ef" density="comfortable" rounded="pill" divided>
                                 <v-btn v-bind="activatorProps">
@@ -183,8 +187,8 @@
                             <v-card title="Save as template">
                                 <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
 
-                                <v-select label="Template Type" required v-model="templateType"
-                                    :items="['Text', 'Fold brochure', 'Shapes']"></v-select>
+                                <v-select label="Template Type" required v-model="templateType" :items="categories"
+                                    item-title="name" item-value="id"></v-select>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -195,6 +199,10 @@
                             </v-card>
                         </template>
                     </v-dialog>
+                    <!-- save edited template -->
+                    <v-btn-group color="#b2d7ef" density="comfortable" rounded="pill" divided>
+                        <v-btn v-if="this.editingTemp" @click="saveEditedTemplate(this.editedId)">Save</v-btn>
+                    </v-btn-group>
 
                     <!-- positions -->
                     <v-btn>
@@ -284,8 +292,8 @@
                 v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
-                <v-combobox clearable label="font style" :items="GoogleFonts" item-title="name" item-value="file"
-                    v-model="selectedFont" @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
+                <v-combobox clearable :items="GoogleFonts" item-title="name" item-value="file" v-model="selectedFont"
+                    @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
@@ -351,8 +359,6 @@
         <v-main class="d-flex align-center justify-center"
             style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
-            <!-- {{ selectedObjectIds }} -->
-            <!-- {{ selectedFont }} -->
         </v-main>
     </v-app>
 </template>
@@ -361,6 +367,7 @@ import allFunctions from '@/Utils/allFunctions.js';
 import { rectConfig } from '../Utils/shapesConfig.js';
 import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
 import { Head } from '@inertiajs/vue3';
+import axios from 'axios';
 
 export default {
     mixins: [allFunctions],
@@ -425,63 +432,56 @@ export default {
 
             selectedFont: null,
 
-            categoryName: ''
+            categoryName: '',
+
+            editingTemp: false,
+            editedId: null,
         }
     },
     async mounted() {
         this.fetchUnsplashImages();
         this.initializeKonva();
         this.fetchFonts();
+        // this.fetchFont('Khand')
     },
     methods: {
-        async fetchFonts() {
-            await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
-                .then(res => res.json())
-                .then(json => {
-                    json.items.forEach(font => {
-                        this.GoogleFonts.push({
-                            name: font.family,
-                            file: font.files.regular
-                        });
-                    });
-                });
+        editTemplate(id) {
+            this.editingTemp = true;
+            this.getSelectedTemplate(id);
+            this.editedId = id;
         },
-        async loadGoogleFont(font) {
-            const fontFace = new FontFace(font.name, `url(${font.file})`);
+        async saveEditedTemplate(id) {
             try {
-                await fontFace.load();
-                document.fonts.add(fontFace);
-                return true;
+                let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
+
+                let blob = await this.resizeImage(dataURL, 300, 300);
+
+                let formData = new FormData();
+                formData.append('data', this.stage.toJSON());
+                formData.append('image', blob, `new.png`);
+
+                let res = await axios.post(`/template/edit/${id}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log(res);
+                alert('Updated successfully!')
             } catch (error) {
-                console.error(`Failed to load font: ${font.name}`, error);
-                return false;
+                alert('Error while saving!')
             }
         },
-        async onFontChange() {
-            const fontLoaded = await this.loadGoogleFont(this.selectedFont);
-            if (fontLoaded) {
-                this.changeFontFamily(this.selectedFont);
-            } else {
-                console.error("Font failed to load, can't change font family.");
+        async deleteTemplate(id) {
+            if (confirm("Are you sure ? ")) {
+                try {
+                    let res = await axios.post(`/template/delete/${id}`);
+                    console.log(res)
+                    alert('deleted successfully')
+                } catch (error) {
+                    alert('Error while deleting')
+                }
             }
-        },
-        // async addFont(font, name) {
-        //     let formData = new FormData();
-
-        //     formData.append('font', font);
-        //     formData.append('name', name);
-
-        //     try {
-        //         let res = await axios.post('/font/add', formData, {
-        //             headers: {
-        //                 'Content-Type': 'multipart/form-data'
-        //             }
-        //         });
-        //         alert('Font uploaded successfully!');
-        //     } catch (error) {
-        //         console.error('Error uploading font:', error);
-        //     }
-        // },
+        }
     },
     computed: {
         reversedLayers() {
@@ -516,20 +516,6 @@ export default {
                 }
             }
         },
-        // selectedFont() {
-        //     if (this.objectSelected.length === 1) {
-        //         return this.objectSelected[0].config.attrs.fontFamily;
-        //     } else {
-        //         return 'Cairo';
-        //     }
-        // },
-        selectedFillColor() {
-            if (this.objectSelected.length === 1) {
-                return this.objectSelected[0].config.attrs.fill;
-            } else {
-                return '#0000';
-            }
-        },
         fontSize() {
             if (this.objectSelected.length === 1) {
                 return this.objectSelected[0].config.attrs.fontSize;
@@ -555,6 +541,10 @@ export default {
             type: Object,
             required: true,
         },
+        categories: {
+            type: Object,
+            required: true,
+        }
     }
 }
 </script>

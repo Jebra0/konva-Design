@@ -1,6 +1,5 @@
 <template>
     <v-layout>
-
         <Head>
             <title>Design Tool</title>
         </Head>
@@ -134,8 +133,8 @@
 
             <template v-slot:prepend>
 
-                <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
-                    :value="selectedFillColor" v-model="colorFill" @input="fillColor(colorFill)" />
+                <input v-if="SelectedObjectType === 'Shape'"  class="ml-2" type="color" style="width: 40px; height: 40px" 
+                    v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
 
                 <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
                 <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
@@ -254,8 +253,8 @@
                 v-model="colorFill" @input="fillColor(colorFill)" />
 
             <div class="d-flex">
-                <v-combobox clearable label="font style" :items="GoogleFonts" item-title="name" item-value="file"
-                    v-model="selectedFont" @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
+                <v-combobox clearable :items="GoogleFonts" item-title="name" item-value="file"
+                  v-model="selectedFont" @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
                 </v-combobox>
             </div>
 
@@ -396,37 +395,7 @@ export default {
         }
     },
     methods: {
-        async fetchFonts() {
-            await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
-                .then(res => res.json())
-                .then(json => {
-                    json.items.forEach(font => {
-                        this.GoogleFonts.push({
-                            name: font.family,
-                            file: font.files.regular
-                        });
-                    });
-                });
-        },
-        async loadGoogleFont(font) {
-            const fontFace = new FontFace(font.name, `url(${font.file})`);
-            try {
-                await fontFace.load();
-                document.fonts.add(fontFace);
-                return true;
-            } catch (error) {
-                console.error(`Failed to load font: ${font.name}`, error);
-                return false;
-            }
-        },
-        async onFontChange() {
-            const fontLoaded = await this.loadGoogleFont(this.selectedFont);
-            if (fontLoaded) {
-                this.changeFontFamily(this.selectedFont);
-            } else {
-                console.error("Font failed to load, can't change font family.");
-            }
-        },
+       
     },
     mounted() {
         this.fetchUnsplashImages();
@@ -466,20 +435,13 @@ export default {
                 }
             }
         },
-        // selectedFont() {
+        // selectedFillColor() {
         //     if (this.objectSelected.length === 1) {
-        //         return this.objectSelected[0].config.attrs.fontFamily;
+        //         return this.objectSelected[0].config.attrs.fill;
         //     } else {
-        //         return 'Cairo';
+        //         return '#0000';
         //     }
         // },
-        selectedFillColor() {
-            if (this.objectSelected.length === 1) {
-                return this.objectSelected[0].config.attrs.fill;
-            } else {
-                return '#0000';
-            }
-        },
         fontSize() {
             if (this.objectSelected.length === 1) {
                 return this.objectSelected[0].config.attrs.fontSize;
