@@ -144,8 +144,8 @@
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
                     
-                <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
-                <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
+                <v-btn icon="mdi-undo" @click="unDo"></v-btn>
+                <v-btn icon="mdi-redo" @click="reDo"></v-btn>
 
                 <!-- for image -->
                 <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
@@ -289,8 +289,8 @@
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
 
             <input class="ml-2" type="color" style="width: 40px; height: 40px" :value="selectedFillColor"
-                v-model="colorFill" @input="fillColor(colorFill)" />
-
+            v-model="colorFill" @input="fillColor(colorFill)" />
+            
             <div class="d-flex">
                 <v-combobox clearable :items="GoogleFonts" item-title="name" item-value="file" v-model="selectedFont"
                     @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">

@@ -72,27 +72,24 @@ function getTemplateImages(): array
 
 // }
 
-// function pngFont($fontName, $fontFilePath)
-// {
-//     // $fontName = 'DancingScript';
-//     // $fontFilePath = public_path('fonts/DancingScript-VariableFont_wght.ttf');
+function pngFont($fontName, $fontFilePath)
+{
+    // Create an image with GD
+    $width = 100;
+    $height = 50;
+    $im = imagecreatetruecolor($width, $height);
+    $bgColor = imagecolorallocate($im, 255, 255, 255);
+    imagefill($im, 0, 0, $bgColor);
+    $textColor = imagecolorallocate($im, 0, 0, 0);
 
-//     // Create an image with GD
-//     $width = 100;
-//     $height = 50;
-//     $im = imagecreatetruecolor($width, $height);
-//     $bgColor = imagecolorallocate($im, 255, 255, 255);
-//     imagefill($im, 0, 0, $bgColor);
-//     $textColor = imagecolorallocate($im, 0, 0, 0);
+    // Load the font
+    $fontSize = 12;
+    imagettftext($im, $fontSize, 0, 10, 15, $textColor, $fontFilePath, $fontName);
 
-//     // Load the font
-//     $fontSize = 12;
-//     imagettftext($im, $fontSize, 0, 10, 15, $textColor, $fontFilePath, $fontName);
-
-//     // Save the image as PNG
-//     $pngPath = 'fonts/' . uniqid() . '.png';
-//     $pngFullPath = public_path('images/' . $pngPath);
-//     imagepng($im, $pngFullPath);
-//     imagedestroy($im);
-//     return 'images/'.$pngPath;
-// }
+    // Save the image as PNG
+    $pngPath = 'fonts/' . uniqid() . '.png';
+    $pngFullPath = public_path('images/' . $pngPath);
+    imagepng($im, $pngFullPath);
+    imagedestroy($im);
+    return 'images/'.$pngPath;
+}

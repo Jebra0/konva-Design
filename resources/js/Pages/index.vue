@@ -136,8 +136,8 @@
                 <input v-if="SelectedObjectType === 'Shape'"  class="ml-2" type="color" style="width: 40px; height: 40px" 
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
 
-                <v-btn color="red" icon="mdi-undo" @click="unDo"></v-btn>
-                <v-btn color="red" icon="mdi-redo" @click="reDo"></v-btn>
+                <v-btn :disabled="undoDisable" icon="mdi-undo" @click="unDo"></v-btn>
+                <v-btn :disabled="redoDisable" icon="mdi-redo" @click="reDo"></v-btn>
 
                 <!-- for image -->
                 <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">

@@ -10,11 +10,14 @@ import {
 } from '@/Utils/snapping.js';
 import { bodyText, headerText, subHeaderText } from "@/Utils/textConfig.js";
 
-const width = 600;
+const width = 700;
 const height = 500;
 const ZOOM_STEP = 0.1;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2;
+
+var undoStack = [];
+var redoStack = [];
 
 const allFunctions = {
     data() {
@@ -31,6 +34,12 @@ const allFunctions = {
             clippingTransformer: null,
             /////// //// ///////////////
             selectedFillColor: null,
+
+            undoDisable: true,
+            redoDisable: true,
+            addAction: false,
+            // deleteAction: false,
+            // positionAction: false,
         };
     },
     methods: {
@@ -152,68 +161,6 @@ const allFunctions = {
             this.transformer.nodes(selectedShapes);
             this.defaultLayer.batchDraw(); // Ensure the layer is redrawn
         },
-        //get template from json
-        // async getTemplate(template) {
-        //     //delete defualt layer
-        //     console.log(this.stage)
-        //     template.children.forEach(child => {
-        //         if (child.className === 'Layer') {
-        //             const newLayer = new Konva.Layer();
-        //             newLayer.id(uuidv4());
-        //             this.stage.add(newLayer);
-        //             // transformer
-        //             this.addTransformer(newLayer);
-
-        //             child.children.forEach(async grandChild => {
-        //                 // with this condition i create aditional layer with no children
-        //                 if (grandChild.className !== 'Transformer') {
-        //                     const objectConstructor = Konva[grandChild.className];
-        //                     const object = new objectConstructor(grandChild.attrs);
-        //                     object.id(uuidv4());
-
-        //                     if (object.getClassName() === 'Image') {
-        //                         const imageUrl = grandChild.attrs.src; // Get the src from JSON
-        //                         if (imageUrl) {
-        //                             const imageObj = new Image();
-        //                             imageObj.src = imageUrl;
-        //                             imageObj.crossOrigin = 'anonymous';
-
-        //                             // Load the image and set it to the Konva image object
-        //                             await new Promise((resolve) => {
-        //                                 imageObj.onload = () => {
-        //                                     object.image(imageObj);
-        //                                     resolve();
-        //                                 };
-        //                             });
-        //                         }
-        //                     }
-        //                     if (object.getClassName() === 'Text') {
-        //                         this.editText(object);
-        //                     }
-        //                     // layers order
-        //                     this.handleLayersOrder(newLayer, object.getClassName());
-
-        //                     object.on("click", (e) => {
-        //                         e.cancelBubble = true;
-        //                         this.toggleSelection(object.id(), object.getClassName(), object);
-        //                     });
-
-        //                     if (object.getClassName() === 'Text') {
-        //                         const fontLoaded = await this.fetchFont(object.fontFamily());
-        //                         if (fontLoaded) {
-        //                             newLayer.add(object);
-        //                         }
-        //                     }
-
-        //                     newLayer.add(object);
-        //                 }else if(grandChild.className === 'Transformer'){
-        //                     // if the layer has only one child is Transformer delete this layer
-        //                 }
-        //             });
-        //             newLayer.batchDraw();
-        //         }
-        //     });
-        // },
         async getTemplate(template) {
             template.children.forEach(child => {
                 if (child.className === 'Layer') {
@@ -264,7 +211,7 @@ const allFunctions = {
                                 if (fontLoaded) {
                                     newLayer.add(object);
                                 }
-                            } 
+                            }
                             newLayer.add(object);
                         }
                     });
@@ -410,10 +357,53 @@ const allFunctions = {
             this.defaultLayer.batchDraw();
         },
         unDo() {
-
+            if (undoStack.length > 0) {
+                if (this.addAction) {
+                    const lastLayer = undoStack.pop();
+                    redoStack.push(lastLayer);
+                    //destroy the layer
+                    this.deleteLayer(lastLayer.attrs.id);
+                    //disable button
+                    if (undoStack.length === 0) {
+                        this.undoDisable = true;
+                    }
+                    this.redoDisable = false;
+                    this.stage.draw();
+                }
+            }
         },
         reDo() {
+            if (redoStack.length > 0) {
+                if (this.addAction) {
+                    const lastLayerJson = redoStack.pop();
+                    undoStack.push(lastLayerJson);
 
+                    // Recreate the layer from the JSON object
+                    const restoredLayer = Konva.Node.create(lastLayerJson, this.stage);
+
+                    // Handle image loading
+                    const imageNode = restoredLayer.getChildren()[1]; 
+                    if (imageNode && imageNode.className === 'Image' && imageNode.attrs.src) {
+                        const imageObj = new Image();
+                        imageObj.src = imageNode.attrs.src;
+                        imageObj.crossOrigin = 'anonymous';
+                        imageObj.onload = () => {
+                            imageNode.image(imageObj);
+                            restoredLayer.batchDraw();
+                        };
+                    }
+
+                    this.handleLayersOrder(restoredLayer, restoredLayer.getClassName());
+
+                    this.stage.add(restoredLayer);
+
+                    if (redoStack.length === 0) {
+                        this.redoDisable = true;
+                    }
+                    this.undoDisable = false;
+                    this.stage.draw();
+                }
+            }
         },
         //positions
         alignLeft() {
@@ -637,8 +627,6 @@ const allFunctions = {
             const textConstructor = Konva['Text'];
             const text = new textConstructor(config);
 
-            console.log(text.fontFamily());
-
             // Create a transformer
             this.addTransformer(newLayer);
 
@@ -655,6 +643,11 @@ const allFunctions = {
 
             newLayer.add(text);
             newLayer.batchDraw();
+
+            this.undoDisable = false;
+            this.addAction = true;
+            const layerJson = newLayer.toObject();
+            undoStack.push(layerJson);
         },
         //editable text
         editText(text) {
@@ -910,7 +903,7 @@ const allFunctions = {
             imageObj.crossOrigin = 'anonymous';
 
             imageObj.onload = () => {
-                const maxWidth = 600;
+                const maxWidth = 700;
                 const maxHeight = 500;
                 let width = imageObj.width;
                 let height = imageObj.height;
@@ -945,6 +938,11 @@ const allFunctions = {
 
                 newLayer.add(image);
                 newLayer.batchDraw();
+
+                this.undoDisable = false;
+                this.addAction = true;
+                const layerJson = newLayer.toObject();
+                undoStack.push(layerJson);
             };
         },
         addUploadedImage(dataURL) {
