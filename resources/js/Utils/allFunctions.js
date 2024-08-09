@@ -40,9 +40,7 @@ const allFunctions = {
 
             undoDisable: true,
             redoDisable: true,
-            addAction: false,
-            // deleteAction: false,
-            positionAction: false,
+            historyAction: '',
         };
     },
     methods: {
@@ -403,118 +401,93 @@ const allFunctions = {
         },
         savePositionState(object) {
             const state = {
+                type: 'position',
                 x: object.x(),
                 y: object.y(),
                 id: object.id()
             };
-            undoPositionStack.push(state);
-            redoPositionStack = [];
+            undoStack.push(state);
         },
         unDo() {
             if (undoStack.length > 0) {
-                if (this.addAction) {
-                    console.log('add action')
-                    const lastLayer = undoStack.pop();
-                    redoStack.push(lastLayer);
-                    //destroy the layer
-                    this.deleteLayer(lastLayer.attrs.id);
-                    //disable button
-                    if (undoStack.length === 0) {
-                        this.undoDisable = true;
-                    }
-                    this.redoDisable = false;
-                    this.stage.draw();
+                const lastLayer = undoStack.pop();
+                switch (lastLayer.type) {
+                    case 'add':
+                        redoStack.push(lastLayer);
+                        //destroy the layer
+                        this.deleteLayer(lastLayer.data.attrs.id);
+                        //disable button
+                        if (undoStack.length === 0) {
+                            this.undoDisable = true;
+                        }
+                        this.redoDisable = false;
+                        this.stage.draw();
+                        break;
+                    case 'position':
+                        const obj = this.stage.findOne(`#${lastLayer.id}`);
+
+                        const state = {
+                            type: 'position',
+                            x: obj.x(),
+                            y: obj.y(),
+                            id: obj.id()
+                        };
+
+                        redoStack.push(state);
+
+                        // Restore the previous state
+                        obj.x(lastLayer.x);
+                        obj.y(lastLayer.y);
+
+                        if (undoStack.length === 0) {
+                            this.undoDisable = true;
+                        }
+                        this.redoDisable = false;
+
+                        this.stage.draw();
+                        break;
                 }
-                // if (this.deleteAction) {
-                //     console.log('delete action')
-
-                //     console.log('undo stack 1', undoStack);
-                //     const lastLayer = undoStack.pop();
-                //     redoStack.push(lastLayer);
-
-                //     // console.log(lastLayer);
-                //     // console.log('redo stack', redoStack);
-
-                //     //restor the deleted layer
-                //     this.recreateLayer(lastLayer);
-
-                //     if (undoStack.length === 0) {
-                //         this.undoDisable = true;
-                //     }
-                //     this.redoDisable = false;
-                //     this.stage.draw();
-
-                //     console.log('undo stack', undoStack);
-                // }
-            }
-            if (undoPositionStack.length > 0) {
-                const lastState = undoPositionStack.pop();
-
-                const obj = this.stage.findOne(`#${lastState.id}`);
-
-                const state = {
-                    x: obj.x(),
-                    y: obj.y(),
-                    id: obj.id()
-                };
-                
-                redoPositionStack.push(state);
-                
-                // Restore the previous state
-                obj.x(lastState.x);
-                obj.y(lastState.y);
-
-                
-                if (undoPositionStack.length === 0) {
-                    this.undoDisable = true;
-                }
-                this.redoDisable = false;
-
-                this.stage.draw();
             }
         },
         reDo() {
             if (redoStack.length > 0) {
-                if (this.addAction) {
-                    const lastLayerJson = redoStack.pop();
-                    undoStack.push(lastLayerJson);
+                const lastLayerJson = redoStack.pop();
+                switch (lastLayerJson.type) {
+                    case 'add':
+                        undoStack.push(lastLayerJson);
+                        // Recreate the layer
+                        this.recreateLayer(lastLayerJson.data);
 
-                    // Recreate the layer
-                    this.recreateLayer(lastLayerJson);
+                        if (redoStack.length === 0) {
+                            this.redoDisable = true;
+                        }
+                        this.undoDisable = false;
+                        this.stage.draw();
+                        break;
+                    case 'position':
+                        const obj = this.stage.findOne(`#${lastLayerJson.id}`);
 
-                    if (redoStack.length === 0) {
-                        this.redoDisable = true;
-                    }
-                    this.undoDisable = false;
-                    this.stage.draw();
+                        const state = {
+                            type: 'position',
+                            x: obj.x(),
+                            y: obj.y(),
+                            id: obj.id()
+                        };
+
+                        undoStack.push(state);
+
+                        // Restore the previous state
+                        obj.x(lastLayerJson.x);
+                        obj.y(lastLayerJson.y);
+
+                        if (redoStack.length === 0) {
+                            this.redoDisable = true;
+                        }
+                        this.undoDisable = false;
+
+                        this.stage.draw();
+                        break;
                 }
-                if (this.deleteAction) {
-                    // handel redo the deleted layer
-                }
-            }
-            if (redoPositionStack.length > 0) {
-                const lastState = redoPositionStack.pop();
-                
-                const obj = this.stage.findOne(`#${lastState.id}`);
-
-                const state = {
-                    x: obj.x(),
-                    y: obj.y(),
-                    id: obj.id()
-                };
-                
-                undoPositionStack.push(state);
-
-                // Restore the previous state
-                obj.x(lastState.x);
-                obj.y(lastState.y);
-
-                if (redoPositionStack.length === 0) {
-                    this.redoDisable = true;
-                }
-                this.undoDisable = false;
-
-                this.stage.draw();
             }
         },
         //positions
@@ -756,16 +729,16 @@ const allFunctions = {
             newLayer.add(text);
             newLayer.batchDraw();
 
-            // undo redo add 
+            // // undo redo add 
             this.undoDisable = false;
-            this.addAction = true;
-            this.deleteAction = false;
             const layerJson = newLayer.toObject();
-            undoStack.push(layerJson);
+            undoStack.push({
+                type: 'add',
+                data: layerJson
+            });
 
-            // undo redo position
+            // // undo redo position
             text.on('dragstart', () => {
-                this.undoDisable = false;
                 this.savePositionState(text);
             });
         },
@@ -1059,11 +1032,18 @@ const allFunctions = {
                 newLayer.add(image);
                 newLayer.batchDraw();
 
+                // // undo redo add 
                 this.undoDisable = false;
-                this.addAction = true;
-                this.deleteAction = false;
                 const layerJson = newLayer.toObject();
-                undoStack.push(layerJson);
+                undoStack.push({
+                    type: 'add',
+                    data: layerJson
+                });
+
+                // // undo redo position
+                image.on('dragstart', () => {
+                    this.savePositionState(image);
+                });
             };
         },
         addUploadedImage(dataURL) {
