@@ -264,10 +264,10 @@
                     </v-btn>
 
                     <!-- duplicate -->
-                    <v-btn @click="duplicateObjects">
+                    <!-- <v-btn @click="duplicateObjects">
                         <v-icon icon="mdi-content-copy"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
-                    </v-btn>
+                    </v-btn> -->
 
                     <!-- delete -->
                     <v-btn @click="destroyObjects()">

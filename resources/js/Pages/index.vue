@@ -226,10 +226,10 @@
                     </v-btn>
 
                     <!-- duplicate -->
-                    <v-btn @click="duplicateObjects">
+                    <!-- <v-btn @click="duplicateObjects">
                         <v-icon icon="mdi-content-copy"></v-icon>
                         <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
-                    </v-btn>
+                    </v-btn> -->
 
                     <!-- delete -->
                     <v-btn @click="destroyObjects()">
@@ -320,7 +320,7 @@
         <v-main class="d-flex align-center justify-center"
             style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
             <div class="my-3" id="container"></div>
-            <!-- {{ selectedObjectIds }} -->
+            <!-- {{ undoDisable }} -->
         </v-main>
     </v-layout>
 </template>

@@ -19,6 +19,9 @@ const MAX_ZOOM = 2;
 var undoStack = [];
 var redoStack = [];
 
+var redoPositionStack = [];
+var undoPositionStack = [];
+
 const allFunctions = {
     data() {
         return {
@@ -39,7 +42,7 @@ const allFunctions = {
             redoDisable: true,
             addAction: false,
             // deleteAction: false,
-            // positionAction: false,
+            positionAction: false,
         };
     },
     methods: {
@@ -289,9 +292,17 @@ const allFunctions = {
                 if (shape) {
                     const layer = shape.getLayer();
 
+                    //un/re do
+                    // this.undoDisable = false;
+                    // this.addAction = false;
+                    // this.deleteAction = true;
+                    // const layerJson = layer.toObject();
+                    // undoStack.push(layerJson);
+
                     this.deleteLayer(layer.id());
 
                     layer.getChildren().forEach(child => child.destroy());
+
                 }
             });
             this.selectedObjectIds = [];
@@ -356,9 +367,53 @@ const allFunctions = {
             });
             this.defaultLayer.batchDraw();
         },
+        recreateLayer(layer) {
+            // Recreate the layer from the JSON object
+            const restoredLayer = Konva.Node.create(layer, this.stage);
+
+            // Handle image loading
+            const layerNode = restoredLayer.getChildren()[1];
+            if (layerNode && layerNode.className === 'Image' && layerNode.attrs.src) {
+                const imageObj = new Image();
+                imageObj.src = layerNode.attrs.src;
+                imageObj.crossOrigin = 'anonymous';
+                imageObj.onload = () => {
+                    layerNode.image(imageObj);
+                    restoredLayer.batchDraw();
+                };
+            }
+
+            this.addTransformer(restoredLayer);
+
+            // Handle layers order
+            this.handleLayersOrder(restoredLayer, layerNode.getClassName());
+
+            layerNode.on("click", (e) => {
+                e.cancelBubble = true;
+                this.toggleSelection(layerNode.id(), layerNode.getClassName(), layerNode);
+            });
+
+            if (layerNode.getClassName === 'Text') {
+                //editable
+                this.editText(text);
+            }
+
+
+            this.stage.add(restoredLayer);
+        },
+        savePositionState(object) {
+            const state = {
+                x: object.x(),
+                y: object.y(),
+                id: object.id()
+            };
+            undoPositionStack.push(state);
+            redoPositionStack = [];
+        },
         unDo() {
             if (undoStack.length > 0) {
                 if (this.addAction) {
+                    console.log('add action')
                     const lastLayer = undoStack.pop();
                     redoStack.push(lastLayer);
                     //destroy the layer
@@ -370,6 +425,52 @@ const allFunctions = {
                     this.redoDisable = false;
                     this.stage.draw();
                 }
+                // if (this.deleteAction) {
+                //     console.log('delete action')
+
+                //     console.log('undo stack 1', undoStack);
+                //     const lastLayer = undoStack.pop();
+                //     redoStack.push(lastLayer);
+
+                //     // console.log(lastLayer);
+                //     // console.log('redo stack', redoStack);
+
+                //     //restor the deleted layer
+                //     this.recreateLayer(lastLayer);
+
+                //     if (undoStack.length === 0) {
+                //         this.undoDisable = true;
+                //     }
+                //     this.redoDisable = false;
+                //     this.stage.draw();
+
+                //     console.log('undo stack', undoStack);
+                // }
+            }
+            if (undoPositionStack.length > 0) {
+                const lastState = undoPositionStack.pop();
+
+                const obj = this.stage.findOne(`#${lastState.id}`);
+
+                const state = {
+                    x: obj.x(),
+                    y: obj.y(),
+                    id: obj.id()
+                };
+                
+                redoPositionStack.push(state);
+                
+                // Restore the previous state
+                obj.x(lastState.x);
+                obj.y(lastState.y);
+
+                
+                if (undoPositionStack.length === 0) {
+                    this.undoDisable = true;
+                }
+                this.redoDisable = false;
+
+                this.stage.draw();
             }
         },
         reDo() {
@@ -378,24 +479,8 @@ const allFunctions = {
                     const lastLayerJson = redoStack.pop();
                     undoStack.push(lastLayerJson);
 
-                    // Recreate the layer from the JSON object
-                    const restoredLayer = Konva.Node.create(lastLayerJson, this.stage);
-
-                    // Handle image loading
-                    const imageNode = restoredLayer.getChildren()[1]; 
-                    if (imageNode && imageNode.className === 'Image' && imageNode.attrs.src) {
-                        const imageObj = new Image();
-                        imageObj.src = imageNode.attrs.src;
-                        imageObj.crossOrigin = 'anonymous';
-                        imageObj.onload = () => {
-                            imageNode.image(imageObj);
-                            restoredLayer.batchDraw();
-                        };
-                    }
-
-                    this.handleLayersOrder(restoredLayer, restoredLayer.getClassName());
-
-                    this.stage.add(restoredLayer);
+                    // Recreate the layer
+                    this.recreateLayer(lastLayerJson);
 
                     if (redoStack.length === 0) {
                         this.redoDisable = true;
@@ -403,6 +488,33 @@ const allFunctions = {
                     this.undoDisable = false;
                     this.stage.draw();
                 }
+                if (this.deleteAction) {
+                    // handel redo the deleted layer
+                }
+            }
+            if (redoPositionStack.length > 0) {
+                const lastState = redoPositionStack.pop();
+                
+                const obj = this.stage.findOne(`#${lastState.id}`);
+
+                const state = {
+                    x: obj.x(),
+                    y: obj.y(),
+                    id: obj.id()
+                };
+                
+                undoPositionStack.push(state);
+
+                // Restore the previous state
+                obj.x(lastState.x);
+                obj.y(lastState.y);
+
+                if (redoPositionStack.length === 0) {
+                    this.redoDisable = true;
+                }
+                this.undoDisable = false;
+
+                this.stage.draw();
             }
         },
         //positions
@@ -644,10 +756,18 @@ const allFunctions = {
             newLayer.add(text);
             newLayer.batchDraw();
 
+            // undo redo add 
             this.undoDisable = false;
             this.addAction = true;
+            this.deleteAction = false;
             const layerJson = newLayer.toObject();
             undoStack.push(layerJson);
+
+            // undo redo position
+            text.on('dragstart', () => {
+                this.undoDisable = false;
+                this.savePositionState(text);
+            });
         },
         //editable text
         editText(text) {
@@ -941,6 +1061,7 @@ const allFunctions = {
 
                 this.undoDisable = false;
                 this.addAction = true;
+                this.deleteAction = false;
                 const layerJson = newLayer.toObject();
                 undoStack.push(layerJson);
             };
@@ -959,26 +1080,32 @@ const allFunctions = {
             newLayer.add(this.transformer);
 
             imageObj.onload = () => {
+                const maxWidth = 700;
+                const maxHeight = 500;
+                let width = imageObj.width;
+                let height = imageObj.height;
+
+                // Calculate the new width and height while maintaining the aspect ratio
+                if (width > maxWidth || height > maxHeight) {
+                    const scale = Math.min(maxWidth / width, maxHeight / height);
+                    width = width * scale;
+                    height = height * scale;
+                }
+
                 const image = new Konva.Image({
                     image: imageObj,
-                    width: 400,
-                    height: 500,
+                    width: width,
+                    height: height,
                     draggable: true,
                     id: uuidv4(),
+                    name: 'object',
                 });
 
-                const currentLength = this.layers.length;
-                if (currentLength > 1) {
-                    this.layers[currentLength - 1].lastOne = false;
-                }
-                this.layers.push({
-                    'id': newLayer.id(),
-                    'name': image.getClassName(),
-                    'layer': newLayer,
-                    'visible': true,
-                    'firstOne': this.layers.length === 1,
-                    'lastOne': true
-                })
+                // Create a transformer
+                this.addTransformer(newLayer);
+
+                // Handle layers order
+                this.handleLayersOrder(newLayer, image.getClassName());
 
                 image.on("click", (e) => {
                     e.cancelBubble = true;
