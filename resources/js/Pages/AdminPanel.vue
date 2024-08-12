@@ -144,16 +144,16 @@
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
                     
-                <v-btn icon="mdi-undo" @click="unDo"></v-btn>
-                <v-btn icon="mdi-redo" @click="reDo"></v-btn>
+                <v-btn :disabled="undoDisable" icon="mdi-undo" @click="unDo"></v-btn>
+                <v-btn :disabled="redoDisable" icon="mdi-redo" @click="reDo"></v-btn>
 
                 <!-- for image -->
-                <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
+                <!-- <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
                     <v-btn @click=" addClip = !addClip; addClippingTool()">
                         <v-icon icon="mdi-crop"></v-icon>
                     </v-btn>
                     <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
-                </div>
+                </div> -->
 
             </template>
 

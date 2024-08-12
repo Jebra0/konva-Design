@@ -290,23 +290,20 @@ const allFunctions = {
                 if (shape) {
                     const layer = shape.getLayer();
 
-                    //un/re do
-                    // this.undoDisable = false;
-                    // this.addAction = false;
-                    // this.deleteAction = true;
-                    // const layerJson = layer.toObject();
-                    // undoStack.push(layerJson);
+                    layer.getChildren().forEach(child => child.remove());
 
                     this.deleteLayer(layer.id());
-
-                    layer.getChildren().forEach(child => child.destroy());
-
                 }
             });
+
             this.selectedObjectIds = [];
             this.clearSelection();
             this.defaultLayer.batchDraw();
         },
+        // findObject(id){
+        //     const shape = this.stage.findOne(`#${id}`);
+        //     console.log(shape);
+        // },
         duplicateObjects() {
             const newSelectedIds = [];
             this.selectedObjectIds.forEach((id) => {
@@ -1097,149 +1094,158 @@ const allFunctions = {
             }
 
         },
-        ///////////// test crop ///////////////////
-        addClippingTool() {
-            if (this.clippingTool) {
-                this.removeClippingTool();
-            }
+        // ///////////// test crop ///////////////////
+        // addClippingTool() {
+        //     if (this.clippingTool) {
+        //         this.removeClippingTool();
+        //     }
 
-            this.clippingTool = new Konva.Layer();
-            this.stage.add(this.clippingTool);
+        //     this.clippingTool = new Konva.Layer();
+        //     this.stage.add(this.clippingTool);
 
-            this.clippingRect = new Konva.Rect({
-                x: 200,
-                y: 200,
-                width: 200,
-                height: 200,
-                draggable: true,
-                fill: 'rgba(255, 0, 0, 0.3)',
-            });
+        //     this.clippingRect = new Konva.Rect({
+        //         x: 200,
+        //         y: 200,
+        //         width: 200,
+        //         height: 200,
+        //         draggable: true,
+        //         fill: 'rgba(255, 0, 0, 0.3)',
+        //     });
 
-            this.clippingTransformer = new Konva.Transformer({
-                nodes: [this.clippingRect],
-                resizeEnabled: true,
-                rotateEnabled: false,
-                borderStroke: 'blue',
-                borderStrokeWidth: 2,
-                cornerRadius: 6,
-                enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-            });
+        //     this.clippingTransformer = new Konva.Transformer({
+        //         nodes: [this.clippingRect],
+        //         resizeEnabled: true,
+        //         rotateEnabled: false,
+        //         borderStroke: 'blue',
+        //         borderStrokeWidth: 2,
+        //         cornerRadius: 6,
+        //         enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+        //     });
 
-            this.clippingTool.add(this.clippingRect);
-            this.clippingTool.add(this.clippingTransformer);
-            this.stage.add(this.clippingTool);
-            this.clippingTool.batchDraw();
-        },
+        //     this.clippingTool.add(this.clippingRect);
+        //     this.clippingTool.add(this.clippingTransformer);
+        //     this.clippingTool.batchDraw();
+        // },
+
         // applyClipping() {
         //     if (this.clippingRect && this.clippingTool) {
         //         const selectedId = this.selectedObjectIds[0];
         //         const image = this.stage.findOne(`#${selectedId}`);
-
+        
+        //         if (!image || image.className !== 'Image') {
+        //             console.error('Selected object is not an image.');
+        //             return;
+        //         }
+        
+        //         // Get the attributes of the clipping rectangle
         //         const { x, y, width, height } = this.clippingRect.attrs;
-
-        //         const imagLayer = image.getLayer();
-
-        //         image.cache();
-        //         imagLayer.clip({
-        //             x: x,
-        //             y: y,
-        //             width: width,
-        //             height: height
-        //         });
-
-        //         imagLayer.batchDraw();
-        //         ///////////////////////
+        
+        //         // Create a canvas to perform the cropping operation
         //         const cropCanvas = document.createElement('canvas');
         //         const cropCtx = cropCanvas.getContext('2d');
-
+        
         //         cropCanvas.width = width;
         //         cropCanvas.height = height;
-
+        
         //         const imageObj = image.image();
-
+        
+        //         // Calculate the relative position of the clipping rectangle within the image
+        //         const clipX = x - image.x();
+        //         const clipY = y - image.y();
+        
+        //         // Draw the image onto the canvas, cropping it based on the clipping rectangle's position
         //         cropCtx.drawImage(
         //             imageObj,
-        //             x - image.x(),
-        //             y - image.y(),
-        //             width,
-        //             height,
-        //             0, 0,
-        //             width,
-        //             height
+        //             clipX,    // Relative x position of the clipping rect within the image
+        //             clipY,    // Relative y position of the clipping rect within the image
+        //             width,    // Width of the clipping rect
+        //             height,   // Height of the clipping rect
+        //             0, 0,     // Top-left corner of the canvas
+        //             width,    // Canvas width
+        //             height    // Canvas height
         //         );
-
+        
+        //         // Create a new Image object from the cropped canvas
         //         const croppedImage = new Image();
         //         croppedImage.src = cropCanvas.toDataURL();
         //         croppedImage.onload = () => {
+        //             // Replace the original image with the cropped image
         //             image.image(croppedImage);
-        //             this.stage.batchDraw();
+        //             image.size({ width, height }); // Update image size to the cropped dimensions
+        //             image.position({ x, y }); // Reposition the image to match the clipping rectangle's position
+        
+        //             this.stage.batchDraw(); // Redraw the stage to reflect changes
         //         };
-        //         ///////////////////////
+        
         //         this.removeClippingTool();
-
+        
         //     } else {
         //         console.error('Clipping tool not initialized.');
         //     }
+        // },        
+        
+        // // applyClipping() {
+        // //     if (this.clippingRect && this.clippingTool) {
+        // //         const selectedId = this.selectedObjectIds[0];
+        // //         const image = this.stage.findOne(`#${selectedId}`);
+
+        // //         const { x, y, width, height } = this.clippingRect.attrs;
+
+        // //         const imagLayer = image.getLayer();
+
+        // //         image.cache();
+        // //         imagLayer.clip({
+        // //             x: x,
+        // //             y: y,
+        // //             width: width,
+        // //             height: height
+        // //         });
+
+        // //         imagLayer.batchDraw();
+        // //         ///////////////////////
+        // //         const cropCanvas = document.createElement('canvas');
+        // //         const cropCtx = cropCanvas.getContext('2d');
+
+        // //         cropCanvas.width = width;
+        // //         cropCanvas.height = height;
+
+        // //         const imageObj = image.image();
+
+        // //         cropCtx.drawImage(
+        // //             imageObj,
+        // //             x - image.x(),
+        // //             y - image.y(),
+        // //             width,
+        // //             height,
+        // //             0, 0,
+        // //             width,
+        // //             height
+        // //         );
+
+        // //         const croppedImage = new Image();
+        // //         croppedImage.src = cropCanvas.toDataURL();
+        // //         croppedImage.onload = () => {
+        // //             image.image(croppedImage);
+        // //             this.stage.batchDraw();
+        // //         };
+        // //         ///////////////////////
+        // //         this.removeClippingTool();
+
+        // //     } else {
+        // //         console.error('Clipping tool not initialized.');
+        // //     }
+        // // },
+
+        // removeClippingTool() {
+        //     if (this.clippingTool) {
+        //         this.clippingTool.destroy();
+        //         this.clippingTool = null;
+        //         this.clippingRect = null;
+        //         this.clippingTransformer = null;
+        //         this.stage.batchDraw();
+        //     }
         // },
-        applyClipping() {
-            if (this.clippingRect && this.clippingTool) {
-                const selectedId = this.selectedObjectIds[0];
-                const object = this.stage.findOne(`#${selectedId}`);
-
-                if (!object || object.className !== 'Image') {
-                    console.error('Selected object is not an image.');
-                    return;
-                }
-
-                const { x, y, width, height } = this.clippingRect.attrs;
-                console.log(x, y);
-
-                const imageObj = object.image();
-                if (!imageObj) {
-                    console.error('No image object found.');
-                    return;
-                }
-
-                const cropCanvas = document.createElement('canvas');
-                const cropCtx = cropCanvas.getContext('2d');
-
-                cropCanvas.width = width;
-                cropCanvas.height = height;
-
-                cropCtx.drawImage(
-                    imageObj,
-                    x - object.x(),
-                    y - object.y(),
-                    width,
-                    height,
-                    0, 0,
-                    width,
-                    height
-                );
-
-                const croppedImage = new Image();
-                croppedImage.src = cropCanvas.toDataURL();
-                croppedImage.onload = () => {
-                    object.image(croppedImage);
-                    this.stage.batchDraw();
-                };
-
-                this.removeClippingTool();
-
-            } else {
-                console.error('Clipping tool not initialized.');
-            }
-        },
-        removeClippingTool() {
-            if (this.clippingTool) {
-                this.clippingTool.destroy();
-                this.clippingTool = null;
-                this.clippingRect = null;
-                this.clippingTransformer = null;
-                this.stage.batchDraw();
-            }
-        },
-        ///////////// test crop ///////////////////
+        // ///////////// test crop ///////////////////
         async addTemplateImages(images) {
             let formData = new FormData();
             let fetchPromises = images.map(async (image, index) => {
