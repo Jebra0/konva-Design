@@ -30,24 +30,7 @@
                 </v-card>
 
                 <v-list-item @click="openElement" prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
-                <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
-                    <v-icon icon="mdi-minus" color="black" size="70" @click="actions.addShape(minusConfig)" ></v-icon>
-                    <v-icon icon="mdi-arrow-right-thin" color="black" size="70" @click="actions.addShape(minusConfig)" ></v-icon>
-                    <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(rectConfig)" ></v-icon>
-                    <v-icon icon="mdi-circle" color="rgb(179 177 177)" size="70" @click="actions.addShape(circleConfig)"></v-icon>
-                    <v-icon icon="mdi-triangle" color="rgb(179 177 177)" size="70" @click="actions.addShape(triangleConfig)"></v-icon>
-                    <v-icon icon="mdi-hexagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(hexagonConfig)"></v-icon>
-                    <v-icon icon="mdi-octagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(octagonConfig)"></v-icon>
-                    <v-icon icon="mdi-star" color="rgb(179 177 177)" size="70" @click="actions.addShape(starConfig)"></v-icon>
-                    <v-icon icon="mdi-rhombus" color="rgb(179 177 177)" size="70" @click="actions.addShape(rhombusConfig)"></v-icon>
-                    <v-icon icon="mdi-pentagon" color="rgb(179 177 177)" size="70" @click="actions.addShape(pentagonConfig)"></v-icon>
-                    <v-icon icon="mdi-message" color="rgb(179 177 177)" size="70" @click="actions.addShape(messageConfig)"></v-icon>
-                    <v-icon icon="mdi-plus" color="rgb(179 177 177)" size="70" @click="actions.addShape(plusConfig)"></v-icon>
-                    <v-icon icon="mdi-arrow-down-bold" color="rgb(179 177 177)" size="70" @click="actions.addShape(arrowConfig)"></v-icon>
-                    <v-icon icon="mdi-heart" color="rgb(179 177 177)" size="70" @click="actions.addShape(heartConfig)"></v-icon>
-
-                </div>
-
+             
                 <v-list-item @click="openUp" prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
                 <v-card v-if="selectedOption.upload" elevation="1" outlined>
                     <v-card-title>TEST</v-card-title>
@@ -217,7 +200,6 @@
     </v-layout>
 </template>
 <script>
-import { rectConfig, circleConfig, triangleConfig, hexagonConfig, octagonConfig } from '../Pages/shapesConfig.js';
 
 export default {
     data () {
@@ -231,12 +213,7 @@ export default {
                 background: false,
                 layers: false,
             },
-            rectConfig,
-            circleConfig,
-            triangleConfig,
-            hexagonConfig,
-            octagonConfig,
-            ////opacity/////
+            
             min: 0,
             max: 1,
             opacity: 1,

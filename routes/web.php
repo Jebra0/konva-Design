@@ -7,16 +7,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-    ]);
-});
-
-////////////////////////////// my routes ////////////////////////
-
-Route::get('/Arabian-Geeks', function () {
-
     $temps = getTemplates('Text');
 
     $shapes = getTemplates('Shapes');
@@ -24,6 +14,20 @@ Route::get('/Arabian-Geeks', function () {
     $templates = getTemplates('Fold brochre');
 
     return Inertia::render('index', [
+        'textTemplates' => $temps,
+        'shapeTemplates' => $shapes,
+        'templates' => $templates,
+    ]);
+});
+
+Route::get('/test', function () {
+    $temps = getTemplates('Text');
+
+    $shapes = getTemplates('Shapes');
+
+    $templates = getTemplates('Fold brochre');
+
+    return Inertia::render('design', [
         'textTemplates' => $temps,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
