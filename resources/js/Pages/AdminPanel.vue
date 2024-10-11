@@ -253,19 +253,26 @@
                 </div>
             </v-card>
 
-            <v-card v-if="selectedOption.photos" elevation="1" outlined>
+            <v-card v-if="selectedOption.photos" style="background-color: #ebebeb;" elevation="1" outlined>
                 <v-container class="d-flex">
-                    <v-text-field label="search" v-model="searchQuery"></v-text-field>
-                    <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify" @click="searchUnsplashImages(searchQuery)"
-                        style="cursor: pointer;"></v-icon>
+                    <v-text-field style="width: 50px;" label="search" v-model="searchQuery"></v-text-field>
+                    <v-btn @click="searchUnsplashImages(searchQuery)" class="my-2" color="blue-grey">
+                        <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
                 </v-container>
-                <div class="imgParent" v-for="(image, index) in images" :key="index">
+                <v-progress-linear v-if="this.isDataRedy == true" indeterminate color="blue-grey"
+                    class="my-3"></v-progress-linear>
+                <div v-if="this.isDataRedy == false" class="imgParent" v-for="(image, index) in images" :key="index">
                     <img :src="image.src" alt="" @click=" addImage(image.src)"
                         style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
-                    <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{ image.author
-                            }}</a>
+                    <p class="author">
+                        Photo by
+                        <a style="color: blue;" :href="image.portfolio">
+                            {{ image.author }}
+                        </a>
                     </p>
                 </div>
+
             </v-card>
 
             <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
@@ -281,7 +288,7 @@
                         @click=" addShape(rectConfig)"></v-icon> -->
             </div>
 
-            <v-card v-if="selectedOption.upload" elevation="0" outlined>
+            <v-card v-if="selectedOption.upload" elevation="0" outlined style="background-color: #ebebeb;">
                 <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                     <template v-slot:selection="{ fileNames }">
                         <template v-for="(fileName, index) in fileNames" :key="fileName">
@@ -295,8 +302,9 @@
                     <v-btn @click="addTemplateImages(imageUrls)">Add</v-btn>
                 </div>
                 <v-row>
-                    <v-col v-for="(image, index) in templateImages" :key="index" class="d-flex child-flex" cols="6">
-                        <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src" aspect-ratio="1"
+                    <v-col v-for="(image, index) in templateImages" :key="index" class="mx-2 d-flex child-flex"
+                        cols="5">
+                        <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src"
                             class="bg-grey-lighten-2" cover>
                             <template v-slot:placeholder>
                                 <v-row align="center" class="fill-height ma-0" justify="center">

@@ -41,6 +41,8 @@ const allFunctions = {
             undoDisable: true,
             redoDisable: true,
             historyAction: '',
+
+            isDataRedy: false,
         };
     },
     methods: {
@@ -1131,28 +1133,28 @@ const allFunctions = {
         //     if (this.clippingRect && this.clippingTool) {
         //         const selectedId = this.selectedObjectIds[0];
         //         const image = this.stage.findOne(`#${selectedId}`);
-        
+
         //         if (!image || image.className !== 'Image') {
         //             console.error('Selected object is not an image.');
         //             return;
         //         }
-        
+
         //         // Get the attributes of the clipping rectangle
         //         const { x, y, width, height } = this.clippingRect.attrs;
-        
+
         //         // Create a canvas to perform the cropping operation
         //         const cropCanvas = document.createElement('canvas');
         //         const cropCtx = cropCanvas.getContext('2d');
-        
+
         //         cropCanvas.width = width;
         //         cropCanvas.height = height;
-        
+
         //         const imageObj = image.image();
-        
+
         //         // Calculate the relative position of the clipping rectangle within the image
         //         const clipX = x - image.x();
         //         const clipY = y - image.y();
-        
+
         //         // Draw the image onto the canvas, cropping it based on the clipping rectangle's position
         //         cropCtx.drawImage(
         //             imageObj,
@@ -1164,7 +1166,7 @@ const allFunctions = {
         //             width,    // Canvas width
         //             height    // Canvas height
         //         );
-        
+
         //         // Create a new Image object from the cropped canvas
         //         const croppedImage = new Image();
         //         croppedImage.src = cropCanvas.toDataURL();
@@ -1173,17 +1175,17 @@ const allFunctions = {
         //             image.image(croppedImage);
         //             image.size({ width, height }); // Update image size to the cropped dimensions
         //             image.position({ x, y }); // Reposition the image to match the clipping rectangle's position
-        
+
         //             this.stage.batchDraw(); // Redraw the stage to reflect changes
         //         };
-        
+
         //         this.removeClippingTool();
-        
+
         //     } else {
         //         console.error('Clipping tool not initialized.');
         //     }
         // },        
-        
+
         // // applyClipping() {
         // //     if (this.clippingRect && this.clippingTool) {
         // //         const selectedId = this.selectedObjectIds[0];
@@ -1286,10 +1288,10 @@ const allFunctions = {
             });
         },
         fetchUnsplashImages() {
+            this.isDataRedy = true;
             fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)
                 .then(res => res.json())
                 .then(json => {
-                    // console.log(json[0].urls.full)
                     json.forEach(element => {
                         this.images.push({
                             src: element.urls.full,
@@ -1297,19 +1299,24 @@ const allFunctions = {
                             author: element.user.name
                         });
                     });
+                })
+                .finally(() => {
+                    this.isDataRedy = false;
                 });
         },
         searchUnsplashImages(query) {
+            this.isDataRedy = true;
             fetch(`${this.unsplashSearchUrl}?client_id=${this.unsplashAccessKey}&query=${query}`)
                 .then(res => res.json())
                 .then(json => {
-                    json.results.forEach(element => {
-                        this.images.unshift({
-                            src: element.urls.full,
-                            portfolio: element.user.portfolio_url,
-                            author: element.user.name
-                        });
-                    });
+                    this.images = json.results.map(element => ({
+                        src: element.urls.full,
+                        portfolio: element.user.portfolio_url,
+                        author: element.user.name
+                    }));
+                })
+                .finally(() => {
+                    this.isDataRedy = false;
                 });
         },
         toggleFontWeight() {
