@@ -4,138 +4,7 @@
         <Head>
             <title>Admin Panel</title>
         </Head>
-        <v-navigation-drawer permanent width="300">
-            <v-list density="compact">
 
-                <v-list-item @click="this.selectedOption.templates = !this.selectedOption.templates"
-                    prepend-icon="mdi-view-dashboard" title="Templates" value="Templates"></v-list-item>
-                <v-card class=" scroll" v-if="selectedOption.templates" elevation="1" outlined>
-                    <div class="imgParent d-flex justify-center" v-for="(temp, id) in templates" :key="id">
-                        <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
-                            style="cursor: pointer">
-                        <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
-                        <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red"
-                            icon="mdi-delete"></v-btn>
-                    </div>
-                </v-card>
-
-                <v-list-item @click="this.selectedOption.text = !this.selectedOption.text"
-                    prepend-icon="mdi-format-text" title="Text" value="Text"></v-list-item>
-                <v-card class="scroll" v-if="selectedOption.text" elevation="1" outlined>
-                    <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
-                        style=" text-transform: none; font-size: 25px;">
-                        <h1>Create header</h1>
-                    </v-btn>
-                    <v-btn @click="addSubHeader()" elevation="0" width="100%"
-                        style="text-transform: none; font-size: 18px;">
-                        <h4>Create sub header</h4>
-                    </v-btn>
-                    <v-btn @click="addBodyText()" elevation="0" width="100%"
-                        style="text-transform: none; font-size: 14px;">Create Body
-                        Text</v-btn>
-                    <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
-                        <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id)"
-                            style="cursor: pointer">
-                        <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
-                        <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red"
-                            icon="mdi-delete"></v-btn>
-                    </div>
-                </v-card>
-
-                <v-list-item @click="this.selectedOption.photos = !this.selectedOption.photos"
-                    prepend-icon="mdi-image-outline" title="Photos" value="Photos"></v-list-item>
-                <v-card v-if="selectedOption.photos" class="scroll" elevation="1" outlined>
-                    <v-container class="d-flex">
-                        <v-text-field label="search" v-model="searchQuery"></v-text-field>
-                        <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify"
-                            @click="searchUnsplashImages(searchQuery)" style="cursor: pointer;"></v-icon>
-                    </v-container>
-                    <div class="imgParent" v-for="(image, index) in images" :key="index">
-                        <img :src="image.src" alt="" @click=" addImage(image.src)"
-                            style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
-                        <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{ image.author
-                                }}</a>
-                        </p>
-                    </div>
-                </v-card>
-
-                <v-list-item @click="this.selectedOption.elements = !this.selectedOption.elements"
-                    prepend-icon="mdi-shape" title="Elements" value="Elements"></v-list-item>
-                <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
-                    <div style="position: relative;" class=" d-flex justify-center"
-                        v-for="(shape, id) in shapeTemplates" :key="id">
-                        <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
-                            style="cursor: pointer">
-                        <v-icon @click="deleteTemplate(shape.id)" size="25"
-                            style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
-                            icon="mdi-delete"></v-icon>
-                    </div>
-                    <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(rectConfig)"></v-icon> -->
-                </div>
-
-                <v-list-item @click="this.selectedOption.upload = !this.selectedOption.upload"
-                    prepend-icon="mdi-cloud-upload" title="Upload" value="Upload"></v-list-item>
-                <v-card class="scroll m-3" v-if="selectedOption.upload" elevation="0" outlined>
-                    <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
-                        <template v-slot:selection="{ fileNames }">
-                            <template v-for="(fileName, index) in fileNames" :key="fileName">
-                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
-                                    {{ fileName }}
-                                </v-chip>
-                            </template>
-                        </template>
-                    </v-file-input>
-                    <div class="d-flex justify-center mb-3">
-                        <v-btn @click="addTemplateImages(imageUrls)">Add</v-btn>
-                    </div>
-                    <v-row>
-                        <v-col v-for="(image, index) in templateImages" :key="index" class="d-flex child-flex" cols="6">
-                            <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src"
-                                aspect-ratio="1" class="bg-grey-lighten-2" cover>
-                                <template v-slot:placeholder>
-                                    <v-row align="center" class="fill-height ma-0" justify="center">
-                                        <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                                    </v-row>
-                                </template>
-                            </v-img>
-                        </v-col>
-                    </v-row>
-                </v-card>
-                <!--                add category-->
-                <v-list-item @click="this.selectedOption.addCategory = !this.selectedOption.addCategory"
-                    prepend-icon="mdi-format-list-bulleted-square" title="Add Category"
-                    value="addCategory"></v-list-item>
-                <v-card v-if="selectedOption.addCategory" elevation="0" class=" m-2">
-                    <v-text-field v-model="categoryName" label="category name"></v-text-field>
-                    <div class="d-flex justify-center mt-3">
-                        <v-btn @click="addTemplateCategory(categoryName)">Add</v-btn>
-                    </div>
-                </v-card>
-
-
-                <v-list-item @click=" this.selectedOption.layers = !this.selectedOption.layers"
-                    prepend-icon="mdi-layers-triple" title="Layers" value="Layers"></v-list-item>
-                <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
-                    <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
-                        <span v-if="layer.name !== 'Defualt Layer'">
-                            <button @click=" hideLayer(!layer.visible, layer.id)" class="mr-2">
-                                <v-icon :icon="layer.visible ? 'mdi-eye' : 'mdi-eye-closed'"></v-icon>
-                            </button>
-                            <button @click="deleteLayer(layer.layer.id())"><v-icon icon="mdi-delete"></v-icon></button>
-                        </span>
-                        <span v-text="layer.name" class="ml-1" style="width: 120px;"></span>
-
-                        <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
-                            <button v-if="(!layer.lastOne)" @click=" moveLayer('up', layer.id)"><v-icon
-                                    icon="mdi-arrow-up"></v-icon></button>
-                            <button v-if="(!layer.firstOne)" @click=" moveLayer('down', layer.id)"><v-icon
-                                    icon="mdi-arrow-down"></v-icon></button>
-                        </span>
-                    </div>
-                </v-card>
-            </v-list>
-        </v-navigation-drawer>
         <!-- defualt buttons -->
         <v-app-bar :elevation="1">
 
@@ -143,17 +12,17 @@
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
-                    
+
                 <v-btn :disabled="undoDisable" icon="mdi-undo" @click="unDo"></v-btn>
                 <v-btn :disabled="redoDisable" icon="mdi-redo" @click="reDo"></v-btn>
 
                 <!-- for image -->
                 <!-- <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
-                    <v-btn @click=" addClip = !addClip; addClippingTool()">
-                        <v-icon icon="mdi-crop"></v-icon>
-                    </v-btn>
-                    <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
-                </div> -->
+        <v-btn @click=" addClip = !addClip; addClippingTool()">
+            <v-icon icon="mdi-crop"></v-icon>
+        </v-btn>
+        <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
+    </div> -->
 
             </template>
 
@@ -265,9 +134,9 @@
 
                     <!-- duplicate -->
                     <!-- <v-btn @click="duplicateObjects">
-                        <v-icon icon="mdi-content-copy"></v-icon>
-                        <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
-                    </v-btn> -->
+            <v-icon icon="mdi-content-copy"></v-icon>
+            <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
+        </v-btn> -->
 
                     <!-- delete -->
                     <v-btn @click="destroyObjects()">
@@ -285,12 +154,193 @@
             </template>
         </v-app-bar>
 
+        <v-navigation-drawer permanent color="blue-grey" width="90">
+            <v-list density="compact">
+
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'templates' ? '#ebebeb' : '' }"
+                    @click="selectOption('templates')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'templates' ? '#607D8B' : 'white'"
+                        class="icon">mdi-view-dashboard</v-icon>
+                    <span :style="{ color: selectedOption.active === 'templates' ? '#607D8B' : 'white' }"
+                        class="list-title">Templates</span>
+                </v-list-item>
+
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'text' ? '#ebebeb' : '' }"
+                    @click="selectOption('text')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'text' ? '#607D8B' : 'white'"
+                        class="icon">mdi-format-text</v-icon>
+                    <span :style="{ color: selectedOption.active === 'text' ? '#607D8B' : 'white' }"
+                        class="list-title">Text</span>
+                </v-list-item>
+
+
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'photos' ? '#ebebeb' : '' }"
+                    @click="selectOption('photos')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'photos' ? '#607D8B' : 'white'"
+                        class="icon">mdi-image-outline</v-icon>
+                    <span :style="{ color: selectedOption.active === 'photos' ? '#607D8B' : 'white' }"
+                        class="list-title">Photos</span>
+                </v-list-item>
+
+
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'elements' ? '#ebebeb' : '' }"
+                    @click="selectOption('elements')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'elements' ? '#607D8B' : 'white'"
+                        class="icon">mdi-shape</v-icon>
+                    <span :style="{ color: selectedOption.active === 'elements' ? '#607D8B' : 'white' }"
+                        class="list-title">Elements</span>
+                </v-list-item>
+
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'upload' ? '#ebebeb' : '' }"
+                    @click="selectOption('upload')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'upload' ? '#607D8B' : 'white'"
+                        class="icon">mdi-cloud-upload</v-icon>
+                    <span :style="{ color: selectedOption.active === 'upload' ? '#607D8B' : 'white' }"
+                        class="list-title">Upload</span>
+                </v-list-item>
+
+                <!-- add category-->
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'addCategory' ? '#ebebeb' : '' }"
+                    @click="selectOption('addCategory')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'addCategory' ? '#607D8B' : 'white'"
+                        class="icon">mdi-format-list-bulleted-square</v-icon>
+                    <span :style="{ color: selectedOption.active === 'addCategory' ? '#607D8B' : 'white' }"
+                        class="list-title">Add
+                        Category</span>
+                </v-list-item>
+
+
+                <v-list-item :style="{ backgroundColor: selectedOption.active === 'layers' ? '#ebebeb' : '' }"
+                    @click="selectOption('layers')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'layers' ? '#607D8B' : 'white'"
+                        class="icon">mdi-cloud-upload</v-icon>
+                    <span :style="{ color: selectedOption.active === 'layers' ? '#607D8B' : 'white' }"
+                        class="list-title">Layers</span>
+                </v-list-item>
+
+            </v-list>
+        </v-navigation-drawer>
+
+        <v-navigation-drawer width="300" style="background-color: #ebebeb;">
+
+            <v-card v-if="selectedOption.templates">
+                <div class="imgParent d-flex justify-center" v-for="(temp, id) in templates" :key="id">
+                    <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
+                        style="cursor: pointer">
+                    <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
+                    <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red" icon="mdi-delete"></v-btn>
+                </div>
+            </v-card>
+
+            <v-card v-if="selectedOption.text" elevation="1" outlined>
+                <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
+                    style=" text-transform: none; font-size: 25px;">
+                    <h1>Create header</h1>
+                </v-btn>
+                <v-btn @click="addSubHeader()" elevation="0" width="100%"
+                    style="text-transform: none; font-size: 18px;">
+                    <h4>Create sub header</h4>
+                </v-btn>
+                <v-btn @click="addBodyText()" elevation="0" width="100%"
+                    style="text-transform: none; font-size: 14px;">Create
+                    Body
+                    Text</v-btn>
+                <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
+                    <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id)"
+                        style="cursor: pointer">
+                    <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
+                    <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red" icon="mdi-delete"></v-btn>
+                </div>
+            </v-card>
+
+            <v-card v-if="selectedOption.photos" elevation="1" outlined>
+                <v-container class="d-flex">
+                    <v-text-field label="search" v-model="searchQuery"></v-text-field>
+                    <v-icon size="30" class="mt-3 ml-2" icon="mdi-magnify" @click="searchUnsplashImages(searchQuery)"
+                        style="cursor: pointer;"></v-icon>
+                </v-container>
+                <div class="imgParent" v-for="(image, index) in images" :key="index">
+                    <img :src="image.src" alt="" @click=" addImage(image.src)"
+                        style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
+                    <p class="author">Photo by <a style="color: blue;" :href="image.portfolio">{{ image.author
+                            }}</a>
+                    </p>
+                </div>
+            </v-card>
+
+            <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
+                <div style="position: relative;" class=" d-flex justify-center" v-for="(shape, id) in shapeTemplates"
+                    :key="id">
+                    <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
+                        style="cursor: pointer">
+                    <v-icon @click="deleteTemplate(shape.id)" size="25"
+                        style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
+                        icon="mdi-delete"></v-icon>
+                </div>
+                <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
+                        @click=" addShape(rectConfig)"></v-icon> -->
+            </div>
+
+            <v-card v-if="selectedOption.upload" elevation="0" outlined>
+                <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
+                    <template v-slot:selection="{ fileNames }">
+                        <template v-for="(fileName, index) in fileNames" :key="fileName">
+                            <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                {{ fileName }}
+                            </v-chip>
+                        </template>
+                    </template>
+                </v-file-input>
+                <div class="d-flex justify-center mb-3">
+                    <v-btn @click="addTemplateImages(imageUrls)">Add</v-btn>
+                </div>
+                <v-row>
+                    <v-col v-for="(image, index) in templateImages" :key="index" class="d-flex child-flex" cols="6">
+                        <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src" aspect-ratio="1"
+                            class="bg-grey-lighten-2" cover>
+                            <template v-slot:placeholder>
+                                <v-row align="center" class="fill-height ma-0" justify="center">
+                                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
+                    </v-col>
+                </v-row>
+            </v-card>
+
+            <v-card v-if="selectedOption.addCategory" elevation="0" class=" m-2">
+                <v-text-field v-model="categoryName" label="category name"></v-text-field>
+                <div class="d-flex justify-center mt-3">
+                    <v-btn @click="addTemplateCategory(categoryName)">Add</v-btn>
+                </div>
+            </v-card>
+
+            <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
+                <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
+                    <span v-if="layer.name !== 'Defualt Layer'">
+                        <button @click=" hideLayer(!layer.visible, layer.id)" class="mr-2">
+                            <v-icon :icon="layer.visible ? 'mdi-eye' : 'mdi-eye-closed'"></v-icon>
+                        </button>
+                        <button @click="deleteLayer(layer.layer.id())"><v-icon icon="mdi-delete"></v-icon></button>
+                    </span>
+                    <span v-text="layer.name" class="ml-1" style="width: 120px;"></span>
+
+                    <span class="ml-5" v-if="layer.name !== 'Defualt Layer'">
+                        <button v-if="(!layer.lastOne)" @click=" moveLayer('up', layer.id)"><v-icon
+                                icon="mdi-arrow-up"></v-icon></button>
+                        <button v-if="(!layer.firstOne)" @click=" moveLayer('down', layer.id)"><v-icon
+                                icon="mdi-arrow-down"></v-icon></button>
+                    </span>
+                </div>
+            </v-card>
+        </v-navigation-drawer>
+
         <!-- text buttons -->
         <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
 
             <input class="ml-2" type="color" style="width: 40px; height: 40px" :value="selectedFillColor"
-            v-model="colorFill" @input="fillColor(colorFill)" />
-            
+                v-model="colorFill" @input="fillColor(colorFill)" />
+
             <div class="d-flex">
                 <v-combobox clearable :items="GoogleFonts" item-title="name" item-value="file" v-model="selectedFont"
                     @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
@@ -375,15 +425,14 @@ export default {
     data() {
         return {
             selectedOption: {
-                templates: false,
+                templates: true,
                 text: false,
                 photos: false,
                 elements: false,
                 upload: false,
-                background: false,
                 layers: false,
-                addFonts: false,
                 addCategory: false,
+                active: 'templates'
             },
             rectConfig,
             ////opacity/////
@@ -445,6 +494,81 @@ export default {
         // this.fetchFont('Khand')
     },
     methods: {
+        selectOption(type) {
+            switch (type) {
+                case 'templates':
+                    this.selectedOption.templates = true;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'templates';
+                    break;
+                case 'text':
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = true;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'text';
+                    break;
+                case 'photos':
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = true;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'photos';
+                    break;
+                case 'elements':
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = true;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'elements';
+                    break;
+                case 'upload':
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = true;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'upload';
+                    break;
+                case 'layers':
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = true;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'layers';
+                    break;
+                case 'addCategory':
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = true;
+                    this.selectedOption.active = 'addCategory';
+                    break;
+                default:
+            }
+        },
         editTemplate(id) {
             this.editingTemp = true;
             this.getSelectedTemplate(id);
@@ -602,5 +726,25 @@ export default {
     z-index: 10;
     background-color: white;
     padding: 0;
+}
+
+.custom-list-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.icon {
+    font-size: 36px;
+}
+
+.list-title {
+    margin-top: 4px;
+    font-weight: bold;
+    color: white;
+}
+
+.active {
+    color: #CFD8DC;
 }
 </style>

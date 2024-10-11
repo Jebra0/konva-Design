@@ -950,7 +950,7 @@ const allFunctions = {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
-                let blob = await this.resizeImage(dataURL, 300, 300);
+                let blob = await this.resizeImage(dataURL, 700, 700);
 
                 let formData = new FormData();
                 formData.append('name', name);
