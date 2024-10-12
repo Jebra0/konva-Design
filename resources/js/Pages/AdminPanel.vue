@@ -267,17 +267,24 @@
             </v-card>
 
             <v-card v-if="selectedOption.photos" style="background-color: #ebebeb;" elevation="1" outlined>
-                <v-container class="d-flex">
-                    <v-text-field style="width: 50px;" label="search" v-model="searchQuery"></v-text-field>
-                    <v-btn @click="searchUnsplashImages(searchQuery)" class="my-2" color="blue-grey">
-                        <v-icon>mdi-magnify</v-icon>
-                    </v-btn>
-                </v-container>
+                <v-row>
+                    <v-col>
+                        <div class="input-with-button p-1">
+                            <v-text-field v-model="searchQuery" label="search" hide-details
+                                style="margin-left: 8px; flex: 1;"></v-text-field>
+
+                            <v-btn color="blue-grey" @click="searchUnsplashImages(searchQuery)">
+                                <v-icon>mdi-magnify</v-icon>
+                            </v-btn>
+                        </div>
+                    </v-col>
+                </v-row>
+
                 <v-progress-linear v-if="this.isDataRedy == true" indeterminate color="blue-grey"
                     class="my-3"></v-progress-linear>
                 <div v-if="this.isDataRedy == false" class="imgParent" v-for="(image, index) in images" :key="index">
                     <img :src="image.src" alt="" @click=" addImage(image.src)"
-                        style="cursor: pointer; width: 250px; margin-left: 20px; margin-bottom: 15px">
+                        style="cursor: pointer; width: 250px; margin-left: 3px; margin-bottom: 15px">
                     <p class="author">
                         Photo by
                         <a style="color: blue;" :href="image.portfolio">
@@ -303,7 +310,7 @@
 
             <v-card v-if="selectedOption.upload" elevation="0" outlined style="background-color: #ebebeb;">
                 <div class="d-flex m-1">
-                    <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
+                    <v-file-input label="file" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                         <template v-slot:selection="{ fileNames }">
                             <template v-for="(fileName, index) in fileNames" :key="fileName">
                                 <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
@@ -789,5 +796,10 @@ export default {
 .fade-enter,
 .fade-leave-to {
     opacity: 0;
+}
+
+.input-with-button {
+    display: flex;
+    align-items: center;
 }
 </style>
