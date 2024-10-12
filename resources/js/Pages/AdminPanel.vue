@@ -13,16 +13,16 @@
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
 
-                <v-btn :disabled="undoDisable" icon="mdi-undo" @click="unDo"></v-btn>
-                <v-btn :disabled="redoDisable" icon="mdi-redo" @click="reDo"></v-btn>
+                <!-- <v-btn :disabled="undoDisable" icon="mdi-undo" @click="unDo"></v-btn>
+                <v-btn :disabled="redoDisable" icon="mdi-redo" @click="reDo"></v-btn> -->
 
-                <!-- for image -->
+                <!-- crop image -->
                 <!-- <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
-        <v-btn @click=" addClip = !addClip; addClippingTool()">
-            <v-icon icon="mdi-crop"></v-icon>
-        </v-btn>
-        <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
-    </div> -->
+                    <v-btn @click=" addClip = !addClip; addClippingTool()">
+                        <v-icon icon="mdi-crop"></v-icon>
+                    </v-btn>
+                    <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
+                </div> -->
 
             </template>
 
@@ -46,7 +46,7 @@
                     <!-- save as template -->
                     <v-dialog v-if="!this.editingTemp" max-width="500">
                         <template v-slot:activator="{ props: activatorProps }">
-                            <v-btn-group color="#b2d7ef" density="comfortable" rounded="pill" divided>
+                            <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
                                 <v-btn v-bind="activatorProps">
                                     save as template
                                 </v-btn>
@@ -69,7 +69,7 @@
                         </template>
                     </v-dialog>
                     <!-- save edited template -->
-                    <v-btn-group color="#b2d7ef" density="comfortable" rounded="pill" divided>
+                    <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
                         <v-btn v-if="this.editingTemp" @click="saveEditedTemplate(this.editedId)">Save</v-btn>
                     </v-btn-group>
 
@@ -134,9 +134,9 @@
 
                     <!-- duplicate -->
                     <!-- <v-btn @click="duplicateObjects">
-            <v-icon icon="mdi-content-copy"></v-icon>
-            <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
-        </v-btn> -->
+                        <v-icon icon="mdi-content-copy"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
+                    </v-btn> -->
 
                     <!-- delete -->
                     <v-btn @click="destroyObjects()">
@@ -213,7 +213,7 @@
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'layers' ? '#ebebeb' : '' }"
                     @click="selectOption('layers')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'layers' ? '#607D8B' : 'white'"
-                        class="icon">mdi-cloud-upload</v-icon>
+                        class="icon">mdi-layers-triple</v-icon>
                     <span :style="{ color: selectedOption.active === 'layers' ? '#607D8B' : 'white' }"
                         class="list-title">Layers</span>
                 </v-list-item>
@@ -221,18 +221,23 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-navigation-drawer width="300" style="background-color: #ebebeb;">
+        <v-navigation-drawer style="background-color: #ebebeb;" permanent>
 
-            <v-card v-if="selectedOption.templates">
-                <div class="imgParent d-flex justify-center" v-for="(temp, id) in templates" :key="id">
+            <v-row v-if="selectedOption.templates" style="background-color: #ebebeb;">
+                <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
                         style="cursor: pointer">
-                    <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
-                    <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red" icon="mdi-delete"></v-btn>
-                </div>
-            </v-card>
+                    <v-icon @click="editTemplate(temp.id)" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
+                        color="blue-grey" icon="mdi-pencil"></v-icon>
 
-            <v-card v-if="selectedOption.text" elevation="1" outlined>
+                    <v-icon @click="deleteTemplate(temp.id)" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
+                        icon="mdi-delete"></v-icon>
+                </v-col>
+            </v-row>
+
+            <v-card v-if="selectedOption.text" style="background-color: #ebebeb;">
                 <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
                     style=" text-transform: none; font-size: 25px;">
                     <h1>Create header</h1>
@@ -244,12 +249,20 @@
                 <v-btn @click="addBodyText()" elevation="0" width="100%"
                     style="text-transform: none; font-size: 14px;">Create
                     Body
-                    Text</v-btn>
+                    Text
+                </v-btn>
                 <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id)"
                         style="cursor: pointer">
-                    <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
-                    <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red" icon="mdi-delete"></v-btn>
+                    <!-- <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
+                    <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red" icon="mdi-delete"></v-btn> -->
+                    <v-icon @click="editTemplate(temp.id)" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
+                        color="blue-grey" icon="mdi-pencil"></v-icon>
+
+                    <v-icon @click="deleteTemplate(temp.id)" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
+                        icon="mdi-delete"></v-icon>
                 </div>
             </v-card>
 
@@ -275,7 +288,7 @@
 
             </v-card>
 
-            <div v-if="selectedOption.elements" class="scroll d-flex mx-4 flex-wrap justify-between">
+            <div v-if="selectedOption.elements" class=" d-flex mx-4 flex-wrap justify-between">
                 <div style="position: relative;" class=" d-flex justify-center" v-for="(shape, id) in shapeTemplates"
                     :key="id">
                     <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
@@ -289,22 +302,24 @@
             </div>
 
             <v-card v-if="selectedOption.upload" elevation="0" outlined style="background-color: #ebebeb;">
-                <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
-                    <template v-slot:selection="{ fileNames }">
-                        <template v-for="(fileName, index) in fileNames" :key="fileName">
-                            <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
-                                {{ fileName }}
-                            </v-chip>
+                <div class="d-flex m-1">
+                    <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
+                        <template v-slot:selection="{ fileNames }">
+                            <template v-for="(fileName, index) in fileNames" :key="fileName">
+                                <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                    {{ fileName }}
+                                </v-chip>
+                            </template>
                         </template>
-                    </template>
-                </v-file-input>
-                <div class="d-flex justify-center mb-3">
-                    <v-btn @click="addTemplateImages(imageUrls)">Add</v-btn>
+                    </v-file-input>
+                    <v-btn class="my-2 ml-2" @click="addTemplateImages(imageUrls)" color="blue-grey">Add</v-btn>
                 </div>
+
+                <!-- save images to storage -->
                 <v-row>
                     <v-col v-for="(image, index) in templateImages" :key="index" class="mx-2 d-flex child-flex"
                         cols="5">
-                        <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src"
+                        <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src" aspect-ratio="1"
                             class="bg-grey-lighten-2" cover>
                             <template v-slot:placeholder>
                                 <v-row align="center" class="fill-height ma-0" justify="center">
@@ -314,16 +329,29 @@
                         </v-img>
                     </v-col>
                 </v-row>
+                <!-- save image temporary -->
+                <!-- <v-row>
+                    <v-col v-for="(image, index) in imageUrls" :key="index" class="mx-2 d-flex child-flex" cols="5">
+                        <v-img @click=" addUploadedImage(image)" style="cursor: pointer;" :src="image"
+                            class="bg-grey-lighten-2" cover>
+                            <template v-slot:placeholder>
+                                <v-row align="center" class="fill-height ma-0" justify="center">
+                                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
+                    </v-col>
+                </v-row>  -->
             </v-card>
 
-            <v-card v-if="selectedOption.addCategory" elevation="0" class=" m-2">
+            <v-card v-if="selectedOption.addCategory" style="background-color: #ebebeb;" elevation="0" class=" m-2">
                 <v-text-field v-model="categoryName" label="category name"></v-text-field>
                 <div class="d-flex justify-center mt-3">
-                    <v-btn @click="addTemplateCategory(categoryName)">Add</v-btn>
+                    <v-btn @click="addTemplateCategory(categoryName)" color="blue-grey">Add</v-btn>
                 </div>
             </v-card>
 
-            <v-card v-if="selectedOption.layers" elevation="1" class="scroll">
+            <v-card v-if="selectedOption.layers" elevation="1">
                 <div class="m-2 p-2 layer d-flex" v-for="(layer, i) in reversedLayers" :key="i" :value="layer">
                     <span v-if="layer.name !== 'Defualt Layer'">
                         <button @click=" hideLayer(!layer.visible, layer.id)" class="mr-2">
@@ -344,75 +372,77 @@
         </v-navigation-drawer>
 
         <!-- text buttons -->
-        <v-app-bar :style="{ visibility: SelectedObjectType === 'Text' ? 'visible' : 'hidden' }">
+        <transition name="fade">
+            <v-app-bar absolute v-show="SelectedObjectType === 'Text'">
 
-            <input class="ml-2" type="color" style="width: 40px; height: 40px" :value="selectedFillColor"
-                v-model="colorFill" @input="fillColor(colorFill)" />
+                <input class="ml-2" type="color" style="width: 40px; height: 40px" :value="selectedFillColor"
+                    v-model="colorFill" @input="fillColor(colorFill)" />
 
-            <div class="d-flex">
-                <v-combobox clearable :items="GoogleFonts" item-title="name" item-value="file" v-model="selectedFont"
-                    @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
-                </v-combobox>
-            </div>
+                <div class="d-flex">
+                    <v-combobox clearable :items="GoogleFonts" item-title="name" item-value="file"
+                        v-model="selectedFont" @update:modelValue="onFontChange" width="200px" class=" m-2 mt-5">
+                    </v-combobox>
+                </div>
 
-            <input type="number" v-model="fontSize" @input=" textSize($event.target.value)"
-                style="width: 100px; border: 1px solid #ddd;" />
+                <input type="number" v-model="fontSize" @input=" textSize($event.target.value)"
+                    style="width: 100px; border: 1px solid #ddd;" />
 
-            <v-btn>
-                <v-icon icon="mdi-format-align-center"></v-icon>
-                <v-menu activator="parent">
-                    <v-list>
-                        <v-list-item>
-                            <v-btn class="" @click=" alignText('justify')">
-                                <v-icon icon="mdi-format-align-justify"></v-icon>
-                            </v-btn>
-                            <v-btn @click=" alignText('right')">
-                                <v-icon icon="mdi-format-align-right"></v-icon>
-                            </v-btn>
-                            <v-btn class="" @click=" alignText('left')">
-                                <v-icon icon="mdi-format-align-left"></v-icon>
-                            </v-btn>
-                            <v-btn @click=" alignText('center')">
-                                <v-icon icon="mdi-format-align-center"></v-icon>
-                            </v-btn>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-btn>
+                <v-btn>
+                    <v-icon icon="mdi-format-align-center"></v-icon>
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item>
+                                <v-btn class="" @click=" alignText('justify')">
+                                    <v-icon icon="mdi-format-align-justify"></v-icon>
+                                </v-btn>
+                                <v-btn @click=" alignText('right')">
+                                    <v-icon icon="mdi-format-align-right"></v-icon>
+                                </v-btn>
+                                <v-btn class="" @click=" alignText('left')">
+                                    <v-icon icon="mdi-format-align-left"></v-icon>
+                                </v-btn>
+                                <v-btn @click=" alignText('center')">
+                                    <v-icon icon="mdi-format-align-center"></v-icon>
+                                </v-btn>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
 
-            <v-btn @click="toggleFOntCase()">
-                <v-icon icon="mdi-format-letter-case-upper"></v-icon>
-            </v-btn>
+                <v-btn @click="toggleFOntCase()">
+                    <v-icon icon="mdi-format-letter-case-upper"></v-icon>
+                </v-btn>
 
-            <v-btn @click="toggleFontWeight">
-                <v-icon icon="mdi-format-bold"></v-icon>
-            </v-btn>
+                <v-btn @click="toggleFontWeight">
+                    <v-icon icon="mdi-format-bold"></v-icon>
+                </v-btn>
 
-            <v-btn @click="toggleFontItalic()">
-                <v-icon icon="mdi-format-italic"></v-icon>
-            </v-btn>
+                <v-btn @click="toggleFontItalic()">
+                    <v-icon icon="mdi-format-italic"></v-icon>
+                </v-btn>
 
-            <v-btn>
-                <v-icon icon="mdi-format-line-spacing"></v-icon>
-                <v-menu activator="parent">
-                    <v-list>
-                        <v-list-item>
-                            <v-list-item-title>Spacing</v-list-item-title>
-                            <v-slider @mouseout=" textCharSpacing(charSpacing)" :max="sMax" :min="sMin"
-                                v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
-                            </v-slider>
-                        </v-list-item>
-                        <v-list-item>
-                            <v-list-item-title>line height</v-list-item-title>
-                            <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin" v-model="lineHight"
-                                style="width: 250px" class="align-center" hide-details>
-                            </v-slider>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-            </v-btn>
+                <v-btn>
+                    <v-icon icon="mdi-format-line-spacing"></v-icon>
+                    <v-menu activator="parent">
+                        <v-list>
+                            <v-list-item>
+                                <v-list-item-title>Spacing</v-list-item-title>
+                                <v-slider @mouseout=" textCharSpacing(charSpacing)" :max="sMax" :min="sMin"
+                                    v-model="charSpacing" style="width: 250px" class="align-center" hide-details>
+                                </v-slider>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-list-item-title>line height</v-list-item-title>
+                                <v-slider @mouseout=" textLineHight(lineHight)" :max="lMax" :min="lMin"
+                                    v-model="lineHight" style="width: 250px" class="align-center" hide-details>
+                                </v-slider>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
 
-        </v-app-bar>
+            </v-app-bar>
+        </transition>
 
         <v-main class="d-flex align-center justify-center"
             style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
@@ -686,11 +716,6 @@ export default {
     border: 1px solid rgba(184, 184, 184, 0.78);
 }
 
-.scroll {
-    max-height: 300px;
-    overflow-y: scroll;
-}
-
 .layer {
     box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
 }
@@ -754,5 +779,15 @@ export default {
 
 .active {
     color: #CFD8DC;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

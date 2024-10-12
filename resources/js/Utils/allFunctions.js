@@ -204,7 +204,7 @@ const allFunctions = {
                             // layers order
                             this.handleLayersOrder(newLayer, object.getClassName());
 
-                            object.on("click", (e) => {
+                            object.on("pointerdown", (e) => {
                                 e.cancelBubble = true;
                                 this.toggleSelection(object.id(), object.getClassName(), object);
                             });
@@ -242,7 +242,7 @@ const allFunctions = {
             // layers order
             this.handleLayersOrder(newLayer, shape.getClassName());
 
-            shape.on("click", (e) => {
+            shape.on("pointerdown", (e) => {
                 e.cancelBubble = true;
                 this.toggleSelection(shape.id(), shape.getClassName(), shape);
             });
@@ -328,7 +328,7 @@ const allFunctions = {
                     //layers order
                     this.handleLayersOrder(newLayer, object.getClassName());
 
-                    object.on("click", (e) => {
+                    object.on("pointerdown", (e) => {
                         e.cancelBubble = true;
                         this.toggleSelection(object.id(), object.getClassName(), object);
                     });
@@ -385,7 +385,7 @@ const allFunctions = {
             // Handle layers order
             this.handleLayersOrder(restoredLayer, layerNode.getClassName());
 
-            layerNode.on("click", (e) => {
+            layerNode.on("pointerdown", (e) => {
                 e.cancelBubble = true;
                 this.toggleSelection(layerNode.id(), layerNode.getClassName(), layerNode);
             });
@@ -717,10 +717,15 @@ const allFunctions = {
             //layers order
             this.handleLayersOrder(newLayer, text.getClassName());
 
-            text.on("click", (e) => {
+            text.on("pointerdown", (e) => {
                 e.cancelBubble = true;
                 this.toggleSelection(text.id(), text.getClassName(), text);
             });
+            // for mobile
+            // text.on("touchstart", (e) => {
+            //     e.cancelBubble = true;
+            //     this.toggleSelection(text.id(), text.getClassName(), text);
+            // });
 
             //editable
             this.editText(text);
@@ -754,7 +759,7 @@ const allFunctions = {
                 });
             });
 
-            text.on('dblclick', () => {
+            function handel(){
                 text.hide();
                 transformer.hide();
 
@@ -830,6 +835,14 @@ const allFunctions = {
 
                 textarea.addEventListener('keydown', handleKeydown);
                 setTimeout(() => window.addEventListener('click', handleOutsideClick));
+            }
+
+            text.on('dblclick', () => {
+                handel();
+            });
+            // for phons
+            text.on('dbltap', () => {
+                handel();
             });
         },
         //decoration
@@ -1023,7 +1036,7 @@ const allFunctions = {
                 // Handle layers order
                 this.handleLayersOrder(newLayer, image.getClassName());
 
-                image.on("click", (e) => {
+                image.on("pointerdown", (e) => {
                     e.cancelBubble = true;
                     this.toggleSelection(image.id(), image.getClassName(), image);
                 });
@@ -1086,7 +1099,7 @@ const allFunctions = {
                 // Handle layers order
                 this.handleLayersOrder(newLayer, image.getClassName());
 
-                image.on("click", (e) => {
+                image.on("pointerdown", (e) => {
                     e.cancelBubble = true;
                     this.toggleSelection(image.id(), image.getClassName(), image);
                 });

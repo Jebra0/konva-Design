@@ -13,20 +13,6 @@ Route::get('/', function () {
 
     $templates = getTemplates('Fold brochre');
 
-    return Inertia::render('index', [
-        'textTemplates' => $temps,
-        'shapeTemplates' => $shapes,
-        'templates' => $templates,
-    ]);
-});
-
-Route::get('/test', function () {
-    $temps = getTemplates('Text');
-
-    $shapes = getTemplates('Shapes');
-
-    $templates = getTemplates('Fold brochre');
-
     return Inertia::render('design', [
         'textTemplates' => $temps,
         'shapeTemplates' => $shapes,

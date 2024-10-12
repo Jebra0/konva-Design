@@ -196,7 +196,7 @@
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'layers' ? '#ebebeb' : '' }"
                     @click="selectOption('layers')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'layers' ? '#607D8B' : 'white'"
-                        class="icon">mdi-cloud-upload</v-icon>
+                        class="icon">mdi-layers-triple</v-icon>
                     <span :style="{ color: selectedOption.active === 'layers' ? '#607D8B' : 'white' }"
                         class="list-title">Layers</span>
                 </v-list-item>
