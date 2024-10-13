@@ -45,8 +45,10 @@ Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/edit/{template}', [TemplateController::class, 'edit']);
 Route::post('/template/delete/{template}', [TemplateController::class, 'destroy']);
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
+Route::post('/template/search', [TemplateController::class, 'search']);
 // Route::post('/font/add', [TemplateController::class,'addFont']);
 Route::post('/category/add', [TemplateController::class,'addCategory']);
+Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
 
 ////////// //////// ////////// ///////// //////// //////////
 

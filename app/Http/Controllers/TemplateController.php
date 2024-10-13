@@ -8,6 +8,7 @@ use App\Models\Font;
 use App\Models\TemplateCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PhpParser\Node\Stmt\TryCatch;
 
 class TemplateController extends Controller
 {
@@ -100,6 +101,14 @@ class TemplateController extends Controller
         return $category;
     }
 
+    public function deleteCategory(TemplateCategory $templateCategory)
+    {
+        $templateCategory->delete();
+
+        return response()
+            ->json(['message' => 'Category deleted successfully'], 200);
+    }
+
     public function edit(Template $template, Request $request)
     {
         $request->validate([
@@ -108,13 +117,13 @@ class TemplateController extends Controller
         ]);
         $category = TemplateCategory::findOrFail($template->category_id);
         // return $category;
-        
+
         $oldImage = $template->image;
         Storage::disk('public_images')->delete($oldImage);
 
         $file = $request->file('image');
         $path = $file->store('images/' . $category->name, ['disk' => 'public_images']);
-        
+
         return $template->update([
             'data' => $request->data,
             'image' => $path,
@@ -122,9 +131,20 @@ class TemplateController extends Controller
 
     }
 
-    public function destroy(Template $template){
+    public function destroy(Template $template)
+    {
         $image = $template->image;
         Storage::disk('public_images')->delete($image);
         $template->delete();
+    }
+
+    public function search(Request $request){
+        $request->validate([
+            "name" => "string|required"
+        ]);
+        $templates = Template::where('name', 'like', '%'.$request->name.'%')
+            ->get();
+
+        return response()->json($templates);
     }
 }

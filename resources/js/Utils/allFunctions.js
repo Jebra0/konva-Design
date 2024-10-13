@@ -43,6 +43,9 @@ const allFunctions = {
             historyAction: '',
 
             isDataRedy: false,
+            isTemplatesRedy: false,
+
+            templateName: null,
         };
     },
     methods: {
@@ -1332,6 +1335,14 @@ const allFunctions = {
                     this.isDataRedy = false;
                 });
         },
+        async searchForTemplate(name){
+            try{
+                const respons = await axios.post('/template/search', name); 
+                console.log(respons);
+            }catch(error){
+                console.log(error);
+            }
+        },
         toggleFontWeight() {
             this.fontWeight = this.fontWeight === 'normal' ? 'bold' : 'normal';
             this.textStyle(this.fontWeight);
@@ -1361,6 +1372,20 @@ const allFunctions = {
             } catch (error) {
                 alert('Error while creating');
                 console.error(error);
+            }
+        },
+        async deleteCategory(id) {
+            if(confirm("Confirm Deleting ? ")){
+                try {
+                    const response = await axios.delete(`/category/${ id }`);
+                    console.log(response)
+                    if(response.status === 200){
+                        alert(response.data.message)
+                    }
+                } catch (error) {
+                    alert('Error while deleting');
+                    console.error(error);
+                }
             }
         },
         //////////////////////////

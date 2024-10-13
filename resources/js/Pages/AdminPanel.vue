@@ -224,6 +224,17 @@
         <v-navigation-drawer style="background-color: #ebebeb;" permanent>
 
             <v-row v-if="selectedOption.templates" style="background-color: #ebebeb;">
+                <v-col cols="12">
+                    <div class="input-with-button p-1">
+                        <v-text-field v-model="templateName" label="search" hide-details
+                            style="margin-left: 8px; flex: 1;"></v-text-field>
+
+                        <v-btn color="blue-grey" @click="searchForTemplate(templateName)">
+                            <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                    </div>
+                </v-col>
+
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
                         style="cursor: pointer">
@@ -356,6 +367,13 @@
                 <div class="d-flex justify-center mt-3">
                     <v-btn @click="addTemplateCategory(categoryName)" color="blue-grey">Add</v-btn>
                 </div>
+                <div>
+                    <div class="categoryItem" v-for="(category, id) in categories" :key="id">
+                        <p>{{ category.name }}</p>
+                        <v-icon @click="deleteCategory(category.id)" class="icon" color="red">mdi-delete</v-icon>
+                    </div>
+                </div>
+
             </v-card>
 
             <v-card v-if="selectedOption.layers" elevation="1">
@@ -801,5 +819,21 @@ export default {
 .input-with-button {
     display: flex;
     align-items: center;
+}
+
+.categoryItem {
+    margin-top: 10px;
+    display: flex;
+    padding: 5px;
+    justify-content: space-between;
+}
+
+.categoryItem:hover {
+    background-color: white;
+    margin-left: 2px;
+}
+
+.categoryItem .icon {
+    cursor: pointer;
 }
 </style>
