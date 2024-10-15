@@ -27,13 +27,13 @@ class Template extends Model
         return $this->belongsTo(TemplateCategory::class, 'category_id');
     }
 
-    public function scopeGetTemplates(Builder $query){
-        return $query->where('type', 'Template');
-    }
-    public function scopeGetText(Builder $query){
-        return $query->where('type', 'text');
-    }
-    public function scopeGetShapes(Builder $query){
-        return $query->where('type', 'shape');
-    }
+    // public function scopeGetTemplates(Builder $query){
+    //     return $query->where('type', 'Template');
+    // }
+    // public function scopeGetText(Builder $query){
+    //     return $query->where('type', 'text');
+    // }
+    // public function scopeGetShapes(Builder $query){
+    //     return $query->where('type', 'shape');
+    // }
 }

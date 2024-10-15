@@ -236,13 +236,13 @@
                 </v-col>
 
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
-                    <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id)"
+                    <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id, 'template')"
                         style="cursor: pointer">
-                    <v-icon @click="editTemplate(temp.id)" size="30"
+                    <v-icon @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon @click="deleteTemplate(temp.id)" size="30"
+                    <v-icon @click="deleteTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
@@ -263,15 +263,13 @@
                     Text
                 </v-btn>
                 <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
-                    <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id)"
+                    <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id, 'text')"
                         style="cursor: pointer">
-                    <!-- <v-btn @click="editTemplate(temp.id)" class="edit-btn" icon="mdi-pencil"></v-btn>
-                    <v-btn @click="deleteTemplate(temp.id)" class="delete-btn" color="red" icon="mdi-delete"></v-btn> -->
-                    <v-icon @click="editTemplate(temp.id)" size="30"
+                    <v-icon @click="editTemplate(temp.id, 'text')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon @click="deleteTemplate(temp.id)" size="30"
+                    <v-icon @click="deleteTemplate(temp.id, 'text')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </div>
@@ -309,14 +307,12 @@
             <div v-if="selectedOption.elements" class=" d-flex mx-4 flex-wrap justify-between">
                 <div style="position: relative;" class=" d-flex justify-center" v-for="(shape, id) in shapeTemplates"
                     :key="id">
-                    <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id)"
+                    <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id, 'shape')"
                         style="cursor: pointer">
-                    <v-icon @click="deleteTemplate(shape.id)" size="25"
+                    <v-icon @click="deleteTemplate(shape.id, 'shape')" size="25"
                         style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </div>
-                <!-- <v-icon icon="mdi-rectangle" color="rgb(179 177 177)" size="70"
-                        @click=" addShape(rectConfig)"></v-icon> -->
             </div>
 
             <v-card v-if="selectedOption.upload" elevation="0" outlined style="background-color: #ebebeb;">
@@ -545,9 +541,6 @@ export default {
             selectedFont: null,
 
             categoryName: '',
-
-            editingTemp: false,
-            editedId: null,
         }
     },
     async mounted() {
@@ -632,43 +625,6 @@ export default {
                 default:
             }
         },
-        editTemplate(id) {
-            this.editingTemp = true;
-            this.getSelectedTemplate(id);
-            this.editedId = id;
-        },
-        async saveEditedTemplate(id) {
-            try {
-                let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
-
-                let blob = await this.resizeImage(dataURL, 300, 300);
-
-                let formData = new FormData();
-                formData.append('data', this.stage.toJSON());
-                formData.append('image', blob, `new.png`);
-
-                let res = await axios.post(`/template/edit/${id}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                console.log(res);
-                alert('Updated successfully!')
-            } catch (error) {
-                alert('Error while saving!')
-            }
-        },
-        async deleteTemplate(id) {
-            if (confirm("Are you sure ? ")) {
-                try {
-                    let res = await axios.post(`/template/delete/${id}`);
-                    console.log(res)
-                    alert('deleted successfully')
-                } catch (error) {
-                    alert('Error while deleting')
-                }
-            }
-        }
     },
     computed: {
         reversedLayers() {

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Shape;
+use App\Models\Text;
 use App\Models\Template;
 
 // function getFonts(): array
@@ -23,14 +25,25 @@ use App\Models\Template;
 //     return $fontFiles;
 // }
 
-function getTemplates($type)
+function getTemplates()
 {
-    return Template::whereHas('category', function ($query) use($type) {
-        $query->where('name', $type);
-    })->select(['id', 'image'])
+    return Template::with('category')->select(['id', 'image'])
     ->orderBy('created_at', 'desc')
     ->get();
-    
+}
+
+function getShapes()
+{
+    return Shape::select(['id', 'image'])
+    ->orderBy('created_at', 'desc')
+    ->get();
+}
+
+function getTexts()
+{
+    return Text::select(['id', 'image'])
+    ->orderBy('created_at', 'desc')
+    ->get();
 }
 
 function getTemplateImages(): array

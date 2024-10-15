@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Console\Commands\AddFonts;
 use App\Models\Template;
+use App\Models\Text;
+use App\Models\Shape;
 use App\Models\Font;
 use App\Models\TemplateCategory;
 use Illuminate\Http\Request;
@@ -12,9 +14,18 @@ use PhpParser\Node\Stmt\TryCatch;
 
 class TemplateController extends Controller
 {
-    public function index(Template $template)
+    public function index(Request $request, $id)
     {
-        return $template;
+
+        if ($request->type == 'template') {
+            return Template::where('id', $id)->get();
+        }
+        if ($request->type == 'text') {
+            return Text::where('id', $id)->get();
+        }
+        if ($request->type == 'shape') {
+            return Shape::where('id', $id)->get();
+        }
     }
     public function store(Request $request)
     {
@@ -109,20 +120,34 @@ class TemplateController extends Controller
             ->json(['message' => 'Category deleted successfully'], 200);
     }
 
-    public function edit(Template $template, Request $request)
+    public function edit(Request $request, $id)
     {
+        
         $request->validate([
             "data" => "required|json",
             "image" => "required|image|mimes:png|max:2048",
+            "type" => "string"
         ]);
-        $category = TemplateCategory::findOrFail($template->category_id);
-        // return $category;
-
+        
+        
+        if ($request->type == 'template') {
+            $template = Template::findOrFail($id);
+            $category = 'template_images';
+        }
+        if ($request->type == 'text') {
+            $template = Text::findOrFail($id);
+            $category = 'text_images';
+        }
+        if ($request->type == 'shape') {
+            $template = Shape::findOrFail($id);
+            $category = 'shape_images';
+        } 
+        
         $oldImage = $template->image;
         Storage::disk('public_images')->delete($oldImage);
 
         $file = $request->file('image');
-        $path = $file->store('images/' . $category->name, ['disk' => 'public_images']);
+        $path = $file->store('images/' . $category, ['disk' => 'public_images']);
 
         return $template->update([
             'data' => $request->data,
@@ -131,18 +156,29 @@ class TemplateController extends Controller
 
     }
 
-    public function destroy(Template $template)
+    public function destroy(Request $request, $id)
     {
-        $image = $template->image;
+        if ($request->type == 'template') {
+            $template = Template::findOrFail($id);
+        }
+        if ($request->type == 'text') {
+            $template = Text::findOrFail($id);
+        }
+        if ($request->type == 'shape') {
+            $template = Shape::findOrFail($id);
+        }
+
+        $image = $template->pluck('image');
         Storage::disk('public_images')->delete($image);
         $template->delete();
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+    {
         $request->validate([
             "name" => "string|required"
         ]);
-        $templates = Template::where('name', 'like', '%'.$request->name.'%')
+        $templates = Template::where('name', 'like', '%' . $request->name . '%')
             ->get();
 
         return response()->json($templates);

@@ -46,6 +46,10 @@ const allFunctions = {
             isTemplatesRedy: false,
 
             templateName: null,
+            editedType: null,
+
+            editingTemp: false,
+            editedId: null,
         };
     },
     methods: {
@@ -992,9 +996,10 @@ const allFunctions = {
                 alert('An error occurred. Please try again.');
             }
         },
-        async getSelectedTemplate(id) {
-            let res = await axios.get(`/template/${id}`);
-            let data = res.data.data;
+        async getSelectedTemplate(id, type) { 
+            let res = await axios.get(`/template/${id}/${type}`);
+            let data = res.data[0].data;
+            // console.log(res.data);
             if (data) {
                 const template = JSON.parse(data);
                 this.getTemplate(template);
@@ -1338,6 +1343,7 @@ const allFunctions = {
         async searchForTemplate(name){
             try{
                 const respons = await axios.post('/template/search', name); 
+                tconsole.log(respons);
                 console.log(respons);
             }catch(error){
                 console.log(error);
@@ -1431,6 +1437,45 @@ const allFunctions = {
                 console.error("Font failed to load, can't change font family.");
             }
         },
+        editTemplate(id, type) {
+            this.editingTemp = true;
+            this.getSelectedTemplate(id, type);
+            this.editedId = id;
+            this.editedType = type;
+        },
+        async saveEditedTemplate(id) {
+            try {
+
+                let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
+
+                let blob = await this.resizeImage(dataURL, 300, 300);
+
+                let formData = new FormData();
+                formData.append('data', this.stage.toJSON());
+                formData.append('image', blob, `new.png`);
+                formData.append('type', this.editedType);
+
+                let res = await axios.post(`/template/edit/${id}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                alert('Updated successfully!')
+            } catch (error) {
+                alert('Error while saving!')
+            }
+        },
+        async deleteTemplate(id, type) {
+            if (confirm("Are you sure ? ")) {
+                try {
+                    let res = await axios.delete(`/template/delete/${id}/${type}`);
+                    alert('deleted successfully')
+                } catch (error) {
+                    alert('Error while deleting')
+                }
+            }
+        }
     }
 };
 

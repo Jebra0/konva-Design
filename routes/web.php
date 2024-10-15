@@ -7,46 +7,48 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $temps = getTemplates('Text');
+    $texts = getTexts();
 
-    $shapes = getTemplates('Shapes');
+    $shapes = getShapes();
 
-    $templates = getTemplates('Fold brochre');
+    $templates = getTemplates();
 
     return Inertia::render('design', [
-        'textTemplates' => $temps,
+        'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
     ]);
 });
 
 Route::get('/admin-panel', function () {
-    $categories = TemplateCategory::select('id', 'name')->get(); 
+    
+    $categories = TemplateCategory::select('id', 'name')->get();
+    $categories. 
 
-    $temps = getTemplates('Text');
+    $texts = getTexts();
 
-    $shapes = getTemplates('Shapes');
+    $shapes = getShapes();
 
-    $templates = getTemplates('Fold brochre');
+    $templates = getTemplates();
 
     $tmplateImages = getTemplateImages();
 
     return Inertia::render('AdminPanel', [
         'categories'=> $categories,
-        'textTemplates' => $temps,
+        'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
         'templateImages' => $tmplateImages,
     ]);
 });
-
-Route::get('/template/{template}', [TemplateController::class, 'index']);
+// tempaltes
+Route::get('/template/{id}/{type}', [TemplateController::class, 'index']);
 Route::post('/template/add', [TemplateController::class, 'store']);
-Route::post('/template/edit/{template}', [TemplateController::class, 'edit']);
-Route::post('/template/delete/{template}', [TemplateController::class, 'destroy']);
+Route::post('/template/edit/{id}', [TemplateController::class, 'edit']);
+Route::delete('/template/delete/{id}/{type}', [TemplateController::class, 'destroy']);
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
 Route::post('/template/search', [TemplateController::class, 'search']);
-// Route::post('/font/add', [TemplateController::class,'addFont']);
+
 Route::post('/category/add', [TemplateController::class,'addCategory']);
 Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
 
