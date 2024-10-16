@@ -32,19 +32,33 @@ class TemplateController extends Controller
         $request->validate([
             "name" => "required|string",
             "data" => "required|json",
-            "category_id" => "required|exists:templates_categories,id",
+            "type" => "required",
+            "category_id" => "required_if:type,template",
             "image" => "required|image|mimes:png|max:2048",
         ]);
-        $category = TemplateCategory::findOrFail($request->category_id);
+        // return $request;
+
+        if ($request->type == 'template') {
+            $template = new Template();
+            $template->category_id = $request->category_id;
+            $folder = 'template_images';
+        }
+        if ($request->type == 'text') {
+            $template = new Text();
+            $folder = 'text_images';
+        }
+        if ($request->type == 'shape') {
+            $template = new Shape();
+            $folder = 'shape_images';
+        }
 
         $file = $request->file('image');
-        $path = $file->store('images/' . $category->name, ['disk' => 'public_images']);
+        $path = $file->store('images/' . $folder, ['disk' => 'public_images']);
 
-        $template = new Template();
+        
         $template->name = $request->name;
         $template->data = $request->data;
         $template->image = $path;
-        $template->category_id = $request->category_id;
         $template->save();
 
         return $template;
@@ -122,14 +136,14 @@ class TemplateController extends Controller
 
     public function edit(Request $request, $id)
     {
-        
+
         $request->validate([
             "data" => "required|json",
             "image" => "required|image|mimes:png|max:2048",
             "type" => "string"
         ]);
-        
-        
+
+
         if ($request->type == 'template') {
             $template = Template::findOrFail($id);
             $category = 'template_images';
@@ -141,8 +155,8 @@ class TemplateController extends Controller
         if ($request->type == 'shape') {
             $template = Shape::findOrFail($id);
             $category = 'shape_images';
-        } 
-        
+        }
+
         $oldImage = $template->image;
         Storage::disk('public_images')->delete($oldImage);
 

@@ -50,7 +50,11 @@ const allFunctions = {
 
             editingTemp: false,
             editedId: null,
-        };
+
+            templateName: '',
+            templateType1: '',
+            templateType2: null,
+        }
     },
     methods: {
         initializeKonva(template = null) {
@@ -966,9 +970,10 @@ const allFunctions = {
                 };
             });
         },
-        // templates
-        async saveAsTemplate(name, category_id) {
-            // console.log(name, category_id)
+        // templates// type => [text or shape or template ]
+        //          // category_id if the selected type is template
+        async saveAsTemplate(name, type, category_id) {
+            console.log(category_id)
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
@@ -977,6 +982,7 @@ const allFunctions = {
                 let formData = new FormData();
                 formData.append('name', name);
                 formData.append('data', this.stage.toJSON());
+                formData.append('type', type);
                 formData.append('category_id', category_id);
                 formData.append('image', blob, `${name}.png`);
 
@@ -985,6 +991,8 @@ const allFunctions = {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
+
+                console.log(res);
 
                 if (res.status === 201) {
                     alert('Template created successfully!');

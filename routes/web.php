@@ -6,21 +6,21 @@ use App\Models\TemplateCategory;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Route::get('/', function () {
+//     $texts = getTexts();
+
+//     $shapes = getShapes();
+
+//     $templates = getTemplates();
+
+//     return Inertia::render('design', [
+//         'textTemplates' => $texts,
+//         'shapeTemplates' => $shapes,
+//         'templates' => $templates,
+//     ]);
+// });
+
 Route::get('/', function () {
-    $texts = getTexts();
-
-    $shapes = getShapes();
-
-    $templates = getTemplates();
-
-    return Inertia::render('design', [
-        'textTemplates' => $texts,
-        'shapeTemplates' => $shapes,
-        'templates' => $templates,
-    ]);
-});
-
-Route::get('/admin-panel', function () {
     
     $categories = TemplateCategory::select('id', 'name')->get();
     $categories. 
@@ -43,10 +43,10 @@ Route::get('/admin-panel', function () {
 });
 // tempaltes
 Route::get('/template/{id}/{type}', [TemplateController::class, 'index']);
-Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/edit/{id}', [TemplateController::class, 'edit']);
 Route::delete('/template/delete/{id}/{type}', [TemplateController::class, 'destroy']);
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
+Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/search', [TemplateController::class, 'search']);
 
 Route::post('/category/add', [TemplateController::class,'addCategory']);

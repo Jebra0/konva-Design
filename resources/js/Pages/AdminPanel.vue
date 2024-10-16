@@ -56,14 +56,20 @@
                             <v-card title="Save as template">
                                 <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
 
-                                <v-select label="Template Type" required v-model="templateType" :items="categories"
-                                    item-title="name" item-value="id"></v-select>
-
+                                <v-radio-group label="Category" v-model="templateType1">
+                                    <v-radio label="Text" value="text"></v-radio>
+                                    <v-radio label="Shape" value="shape"></v-radio>
+                                    <v-radio label="Template" value="template"></v-radio>
+                                </v-radio-group>
+                                
+                                <v-select v-if="templateType1 === 'template'" label="Template Type" required v-model="templateType2" :items="categories"
+                                item-title="name" item-value="id"></v-select>
+                                
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
                                     <v-btn text="Save"
-                                        @click=" saveAsTemplate(templateName, templateType); isActive.value = false"></v-btn>
+                                        @click=" saveAsTemplate(templateName, templateType1, templateType2); isActive.value = false"></v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -236,8 +242,8 @@
                 </v-col>
 
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
-                    <img :src="temp.image" width="250px" alt="Text Image" @click=" getSelectedTemplate(temp.id, 'template')"
-                        style="cursor: pointer">
+                    <img :src="temp.image" width="250px" alt="Text Image"
+                        @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
                     <v-icon @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
@@ -307,8 +313,8 @@
             <div v-if="selectedOption.elements" class=" d-flex mx-4 flex-wrap justify-between">
                 <div style="position: relative;" class=" d-flex justify-center" v-for="(shape, id) in shapeTemplates"
                     :key="id">
-                    <img :src="shape.image" width="70px" alt="Text Image" @click=" getSelectedTemplate(shape.id, 'shape')"
-                        style="cursor: pointer">
+                    <img :src="shape.image" width="70px" alt="Text Image"
+                        @click=" getSelectedTemplate(shape.id, 'shape')" style="cursor: pointer">
                     <v-icon @click="deleteTemplate(shape.id, 'shape')" size="25"
                         style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
@@ -515,9 +521,6 @@ export default {
             charSpacing: 1,
 
             fontFamilies: [],
-
-            templateName: '',
-            templateType: '',
 
             unsplashAccessKey: 'LhMEo6peuEizFSw0vjF5kANy-B6dgWvBoNmvxSdOlL0',
             unsplashUrl: 'https://api.unsplash.com/photos',
