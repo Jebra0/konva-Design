@@ -9,6 +9,37 @@
         <v-app-bar :elevation="1">
 
             <template v-slot:prepend>
+                <v-dialog v-if="!this.editingTemp" max-width="500">
+                    <template v-slot:activator="{ props: activatorProps }">
+                        <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
+                            <v-btn v-bind="activatorProps" prepend-icon="mdi-printer-outline">
+                                print
+                            </v-btn>
+                        </v-btn-group>
+                    </template>
+                    <template v-slot:default="{ isActive }">
+                        <v-card title="Save as template">
+                            <v-number-input :reverse="false" controlVariant="split" label="Quantity" :hideInput="false"
+                                :inset="false"></v-number-input>
+
+                            <v-select label="Size" required :items="['A3', 'A4']" item-title="size"></v-select>
+
+                            <v-select label="Faces" required :items="['Single face', 'Double face']"
+                                item-title="faces"></v-select>
+
+                            <v-select label="Folding" required :items="['Single fold', 'Double folde']"
+                                item-title="folding"></v-select>
+
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn-group color="blue-grey" @click="addToCart(); isActive.value = false">
+                                    <v-btn text="Add to cart"></v-btn>
+                                </v-btn-group>
+                            </v-card-actions>
+                        </v-card>
+                    </template>
+                </v-dialog>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
@@ -44,7 +75,7 @@
 
                 <div style="">
                     <!-- save as template -->
-                    <v-dialog v-if="!this.editingTemp" max-width="500">
+                    <v-dialog v-if="!this.editingTemp && this.isAdmin" max-width="500">
                         <template v-slot:activator="{ props: activatorProps }">
                             <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
                                 <v-btn v-bind="activatorProps">
@@ -69,8 +100,9 @@
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
-                                    <v-btn text="Save"
-                                        @click=" saveAsTemplate(templateName, templateType1, templateType2); isActive.value = false"></v-btn>
+                                    <v-btn-group color="blue-grey" @click=" saveAsTemplate(templateName, templateType1, templateType2); isActive.value = false">
+                                        <v-btn text="Save"></v-btn>
+                                    </v-btn-group>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -207,7 +239,7 @@
                 </v-list-item>
 
                 <!-- add category-->
-                <v-list-item :style="{ backgroundColor: selectedOption.active === 'addCategory' ? '#ebebeb' : '' }"
+                <v-list-item v-if="this.isAdmin" :style="{ backgroundColor: selectedOption.active === 'addCategory' ? '#ebebeb' : '' }"
                     @click="selectOption('addCategory')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'addCategory' ? '#607D8B' : 'white'"
                         class="icon">mdi-format-list-bulleted-square</v-icon>
@@ -248,14 +280,13 @@
 
                 <v-col v-if="allTemplates !== null" cols="6" class="imgParent" v-for="(temp, id) in allTemplates"
                     :key="id">
-                    <!-- {{ allTemplates }} -->
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
-                    <v-icon @click="editTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin" @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon @click="deleteTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
@@ -267,11 +298,11 @@
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
-                    <v-icon @click="editTemplate(temp.id, 'template')" size="30"
+                    <v-icon  v-if="this.isAdmin" @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon @click="deleteTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin"  @click="deleteTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
@@ -294,11 +325,11 @@
                 <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id, 'text')"
                         style="cursor: pointer">
-                    <v-icon @click="editTemplate(temp.id, 'text')" size="30"
+                    <v-icon v-if="this.isAdmin"  @click="editTemplate(temp.id, 'text')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon @click="deleteTemplate(temp.id, 'text')" size="30"
+                    <v-icon v-if="this.isAdmin"  @click="deleteTemplate(temp.id, 'text')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </div>
@@ -338,7 +369,7 @@
                     :key="id">
                     <img :src="shape.image" width="70px" alt="Text Image"
                         @click=" getSelectedTemplate(shape.id, 'shape')" style="cursor: pointer">
-                    <v-icon @click="deleteTemplate(shape.id, 'shape')" size="25"
+                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(shape.id, 'shape')" size="25"
                         style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </div>
@@ -387,7 +418,7 @@
                 </v-row>  -->
             </v-card>
 
-            <v-card v-if="selectedOption.addCategory" style="background-color: #ebebeb;" elevation="0" class=" m-2">
+            <v-card v-if="selectedOption.addCategory&&this.isAdmin" style="background-color: #ebebeb;" elevation="0" class=" m-2">
                 <v-text-field v-model="categoryName" label="category name"></v-text-field>
                 <div class="d-flex justify-center mt-3">
                     <v-btn @click="addTemplateCategory(categoryName)" color="blue-grey">Add</v-btn>
@@ -506,10 +537,11 @@ import { rectConfig } from '../Utils/shapesConfig.js';
 import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
 import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
+import { VNumberInput } from 'vuetify/labs/VNumberInput'
 
 export default {
     mixins: [allFunctions],
-    components: { Head },
+    components: { Head, VNumberInput },
     data() {
         return {
             selectedOption: {
@@ -714,6 +746,10 @@ export default {
         categories: {
             type: Object,
             required: true,
+        }, 
+        isAdmin: {
+            type: Boolean,
+            required: true
         }
     }
 }

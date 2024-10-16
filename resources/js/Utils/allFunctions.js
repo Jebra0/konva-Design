@@ -56,6 +56,7 @@ const allFunctions = {
             templateType2: null,
 
             allTemplates: null,
+            isPrintActive: false,
         }
     },
     methods: {
@@ -1489,6 +1490,9 @@ const allFunctions = {
                     alert('Error while deleting')
                 }
             }
+        },
+        addToCart(){
+            // add to cart request
         }
     }
 };

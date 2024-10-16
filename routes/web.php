@@ -23,7 +23,6 @@ use Inertia\Inertia;
 Route::get('/', function () {
     
     $categories = TemplateCategory::select('id', 'name')->get();
-    $categories. 
 
     $texts = getTexts();
 
@@ -33,12 +32,15 @@ Route::get('/', function () {
 
     $tmplateImages = getTemplateImages();
 
+    $isAdmin = isAdmin();
+
     return Inertia::render('AdminPanel', [
         'categories'=> $categories,
         'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
         'templateImages' => $tmplateImages,
+        'isAdmin' => $isAdmin
     ]);
 });
 // tempaltes
@@ -48,9 +50,11 @@ Route::delete('/template/delete/{id}/{type}', [TemplateController::class, 'destr
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
 Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/search', [TemplateController::class, 'search']);
-
+// category
 Route::post('/category/add', [TemplateController::class,'addCategory']);
 Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
+
+// print 
 
 ////////// //////// ////////// ///////// //////// //////////
 

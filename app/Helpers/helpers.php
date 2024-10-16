@@ -25,6 +25,14 @@ use App\Models\Template;
 //     return $fontFiles;
 // }
 
+
+function isAdmin(){
+    $user = Auth::user();
+    if(isset($user) && $user->is_admin){
+        return true;
+    }
+    return false;
+}
 function getTemplates()
 {
     return Template::with('category')->select(['id', 'image'])
