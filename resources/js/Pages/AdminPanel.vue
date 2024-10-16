@@ -61,10 +61,11 @@
                                     <v-radio label="Shape" value="shape"></v-radio>
                                     <v-radio label="Template" value="template"></v-radio>
                                 </v-radio-group>
-                                
-                                <v-select v-if="templateType1 === 'template'" label="Template Type" required v-model="templateType2" :items="categories"
-                                item-title="name" item-value="id"></v-select>
-                                
+
+                                <v-select v-if="templateType1 === 'template'" label="Template Type" required
+                                    v-model="templateType2" :items="categories" item-title="name"
+                                    item-value="id"></v-select>
+
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
@@ -239,6 +240,28 @@
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
                     </div>
+                </v-col>
+
+                <v-col v-if="allTemplates !== null" cols="12" class="d-flex justify-center align-center">
+                    <p>Search result</p>
+                </v-col>
+
+                <v-col v-if="allTemplates !== null" cols="6" class="imgParent" v-for="(temp, id) in allTemplates"
+                    :key="id">
+                    <!-- {{ allTemplates }} -->
+                    <img :src="temp.image" width="250px" alt="Text Image"
+                        @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
+                    <v-icon @click="editTemplate(temp.id, 'template')" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
+                        color="blue-grey" icon="mdi-pencil"></v-icon>
+
+                    <v-icon @click="deleteTemplate(temp.id, 'template')" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
+                        icon="mdi-delete"></v-icon>
+                </v-col>
+
+                <v-col cols="12" class="d-flex justify-center align-center">
+                    <p>All Templates</p>
                 </v-col>
 
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
@@ -628,6 +651,7 @@ export default {
                 default:
             }
         },
+
     },
     computed: {
         reversedLayers() {

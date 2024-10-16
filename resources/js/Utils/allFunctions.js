@@ -54,6 +54,8 @@ const allFunctions = {
             templateName: '',
             templateType1: '',
             templateType2: null,
+
+            allTemplates: null,
         }
     },
     methods: {
@@ -1349,10 +1351,14 @@ const allFunctions = {
                 });
         },
         async searchForTemplate(name){
+            let formData = new FormData();
+            formData.append('name', name);
             try{
-                const respons = await axios.post('/template/search', name); 
-                tconsole.log(respons);
-                console.log(respons);
+                const respons = await axios.post('/template/search', formData);
+                this.allTemplates = []; 
+                respons.data.forEach(el => {
+                    this.allTemplates.push(el); 
+                });
             }catch(error){
                 console.log(error);
             }

@@ -36,7 +36,6 @@ class TemplateController extends Controller
             "category_id" => "required_if:type,template",
             "image" => "required|image|mimes:png|max:2048",
         ]);
-        // return $request;
 
         if ($request->type == 'template') {
             $template = new Template();
@@ -193,8 +192,9 @@ class TemplateController extends Controller
             "name" => "string|required"
         ]);
         $templates = Template::where('name', 'like', '%' . $request->name . '%')
+            ->select(['id', 'image'])
             ->get();
-
+        
         return response()->json($templates);
     }
 }
