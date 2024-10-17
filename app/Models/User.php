@@ -44,4 +44,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function designs(){
+        return $this->hasMany(Design::class, 'user_id', 'id');
+    }
 }

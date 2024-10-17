@@ -2,13 +2,41 @@
     <v-app>
 
         <Head>
-            <title>Admin Panel</title>
+            <title>Konva Design</title>
         </Head>
 
         <!-- defualt buttons -->
         <v-app-bar :elevation="1">
 
             <template v-slot:prepend>
+                <!-- login button -->
+                <v-btn-group @click="getPage('login')" class="mx-2" v-if="this.user == null" color="green"
+                    density="comfortable" rounded="pill" divided>
+                    <v-btn>
+                        Login
+                    </v-btn>
+                </v-btn-group>
+
+                <div class="text-center" v-if="this.user">
+                    <v-menu open-on-hover>
+                        <template v-slot:activator="{ props }">
+                            <v-btn color="primary" v-bind="props">
+                                <v-icon color="blue-grey" class="mx-1">
+                                    mdi-account
+                                </v-icon>
+                                {{ this.user?.name }}
+                                <v-icon> mdi-menu-down</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index">
+                                <v-list-item-title @click="this.getPage(item.title)">{{ item.title
+                                    }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </div>
+
                 <v-dialog v-if="!this.editingTemp" max-width="500">
                     <template v-slot:activator="{ props: activatorProps }">
                         <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
@@ -20,7 +48,7 @@
                     <template v-slot:default="{ isActive }">
                         <v-card title="Save as template">
                             <v-number-input :reverse="false" controlVariant="split" label="Quantity" :hideInput="false"
-                                :inset="false"></v-number-input>
+                                :inset="false" :min="10" :max="1000"></v-number-input>
 
                             <v-select label="Size" required :items="['A3', 'A4']" item-title="size"></v-select>
 
@@ -72,6 +100,31 @@
             </span>
 
             <template v-slot:append>
+                <!-- add to my designs button -->
+                <v-dialog v-if="!this.editingTemp && !this.isAdmin && this.user" max-width="500">
+                    <template v-slot:activator="{ props: activatorProps }">
+                        <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
+                            <v-btn v-bind="activatorProps">
+                                Add to my designs
+                            </v-btn>
+                        </v-btn-group>
+                    </template>
+                    <template v-slot:default="{ isActive }">
+                        <v-card title="Add to my designs">
+
+                            <v-text-field label="Template Name" required v-model="designName"></v-text-field>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+
+                                <v-btn-group color="blue-grey"
+                                    @click="saveAsTemplate(designName, 'myDesigns', 0, this.user.id); isActive.value = false">
+                                    <v-btn text="Save"></v-btn>
+                                </v-btn-group>
+                            </v-card-actions>
+                        </v-card>
+                    </template>
+                </v-dialog>
 
                 <div style="">
                     <!-- save as template -->
@@ -100,7 +153,8 @@
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
-                                    <v-btn-group color="blue-grey" @click=" saveAsTemplate(templateName, templateType1, templateType2); isActive.value = false">
+                                    <v-btn-group color="blue-grey"
+                                        @click=" saveAsTemplate(templateName, templateType1, templateType2); isActive.value = false">
                                         <v-btn text="Save"></v-btn>
                                     </v-btn-group>
                                 </v-card-actions>
@@ -196,6 +250,17 @@
         <v-navigation-drawer permanent color="blue-grey" width="90">
             <v-list density="compact">
 
+                <!-- my designs -->
+                <v-list-item v-if="this.user && !this.isAdmin"
+                    :style="{ backgroundColor: selectedOption.active === 'myDesigns' ? '#ebebeb' : '' }"
+                    @click="selectOption('myDesigns')" class="custom-list-item">
+                    <v-icon :color="selectedOption.active === 'myDesigns' ? '#607D8B' : 'white'"
+                        class="icon">mdi-palette</v-icon>
+                    <span :style="{ color: selectedOption.active === 'myDesigns' ? '#607D8B' : 'white' }"
+                        class="list-title">My
+                        designs</span>
+                </v-list-item>
+
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'templates' ? '#ebebeb' : '' }"
                     @click="selectOption('templates')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'templates' ? '#607D8B' : 'white'"
@@ -239,7 +304,8 @@
                 </v-list-item>
 
                 <!-- add category-->
-                <v-list-item v-if="this.isAdmin" :style="{ backgroundColor: selectedOption.active === 'addCategory' ? '#ebebeb' : '' }"
+                <v-list-item v-if="this.isAdmin"
+                    :style="{ backgroundColor: selectedOption.active === 'addCategory' ? '#ebebeb' : '' }"
                     @click="selectOption('addCategory')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'addCategory' ? '#607D8B' : 'white'"
                         class="icon">mdi-format-list-bulleted-square</v-icon>
@@ -261,6 +327,22 @@
         </v-navigation-drawer>
 
         <v-navigation-drawer style="background-color: #ebebeb;" permanent>
+
+            <!-- my designs -->
+            <v-row class="mx-2 my-2" v-if="selectedOption.myDesigns && this.user && !this.isAdmin"
+                style="background-color: #ebebeb;">
+                <v-col cols="6" class="imgParent" v-for="(temp, id) in my_designs" :key="id">
+                    <img :src="temp.image" width="250px" alt="Text Image"
+                        @click="getSelectedTemplate(temp.id, 'myDesigns')" style="cursor: pointer">
+                    <v-icon v-if="this.user" @click="editTemplate(temp.id, 'myDesigns')" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
+                        color="blue-grey" icon="mdi-pencil"></v-icon>
+
+                    <v-icon v-if="this.user" @click="deleteTemplate(temp.id, 'myDesigns')" size="30"
+                        style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
+                        icon="mdi-delete"></v-icon>
+                </v-col>
+            </v-row>
 
             <v-row v-if="selectedOption.templates" style="background-color: #ebebeb;">
                 <v-col cols="12">
@@ -298,11 +380,11 @@
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
-                    <v-icon  v-if="this.isAdmin" @click="editTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin" @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon v-if="this.isAdmin"  @click="deleteTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
@@ -325,11 +407,11 @@
                 <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id, 'text')"
                         style="cursor: pointer">
-                    <v-icon v-if="this.isAdmin"  @click="editTemplate(temp.id, 'text')" size="30"
+                    <v-icon v-if="this.isAdmin" @click="editTemplate(temp.id, 'text')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon v-if="this.isAdmin"  @click="deleteTemplate(temp.id, 'text')" size="30"
+                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(temp.id, 'text')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </div>
@@ -418,7 +500,8 @@
                 </v-row>  -->
             </v-card>
 
-            <v-card v-if="selectedOption.addCategory&&this.isAdmin" style="background-color: #ebebeb;" elevation="0" class=" m-2">
+            <v-card v-if="selectedOption.addCategory && this.isAdmin" style="background-color: #ebebeb;" elevation="0"
+                class=" m-2">
                 <v-text-field v-model="categoryName" label="category name"></v-text-field>
                 <div class="d-flex justify-center mt-3">
                     <v-btn @click="addTemplateCategory(categoryName)" color="blue-grey">Add</v-btn>
@@ -605,12 +688,23 @@ export default {
         this.fetchUnsplashImages();
         this.initializeKonva();
         this.fetchFonts();
-        // this.fetchFont('Khand')
     },
     methods: {
         selectOption(type) {
             switch (type) {
+                case 'myDesigns':
+                    this.selectedOption.myDesigns = true;
+                    this.selectedOption.templates = false;
+                    this.selectedOption.text = false;
+                    this.selectedOption.photos = false;
+                    this.selectedOption.elements = false;
+                    this.selectedOption.upload = false;
+                    this.selectedOption.layers = false;
+                    this.selectedOption.addCategory = false;
+                    this.selectedOption.active = 'myDesigns';
+                    break;
                 case 'templates':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = true;
                     this.selectedOption.text = false;
                     this.selectedOption.photos = false;
@@ -621,6 +715,7 @@ export default {
                     this.selectedOption.active = 'templates';
                     break;
                 case 'text':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = false;
                     this.selectedOption.text = true;
                     this.selectedOption.photos = false;
@@ -631,6 +726,7 @@ export default {
                     this.selectedOption.active = 'text';
                     break;
                 case 'photos':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = false;
                     this.selectedOption.text = false;
                     this.selectedOption.photos = true;
@@ -641,6 +737,7 @@ export default {
                     this.selectedOption.active = 'photos';
                     break;
                 case 'elements':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = false;
                     this.selectedOption.text = false;
                     this.selectedOption.photos = false;
@@ -651,6 +748,7 @@ export default {
                     this.selectedOption.active = 'elements';
                     break;
                 case 'upload':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = false;
                     this.selectedOption.text = false;
                     this.selectedOption.photos = false;
@@ -661,6 +759,7 @@ export default {
                     this.selectedOption.active = 'upload';
                     break;
                 case 'layers':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = false;
                     this.selectedOption.text = false;
                     this.selectedOption.photos = false;
@@ -671,6 +770,7 @@ export default {
                     this.selectedOption.active = 'layers';
                     break;
                 case 'addCategory':
+                    this.selectedOption.myDesigns = false;
                     this.selectedOption.templates = false;
                     this.selectedOption.text = false;
                     this.selectedOption.photos = false;
@@ -683,7 +783,24 @@ export default {
                 default:
             }
         },
+        async getPage(name) {
+            switch (name) {
+                case 'Profile':
+                    window.location.href = '/profile';
+                    break;
+                case 'Cart':
+                    // window.location.href = '/cart'; 
+                    break;
+                case 'Log out':
+                    axios.post('/logout');
+                    window.location.reload();
+                    break;
+                case 'login':
+                    window.location.href = '/login';
+                    break;
 
+            }
+        },
     },
     computed: {
         reversedLayers() {
@@ -746,9 +863,17 @@ export default {
         categories: {
             type: Object,
             required: true,
-        }, 
+        },
         isAdmin: {
             type: Boolean,
+            required: true
+        },
+        user: {
+            type: Object,
+            required: true
+        },
+        my_designs: {
+            type: Object,
             required: true
         }
     }
@@ -854,5 +979,15 @@ export default {
 
 .categoryItem .icon {
     cursor: pointer;
+}
+
+.account {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.account:hover {
+    background-color: #CFD8DC;
 }
 </style>

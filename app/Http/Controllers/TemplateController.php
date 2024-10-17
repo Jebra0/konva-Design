@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Console\Commands\AddFonts;
+use App\Models\Design;
 use App\Models\Template;
 use App\Models\Text;
 use App\Models\Shape;
@@ -25,6 +26,9 @@ class TemplateController extends Controller
         }
         if ($request->type == 'shape') {
             return Shape::where('id', $id)->get();
+        }
+        if ($request->type == 'myDesigns') {
+            return Design::where('id', $id)->get();
         }
     }
     public function store(Request $request)
@@ -49,6 +53,11 @@ class TemplateController extends Controller
         if ($request->type == 'shape') {
             $template = new Shape();
             $folder = 'shape_images';
+        }
+        if ($request->type == 'myDesigns') {
+            $template = new Design();
+            $template->user_id = $request->user_id;
+            $folder = 'user_design_images';
         }
 
         $file = $request->file('image');
@@ -155,6 +164,10 @@ class TemplateController extends Controller
             $template = Shape::findOrFail($id);
             $category = 'shape_images';
         }
+        if ($request->type == 'myDesigns') {
+            $template = Design::findOrFail($id);
+            $category = 'user_design_images';
+        }
 
         $oldImage = $template->image;
         Storage::disk('public_images')->delete($oldImage);
@@ -179,6 +192,9 @@ class TemplateController extends Controller
         }
         if ($request->type == 'shape') {
             $template = Shape::findOrFail($id);
+        }
+        if ($request->type == 'myDesigns') {
+            $template = Design::findOrFail($id);
         }
 
         $image = $template->pluck('image');

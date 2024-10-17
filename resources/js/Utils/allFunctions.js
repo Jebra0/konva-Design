@@ -57,6 +57,13 @@ const allFunctions = {
 
             allTemplates: null,
             isPrintActive: false,
+            acountNavItems: [
+                { title: 'Profile' },
+                { title: 'Cart' },
+                { title: 'Log out' },
+            ],
+
+            designName: '',
         }
     },
     methods: {
@@ -179,68 +186,70 @@ const allFunctions = {
             this.defaultLayer.batchDraw(); // Ensure the layer is redrawn
         },
         async getTemplate(template) {
-            template.children.forEach(child => {
-                if (child.className === 'Layer') {
-                    const newLayer = new Konva.Layer();
-                    newLayer.id(uuidv4());
-                    this.stage.add(newLayer);
-                    // transformer
-                    this.addTransformer(newLayer);
+            if (Array.isArray(template.children)) {
+                template.children.forEach(child => {
+                    if (child.className === 'Layer') {
+                        const newLayer = new Konva.Layer();
+                        newLayer.id(uuidv4());
+                        this.stage.add(newLayer);
+                        // transformer
+                        this.addTransformer(newLayer);
 
-                    let hasNonTransformer = false;
+                        let hasNonTransformer = false;
 
-                    child.children.forEach(async grandChild => {
-                        if (grandChild.className !== 'Transformer') {
-                            hasNonTransformer = true;
-                            const objectConstructor = Konva[grandChild.className];
-                            const object = new objectConstructor(grandChild.attrs);
-                            object.id(uuidv4());
+                        child.children.forEach(async grandChild => {
+                            if (grandChild.className !== 'Transformer') {
+                                hasNonTransformer = true;
+                                const objectConstructor = Konva[grandChild.className];
+                                const object = new objectConstructor(grandChild.attrs);
+                                object.id(uuidv4());
 
-                            if (object.getClassName() === 'Image') {
-                                const imageUrl = grandChild.attrs.src; // Get the src from JSON
-                                if (imageUrl) {
-                                    const imageObj = new Image();
-                                    imageObj.src = imageUrl;
-                                    imageObj.crossOrigin = 'anonymous';
+                                if (object.getClassName() === 'Image') {
+                                    const imageUrl = grandChild.attrs.src; // Get the src from JSON
+                                    if (imageUrl) {
+                                        const imageObj = new Image();
+                                        imageObj.src = imageUrl;
+                                        imageObj.crossOrigin = 'anonymous';
 
-                                    // Load the image and set it to the Konva image object
-                                    await new Promise((resolve) => {
-                                        imageObj.onload = () => {
-                                            object.image(imageObj);
-                                            resolve();
-                                        };
-                                    });
+                                        // Load the image and set it to the Konva image object
+                                        await new Promise((resolve) => {
+                                            imageObj.onload = () => {
+                                                object.image(imageObj);
+                                                resolve();
+                                            };
+                                        });
+                                    }
                                 }
-                            }
-                            if (object.getClassName() === 'Text') {
-                                this.editText(object);
-                            }
-                            // layers order
-                            this.handleLayersOrder(newLayer, object.getClassName());
-
-                            object.on("pointerdown", (e) => {
-                                e.cancelBubble = true;
-                                this.toggleSelection(object.id(), object.getClassName(), object);
-                            });
-
-                            if (object.getClassName() === 'Text') {
-                                const fontLoaded = await this.fetchFont(object.fontFamily());
-                                if (fontLoaded) {
-                                    newLayer.add(object);
+                                if (object.getClassName() === 'Text') {
+                                    this.editText(object);
                                 }
+                                // layers order
+                                this.handleLayersOrder(newLayer, object.getClassName());
+
+                                object.on("pointerdown", (e) => {
+                                    e.cancelBubble = true;
+                                    this.toggleSelection(object.id(), object.getClassName(), object);
+                                });
+
+                                if (object.getClassName() === 'Text') {
+                                    const fontLoaded = await this.fetchFont(object.fontFamily());
+                                    if (fontLoaded) {
+                                        newLayer.add(object);
+                                    }
+                                }
+                                newLayer.add(object);
                             }
-                            newLayer.add(object);
+                        });
+
+                        // If no non-Transformer objects were added, remove the layer
+                        if (!hasNonTransformer) {
+                            newLayer.destroy();
+                        } else {
+                            newLayer.batchDraw();
                         }
-                    });
-
-                    // If no non-Transformer objects were added, remove the layer
-                    if (!hasNonTransformer) {
-                        newLayer.destroy();
-                    } else {
-                        newLayer.batchDraw();
                     }
-                }
-            });
+                });
+            }
         },
         addShape(config) {
             const newLayer = new Konva.Layer();
@@ -773,7 +782,7 @@ const allFunctions = {
                 });
             });
 
-            function handel(){
+            function handel() {
                 text.hide();
                 transformer.hide();
 
@@ -975,7 +984,7 @@ const allFunctions = {
         },
         // templates// type => [text or shape or template ]
         //          // category_id if the selected type is template
-        async saveAsTemplate(name, type, category_id) {
+        async saveAsTemplate(name, type, category_id, user = null) {
             console.log(category_id)
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
@@ -987,6 +996,9 @@ const allFunctions = {
                 formData.append('data', this.stage.toJSON());
                 formData.append('type', type);
                 formData.append('category_id', category_id);
+                if(user){
+                    formData.append('user_id', user);
+                }
                 formData.append('image', blob, `${name}.png`);
 
                 let res = await axios.post('/template/add', formData, {
@@ -1007,10 +1019,9 @@ const allFunctions = {
                 alert('An error occurred. Please try again.');
             }
         },
-        async getSelectedTemplate(id, type) { 
+        async getSelectedTemplate(id, type) {
             let res = await axios.get(`/template/${id}/${type}`);
             let data = res.data[0].data;
-            // console.log(res.data);
             if (data) {
                 const template = JSON.parse(data);
                 this.getTemplate(template);
@@ -1351,16 +1362,16 @@ const allFunctions = {
                     this.isDataRedy = false;
                 });
         },
-        async searchForTemplate(name){
+        async searchForTemplate(name) {
             let formData = new FormData();
             formData.append('name', name);
-            try{
+            try {
                 const respons = await axios.post('/template/search', formData);
-                this.allTemplates = []; 
+                this.allTemplates = [];
                 respons.data.forEach(el => {
-                    this.allTemplates.push(el); 
+                    this.allTemplates.push(el);
                 });
-            }catch(error){
+            } catch (error) {
                 console.log(error);
             }
         },
@@ -1396,11 +1407,11 @@ const allFunctions = {
             }
         },
         async deleteCategory(id) {
-            if(confirm("Confirm Deleting ? ")){
+            if (confirm("Confirm Deleting ? ")) {
                 try {
-                    const response = await axios.delete(`/category/${ id }`);
+                    const response = await axios.delete(`/category/${id}`);
                     console.log(response)
-                    if(response.status === 200){
+                    if (response.status === 200) {
                         alert(response.data.message)
                     }
                 } catch (error) {
@@ -1491,9 +1502,11 @@ const allFunctions = {
                 }
             }
         },
-        addToCart(){
+        addToCart() {
+
             // add to cart request
-        }
+        },
+
     }
 };
 

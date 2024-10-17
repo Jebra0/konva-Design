@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
+use App\Models\Design;
 use App\Models\TemplateCategory;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,15 +35,23 @@ Route::get('/', function () {
 
     $isAdmin = isAdmin();
 
+    $user = Auth::user();
+
+    $my_designs = $user->designs()
+        ->orderBy('created_at', 'desc')
+        ->get();
+
     return Inertia::render('AdminPanel', [
         'categories'=> $categories,
         'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
         'templateImages' => $tmplateImages,
-        'isAdmin' => $isAdmin
+        'isAdmin' => $isAdmin,
+        'user' => $user,
+        'my_designs' => $my_designs
     ]);
-});
+})->name('home');
 // tempaltes
 Route::get('/template/{id}/{type}', [TemplateController::class, 'index']);
 Route::post('/template/edit/{id}', [TemplateController::class, 'edit']);
@@ -54,8 +63,8 @@ Route::post('/template/search', [TemplateController::class, 'search']);
 Route::post('/category/add', [TemplateController::class,'addCategory']);
 Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
 
-// print 
-
+// cart 
+Route::get('/cart');
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {
