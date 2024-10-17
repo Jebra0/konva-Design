@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Models\Design;
@@ -37,9 +38,13 @@ Route::get('/', function () {
 
     $user = Auth::user();
 
-    $my_designs = $user->designs()
-        ->orderBy('created_at', 'desc')
-        ->get();
+    $my_designs='';
+
+    if($user){
+        $my_designs = $user->designs()
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
 
     return Inertia::render('AdminPanel', [
         'categories'=> $categories,
@@ -49,7 +54,8 @@ Route::get('/', function () {
         'templateImages' => $tmplateImages,
         'isAdmin' => $isAdmin,
         'user' => $user,
-        'my_designs' => $my_designs
+        'my_designs'=> $my_designs 
+        
     ]);
 })->name('home');
 // tempaltes
@@ -64,7 +70,7 @@ Route::post('/category/add', [TemplateController::class,'addCategory']);
 Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
 
 // cart 
-Route::get('/cart');
+Route::get('/cart', [CartController::class, 'index']);
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {
