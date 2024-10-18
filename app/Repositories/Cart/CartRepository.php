@@ -7,7 +7,7 @@ use App\Models\TemplateCategory;
 interface CartRepository  {
     public function get();
 
-    public function add(TemplateCategory $item, $quantity = 1);
+    public function add($category_id, $data, $image, $quantity);
 
     public function update($id, $quantity);
 

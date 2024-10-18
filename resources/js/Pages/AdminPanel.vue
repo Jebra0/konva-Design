@@ -46,22 +46,18 @@
                         </v-btn-group>
                     </template>
                     <template v-slot:default="{ isActive }">
-                        <v-card title="Save as template">
-                            <v-number-input :reverse="false" controlVariant="split" label="Quantity" :hideInput="false"
+                        <v-card title="Add to cart">
+                            <v-number-input :reverse="false" v-model="productQuantity" controlVariant="split" label="Quantity" :hideInput="false"
                                 :inset="false" :min="10" :max="1000"></v-number-input>
 
-                            <v-select label="Size" required :items="['A3', 'A4']" item-title="size"></v-select>
-
-                            <v-select label="Faces" required :items="['Single face', 'Double face']"
-                                item-title="faces"></v-select>
-
-                            <v-select label="Folding" required :items="['Single fold', 'Double folde']"
-                                item-title="folding"></v-select>
-
+                            <v-select label="Category" required v-model="categoryId" :items="categories"
+                                item-title="name" item-value="id"></v-select>
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn-group color="blue-grey" @click="addToCart(); isActive.value = false">
+                                <p style="color: #607D8B; font-weight: bolder">pleas justify your design at the center</p>
+                                <v-spacer></v-spacer>
+                                <v-btn-group color="blue-grey" @click="addToCart(productQuantity, categoryId); isActive.value = false">
                                     <v-btn text="Add to cart"></v-btn>
                                 </v-btn-group>
                             </v-card-actions>

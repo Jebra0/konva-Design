@@ -64,6 +64,9 @@ const allFunctions = {
             ],
 
             designName: '',
+            categoryId: null,
+            userId: null,
+            productQuantity: 1,
         }
     },
     methods: {
@@ -984,6 +987,34 @@ const allFunctions = {
         },
         // templates// type => [text or shape or template ]
         //          // category_id if the selected type is template
+
+        async createImage(dataURL) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = dataURL;
+
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        resolve(blob);
+                    }, 'image/png');
+                };
+
+                img.onerror = (err) => {
+                    reject(err);
+                };
+            });
+        },
+
         async saveAsTemplate(name, type, category_id, user = null) {
             console.log(category_id)
             try {
@@ -996,7 +1027,7 @@ const allFunctions = {
                 formData.append('data', this.stage.toJSON());
                 formData.append('type', type);
                 formData.append('category_id', category_id);
-                if(user){
+                if (user) {
                     formData.append('user_id', user);
                 }
                 formData.append('image', blob, `${name}.png`);
@@ -1502,11 +1533,27 @@ const allFunctions = {
                 }
             }
         },
-        addToCart() {
+        async addToCart(quantity, category_id) {
+            try {
+                let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
-            // add to cart request
+                let blob = await this.createImage(dataURL);
+
+                let formData = new FormData();
+                formData.append('quantity', quantity);
+                formData.append('category_id', category_id);
+                formData.append('data', this.stage.toJSON());
+                formData.append('image', blob, `new.png`);
+
+                let res = await axios.post(`/cart`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log(res);
+            } catch { }
+            
         },
-
     }
 };
 

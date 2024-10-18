@@ -70,7 +70,8 @@ Route::post('/category/add', [TemplateController::class,'addCategory']);
 Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
 
 // cart 
-Route::get('/cart', [CartController::class, 'index']);
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'store']);
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {

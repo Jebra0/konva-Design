@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category_variants', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('templates_categories', function (Blueprint $table) {
+            $table->integer('quantity')->nullable();
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category_variants');
+        Schema::table('templates_categories', function (Blueprint $table) {
+            //
+        });
     }
 };

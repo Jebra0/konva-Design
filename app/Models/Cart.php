@@ -9,15 +9,24 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $incrementing = false;
+    public $incrementing = false;
 
     protected $fillable = [
+        'id',
         'cookie_id',
         'user_id',
         'category_id',
         'quantity',
-        'options',
+        'image',
+        'data',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'data' => 'json',
+        ];
+    }
     
     public function product(){
         return $this->belongsTo(TemplateCategory::class, 'category_id', 'id');
