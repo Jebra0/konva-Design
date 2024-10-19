@@ -5,27 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TemplateCategory extends Model
+class Option extends Model
 {
     use HasFactory;
 
-    protected $table = 'templates_categories';
- 
-    protected $fillable = ['name'] ;
+    public $incrementing = false;
 
-    public function templates()
-    {
-        return $this->hasMany(Template::class, 'category_id');
-    }
+    protected $fillable = ['name'];
 
     public function options(){
         return $this->belongsToMany(
-            Option::class,
+            TemplateCategory::class,
             'category_options',
-            'category_id',
             'option_id',
+            'category_id',
             'id',
             'id'
         );
+    }
+
+    public function values(){
+        return $this->hasMany(OptionValue::class, 'option_id', 'id');
     }
 }

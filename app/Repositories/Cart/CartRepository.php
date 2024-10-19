@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Cart;
 
+use App\Models\Cart;
 use App\Models\TemplateCategory;
 
 interface CartRepository  {

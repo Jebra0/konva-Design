@@ -65,6 +65,8 @@
                     </template>
                 </v-dialog>
 
+                <v-icon @click="getPage('Cart')" class="mx-5 " color="blue-grey">mdi-cart</v-icon>
+
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
 
@@ -785,7 +787,7 @@ export default {
                     window.location.href = '/profile';
                     break;
                 case 'Cart':
-                    // window.location.href = '/cart'; 
+                    window.location.href = '/cart';
                     break;
                 case 'Log out':
                     axios.post('/logout');

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Option;
 use App\Repositories\Cart\CartModelRepository;
+use Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,9 +13,13 @@ class CartController extends Controller
     public function index()
     {
         $cart = new CartModelRepository();
-
+        $all_options = Option::with('values')->get();
+        $total = $cart->total();
         return Inertia::render('Cart', [
             'cart' => $cart->get(),
+            'all_options' => $all_options,
+            'total' => $total,
+            'user' => Auth::user(),
         ]);
     }
 

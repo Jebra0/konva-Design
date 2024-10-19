@@ -197,7 +197,8 @@ class TemplateController extends Controller
             $template = Design::findOrFail($id);
         }
 
-        $image = $template->pluck('image');
+        $image = '/'.$template->pluck('image');
+        
         Storage::disk('public_images')->delete($image);
         $template->delete();
     }

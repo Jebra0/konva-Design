@@ -28,11 +28,24 @@ class Cart extends Model
         ];
     }
     
-    public function product(){
-        return $this->belongsTo(TemplateCategory::class, 'category_id', 'id');
+    public function category(){
+        return $this->belongsTo(TemplateCategory::class, 'category_id', 'id')
+            ->with('options');
     }
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function options(){
+        return $this->belongsToMany(
+            OptionValue::class,
+            'cart_option_values',
+            'cart_id',
+            'option_value_id',
+            'id',
+            'id'
+
+        );
     }
 }

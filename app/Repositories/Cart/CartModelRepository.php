@@ -10,7 +10,7 @@ class CartModelRepository implements CartRepository
 {
     public function get()
     {
-        Cart::where('cookie_id', $this->getCookieId())->get();
+        return Cart::with('category', 'options')->where('cookie_id', $this->getCookieId())->get();
     }
 
     public function add($category_id, $data, $image, $quantity)
@@ -51,10 +51,23 @@ class CartModelRepository implements CartRepository
 
     public function total()
     {
-        Cart::where('cookie_id', $this->getCookieId())
-            ->join('templates_categories', 'templates_categories.id', '=', 'carts.category_id')
-            ->selectRaw('SUM(carts.quantity * templates_categories.price) AS totlal')
-            ->value('total');
+        $cartItems = Cart::where('cookie_id', $this->getCookieId())
+            ->with('category', 'options') 
+            ->get(); 
+
+        $total = 0;
+
+        foreach ($cartItems as $cartItem) {
+            $quantity = $cartItem->quantity;
+
+            $category_price = $cartItem->category ? $cartItem->category->price : 0;
+
+            $options_sum_price = $cartItem->options->sum('price');
+
+            $total += $quantity * ($category_price + $options_sum_price);
+        }
+
+        return $total;
     }
 
     public function empty()
