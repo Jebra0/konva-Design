@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('cart_option_values', function (Blueprint $table) {
             $table->uuid('cart_id');
             $table->foreign('cart_id')
-                ->references('id')->on('carts');
+                ->references('id')->on('carts')
+                ->cascadeOnDelete();
             $table->foreignId('option_value_id')
                 ->constrained('option_values');
             $table->unique(['cart_id', 'option_value_id']);

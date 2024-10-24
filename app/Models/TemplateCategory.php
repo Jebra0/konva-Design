@@ -26,6 +26,6 @@ class TemplateCategory extends Model
             'option_id',
             'id',
             'id'
-        );
+        )->with('values');
     }
 }

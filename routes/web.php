@@ -72,6 +72,8 @@ Route::delete('/category/{templateCategory}', [TemplateController::class,'delete
 // cart 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store']);
+Route::delete('/cart/delete/{cart}', [CartController::class, 'destroy']);
+Route::post('/cart/update', [CartController::class, 'update']);
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {

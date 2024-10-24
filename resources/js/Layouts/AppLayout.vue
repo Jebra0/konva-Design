@@ -1,4 +1,5 @@
 <template>
+
     <Head>
         <title>Cart</title>
     </Head>
@@ -39,6 +40,13 @@
             <v-spacer></v-spacer>
 
             <template v-slot:append>
+                <v-btn-group @click="getPage('Design')" class="mx-2" color="blue-grey" density="comfortable"
+                    rounded="pill" divided>
+                    <v-btn>
+                        Back To Design
+                    </v-btn>
+                </v-btn-group>
+
                 <v-icon @click="getPage('Cart')" color="blue-grey" style="cursor: pointer;"
                     class="mr-3">mdi-cart</v-icon>
             </template>
@@ -115,6 +123,9 @@ export default {
                     break;
                 case 'login':
                     window.location.href = '/login';
+                    break;
+                case 'Design':
+                    window.location.href = '/';
                     break;
 
             }

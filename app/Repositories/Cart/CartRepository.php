@@ -10,9 +10,7 @@ interface CartRepository  {
 
     public function add($category_id, $data, $image, $quantity);
 
-    public function update($id, $quantity);
-
-    public function delete($id);
+    public function updateCart($id, $quantity, $option_val_id);
 
     public function total();
 

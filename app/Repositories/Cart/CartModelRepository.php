@@ -4,6 +4,7 @@ namespace App\Repositories\Cart;
 use App\Models\Cart;
 use App\Models\TemplateCategory;
 use Cookie;
+use Log;
 use Str;
 
 class CartModelRepository implements CartRepository
@@ -33,27 +34,25 @@ class CartModelRepository implements CartRepository
 
     }
 
-    public function update($id, $quantity = 1)
+    public function updateCart($id, $quantity, $option_val_id)
     {
-        Cart::where('id', $id)
-            ->where('cookie_id', $this->getCookieId())
-            ->update([
-                'quantity' => $quantity
-            ]);
-    }
+        $cart = Cart::with('options')
+            ->where('id', $id)
+            ->first();
 
-    public function delete($id)
-    {
-        Cart::where('id', $id)
-            ->where('cookie_id', $this->getCookieId())
-            ->delete();
+        if ($cart) {
+            $cart->update([
+                'quantity' => $quantity,
+            ]);
+            $cart->options()->attach( $option_val_id);
+        }
     }
 
     public function total()
     {
         $cartItems = Cart::where('cookie_id', $this->getCookieId())
-            ->with('category', 'options') 
-            ->get(); 
+            ->with('category', 'options')
+            ->get();
 
         $total = 0;
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Cart extends Model
 {
@@ -37,15 +38,12 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function options(){
+    public function options(): BelongsToMany{
         return $this->belongsToMany(
             OptionValue::class,
             'cart_option_values',
             'cart_id',
             'option_value_id',
-            'id',
-            'id'
-
         );
     }
 }
