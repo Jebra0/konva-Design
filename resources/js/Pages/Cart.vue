@@ -1,5 +1,6 @@
 <template>
-    <AppLayout :user="user">
+
+    <AppLayout :user="user" title="Cart">
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="mx-auto my-12" max-width="900" v-for="(item, id) in cart" :key="id">
@@ -66,7 +67,7 @@
                         <span>$ {{ this.cartTotal() + this.shippingEstimate }}</span>
                     </div>
                     <v-row justify="center" class="my-5">
-                        <v-btn color="primary">checkout</v-btn>
+                        <v-btn @click="getPage('checkout')" color="primary">checkout</v-btn>
                     </v-row>
                 </v-card>
             </v-col>
@@ -144,6 +145,8 @@ export default {
                 case 'login':
                     window.location.href = '/login';
                     break;
+                case 'checkout':
+                    window.location.href = '/checkout';
             }
         },
         async deleteCartItem(cart) {

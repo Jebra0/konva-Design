@@ -1,26 +1,13 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Models\Design;
 use App\Models\TemplateCategory;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-// Route::get('/', function () {
-//     $texts = getTexts();
-
-//     $shapes = getShapes();
-
-//     $templates = getTemplates();
-
-//     return Inertia::render('design', [
-//         'textTemplates' => $texts,
-//         'shapeTemplates' => $shapes,
-//         'templates' => $templates,
-//     ]);
-// });
 
 Route::get('/', function () {
     
@@ -74,6 +61,9 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store']);
 Route::delete('/cart/delete/{cart}', [CartController::class, 'destroy']);
 Route::post('/cart/update', [CartController::class, 'update']);
+
+//checkout
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {

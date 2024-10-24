@@ -1,7 +1,7 @@
 <template>
 
     <Head>
-        <title>Cart</title>
+        <title>{{title}}</title>
     </Head>
     <v-app>
         <v-app-bar>
@@ -37,7 +37,10 @@
 
             <v-app-bar-title>Konva Design</v-app-bar-title>
 
+            <p class="" style="font-size: 20px; font-weight: bold;">{{ title }}</p>
+            
             <v-spacer></v-spacer>
+
 
             <template v-slot:append>
                 <v-btn-group @click="getPage('Design')" class="mx-2" color="blue-grey" density="comfortable"
@@ -148,6 +151,9 @@ export default {
             type: Object,
             required: true
         },
+        title: {
+            type: String
+        }
     },
 }
 </script>
