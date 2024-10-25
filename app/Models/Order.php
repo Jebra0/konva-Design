@@ -25,12 +25,31 @@ class Order extends Model
         'total',
     ];
 
-    public function user():BelongsTo
+    public static function booted()
+    {
+        static::creating(function (Order $order) {
+            $order->number = self::getNextOrderNum();
+        });
+    }
+
+    public static function getNextOrderNum(): int|string
+    {
+        $year = date('Y');
+        $number = Order::whereYear('created_at', $year)->max('number');
+        if ($number) {
+            return $number += 1;
+        } else {
+            return $year . '0001';
+        }
+    }
+
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function categories():BelongsToMany
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(
             TemplateCategory::class,
@@ -38,21 +57,21 @@ class Order extends Model
             'order_id',
             'category_id'
         )->using(OrderItem::class)
-        ->withPivot(['category_name', 'price', 'quantity']);
+            ->withPivot(['category_name', 'price', 'quantity']);
     }
 
-    public function addresses():HasMany
+    public function addresses(): HasMany
     {
         return $this->hasMany(OrderAddress::class);
     }
 
-    public function billing():HasOne
+    public function billing(): HasOne
     {
         return $this->hasOne(OrderAddress::class)
             ->where('type', 'billing');
     }
 
-    public function shipping():HasOne
+    public function shipping(): HasOne
     {
         return $this->hasOne(OrderAddress::class)
             ->where('type', 'shipping');

@@ -63,7 +63,13 @@ Route::delete('/cart/delete/{cart}', [CartController::class, 'destroy']);
 Route::post('/cart/update', [CartController::class, 'update']);
 
 //checkout
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->name('checkout.index')
+    ->middleware('auth');
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store')
+    ->middleware('auth');
+
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {
