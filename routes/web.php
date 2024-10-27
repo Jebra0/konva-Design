@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Models\Design;
 use App\Models\TemplateCategory;
+use App\Repositories\Cart\CartModelRepository;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -25,6 +26,9 @@ Route::get('/', function () {
 
     $user = Auth::user();
 
+    $repo = new CartModelRepository();
+    $cart = $repo->get();
+
     $my_designs='';
 
     if($user){
@@ -41,7 +45,8 @@ Route::get('/', function () {
         'templateImages' => $tmplateImages,
         'isAdmin' => $isAdmin,
         'user' => $user,
-        'my_designs'=> $my_designs 
+        'my_designs'=> $my_designs,
+        'items' => $cart->count(),
         
     ]);
 })->name('home');

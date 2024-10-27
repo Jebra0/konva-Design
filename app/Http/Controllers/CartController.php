@@ -9,6 +9,7 @@ use Auth;
 use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Log;
 
 class CartController extends Controller
 {
@@ -32,20 +33,23 @@ class CartController extends Controller
                 'category_id' => 'required|exists:templates_categories,id',
                 'quantity' => 'integer|required',
                 'data' => 'json|required',
-                'image' => 'required|image|mimes:png|max:2048'
+                'image' => 'required|image|mimes:png|max:2048',
             ]);
-
+            // 'file' => 'required|file|mimes:pdf|max:20480'
+  
             $cart = new CartModelRepository();
+  
             $cart->add(
                 $request->post('category_id'),
                 $request->post('data'),
                 $request->file('image'),
-                $request->post('quantity')
+                $request->post('quantity'),
+                'test'
             );
 
             return redirect()->route('cart.index');
         } catch (\Exception $e) {
-            // return $e->getMessage();
+            return $e->getMessage();
         }
 
     }

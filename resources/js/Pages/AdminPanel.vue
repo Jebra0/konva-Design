@@ -29,7 +29,8 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index">
+                            <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index"
+                                v-show="item.for === 'all' || (item.for === 'admin' && isAdmin) || (item.for === 'user' && !isAdmin)">
                                 <v-list-item-title @click="this.getPage(item.title)">{{ item.title
                                     }}</v-list-item-title>
                             </v-list-item>
@@ -37,7 +38,7 @@
                     </v-menu>
                 </div>
 
-                <v-dialog v-if="!this.editingTemp" max-width="500">
+                <v-dialog v-if="!this.editingTemp && !this.isAdmin" max-width="500">
                     <template v-slot:activator="{ props: activatorProps }">
                         <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
                             <v-btn v-bind="activatorProps" prepend-icon="mdi-printer-outline">
@@ -47,25 +48,34 @@
                     </template>
                     <template v-slot:default="{ isActive }">
                         <v-card title="Add to cart">
-                            <v-number-input :reverse="false" v-model="productQuantity" controlVariant="split" label="Quantity" :hideInput="false"
-                                :inset="false" :min="10" :max="1000"></v-number-input>
+                            <v-number-input :reverse="false" v-model="productQuantity" controlVariant="split"
+                                label="Quantity" :hideInput="false" :inset="false" :min="10"
+                                :max="1000"></v-number-input>
 
                             <v-select label="Category" required v-model="categoryId" :items="categories"
                                 item-title="name" item-value="id"></v-select>
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <p style="color: #607D8B; font-weight: bolder">pleas justify your design at the center</p>
+                                <p style="color: #607D8B; font-weight: bolder">pleas justify your design at the center
+                                </p>
                                 <v-spacer></v-spacer>
-                                <v-btn-group color="blue-grey" @click="addToCart(productQuantity, categoryId); isActive.value = false">
+                                <v-btn-group color="blue-grey"
+                                    @click="addToCart(productQuantity, categoryId); isActive.value = false">
                                     <v-btn text="Add to cart"></v-btn>
                                 </v-btn-group>
                             </v-card-actions>
                         </v-card>
                     </template>
                 </v-dialog>
+                <v-badge :content="items" color="red" v-if="!this.isAdmin && items > 0">
+                    <v-icon v-if="!this.isAdmin" @click="getPage('Cart')" class="ml-5 "
+                        color="blue-grey">mdi-cart</v-icon>
+                </v-badge>
+                <v-icon v-else v-if="!this.isAdmin" @click="getPage('Cart')" class="ml-5 "
+                    color="blue-grey">mdi-cart</v-icon>
+                <!-- <v-btn @click="saveAsPDF()">Export PDF</v-btn> -->
 
-                <v-icon @click="getPage('Cart')" class="mx-5 " color="blue-grey">mdi-cart</v-icon>
 
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
@@ -799,6 +809,12 @@ export default {
 
             }
         },
+        canDisplay(item) {
+            if (this.isAdmin && item.for === 'admin') {
+                return true;
+            }
+            return false;
+        },
     },
     computed: {
         reversedLayers() {
@@ -873,6 +889,9 @@ export default {
         my_designs: {
             type: Object,
             required: true
+        },
+        items: {
+            type: Number
         }
     }
 }

@@ -5,6 +5,7 @@ use App\Models\Cart;
 use App\Models\TemplateCategory;
 use Cookie;
 use Log;
+use Storage;
 use Str;
 
 class CartModelRepository implements CartRepository
@@ -14,10 +15,11 @@ class CartModelRepository implements CartRepository
         return Cart::with('category', 'options')->where('cookie_id', $this->getCookieId())->get();
     }
 
-    public function add($category_id, $data, $image, $quantity)
+    public function add($category_id, $data, $image, $quantity, $file)
     {
         try {
-            $path = $image->store('images/' . 'cart_Images', ['disk' => 'public_images']);
+            $img_path = $image->store('images/' . 'cart_Images', ['disk' => 'public_images']);
+            // $file_path = $file->store('printed_PDF_files', ['disk' => 'public_images']);
 
             return Cart::create([
                 'id' => Str::uuid(),
@@ -25,7 +27,8 @@ class CartModelRepository implements CartRepository
                 'user_id' => auth()->id(),
                 'category_id' => $category_id,
                 'quantity' => $quantity,
-                'image' => $path,
+                'image' => $img_path,
+                'file' => $file,
                 'data' => $data
             ]);
         } catch (\Exception $e) {

@@ -20,6 +20,7 @@ class Cart extends Model
         'quantity',
         'image',
         'data',
+        'file'
     ];
 
     protected function casts(): array

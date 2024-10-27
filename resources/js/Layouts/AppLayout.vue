@@ -1,7 +1,7 @@
 <template>
 
     <Head>
-        <title>{{title}}</title>
+        <title>{{ title }}</title>
     </Head>
     <v-app>
         <v-app-bar>
@@ -38,7 +38,7 @@
             <v-app-bar-title>Konva Design</v-app-bar-title>
 
             <p class="" style="font-size: 20px; font-weight: bold;">{{ title }}</p>
-            
+
             <v-spacer></v-spacer>
 
 
@@ -49,9 +49,10 @@
                         Back To Design
                     </v-btn>
                 </v-btn-group>
-
-                <v-icon @click="getPage('Cart')" color="blue-grey" style="cursor: pointer;"
-                    class="mr-3">mdi-cart</v-icon>
+                <v-badge :content="items" color="red" class="mr-5" v-if="items > 0">
+                    <v-icon  @click="getPage('Cart')" color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
+                </v-badge>
+                <v-icon v-else @click="getPage('Cart')" color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
             </template>
         </v-app-bar>
 
@@ -153,6 +154,9 @@ export default {
         },
         title: {
             type: String
+        },
+        items: {
+            type: Number
         }
     },
 }

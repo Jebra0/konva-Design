@@ -1,6 +1,8 @@
 import Konva from "konva";
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+
 // Import the snapping functions
 import {
     getLineGuideStops,
@@ -58,9 +60,10 @@ const allFunctions = {
             allTemplates: null,
             isPrintActive: false,
             acountNavItems: [
-                { title: 'Profile' },
-                { title: 'Cart' },
-                { title: 'Log out' },
+                { title: 'Profile', for: 'all' },
+                { title: 'Cart', for: 'user' },
+                { title: 'Dashboard', for: 'admin' },
+                { title: 'Log out', for: 'all' },
             ],
 
             designName: '',
@@ -276,6 +279,65 @@ const allFunctions = {
             newLayer.add(shape);
             newLayer.batchDraw();
         },
+        //return blop
+        saveAsPDF() {
+            return new Promise((resolve) => {
+                const pdf = new jsPDF('l', 'px', [this.stage.width(), this.stage.height()]);
+                pdf.setTextColor('#000000');
+
+                // Add text layers to PDF
+                this.stage.find('Text').forEach((text) => {
+                    const fontSize = text.fontSize() / 0.75;
+                    pdf.setFontSize(fontSize);
+                    pdf.text(text.text(), text.x(), text.y(), {
+                        baseline: 'top',
+                        angle: -text.getAbsoluteRotation(),
+                    });
+                });
+
+                // Add image layer
+                pdf.addImage(
+                    this.stage.toDataURL({ pixelRatio: 2 }),
+                    0,
+                    0,
+                    this.stage.width(),
+                    this.stage.height()
+                );
+
+                // Return the Blob
+                resolve(pdf.output('blob'));
+            });
+        },
+        // returning file
+        // saveAsPDF() {
+        //     // Ensure the stage is rendered before creating the PDF
+        //     if (!this.stage) return;
+
+        //     const pdf = new jsPDF('l', 'px', [this.stage.width(), this.stage.height()]);
+        //     pdf.setTextColor('#000000');
+
+        //     // Add all text elements individually
+        //     this.stage.find('Text').forEach((text) => {
+        //         const fontSize = text.fontSize() / 0.75; // convert pixels to points
+        //         pdf.setFontSize(fontSize);
+        //         pdf.text(text.text(), text.x(), text.y(), {
+        //             baseline: 'top',
+        //             angle: -text.getAbsoluteRotation(),
+        //         });
+        //     });
+
+        //     // Add the whole stage as an image on top
+        //     pdf.addImage(
+        //         this.stage.toDataURL({ pixelRatio: 2 }), // Adjust pixelRatio for quality
+        //         0,
+        //         0,
+        //         this.stage.width(),
+        //         this.stage.height()
+        //     );
+
+        //     pdf.save('design.pdf');
+        // },
+
         //Default  //TrFunctionality
         download(uri, name) {
             let link = document.createElement('a');
@@ -1536,14 +1598,17 @@ const allFunctions = {
         async addToCart(quantity, category_id) {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
-
                 let blob = await this.createImage(dataURL);
+
+                // Get the PDF Blob from saveAsPDF
+                // let pdfBlob = await this.saveAsPDF();
 
                 let formData = new FormData();
                 formData.append('quantity', quantity);
                 formData.append('category_id', category_id);
                 formData.append('data', this.stage.toJSON());
                 formData.append('image', blob, `new.png`);
+                // formData.append('file', pdfBlob, `design.pdf`);
 
                 let res = await axios.post(`/cart`, formData, {
                     headers: {
@@ -1551,8 +1616,10 @@ const allFunctions = {
                     }
                 });
                 console.log(res);
-            } catch { }
-            
+            } catch(error) {
+                console.log(error)
+             }
+
         },
     }
 };

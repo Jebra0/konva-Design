@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Design;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\OrderItem;
@@ -26,7 +27,6 @@ class CheckoutController extends Controller
 
     public function store(Request $request, CartModelRepository $cart)
     {
-        //orders + order_items + order_items_option_values + order_addresses 
         $request->validate([
             'billing_address.first_name' => 'required|string|max:255',
             'billing_address.last_name' => 'required|string|max:255',
@@ -74,9 +74,14 @@ class CheckoutController extends Controller
                 if (!empty($item->options)) {
                     $order_item->options()->attach($item->options);
                 }
+
+                Design::create([
+                    'user_id' => Auth::user()->id,
+                    'name' => $item->category->name,
+                    'data' => $item->data,
+                    'image' => $item->image,
+                ]);
             }
-
-
 
             $order->addresses()->create($shipping_address);
             $order->addresses()->create($billing_address);
@@ -84,7 +89,7 @@ class CheckoutController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return $e->getMessage();
+            // return $e->getMessage();
         }
     }
 }

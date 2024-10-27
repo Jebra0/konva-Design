@@ -1,6 +1,6 @@
 <template>
 
-    <AppLayout :user="user" title="Cart">
+    <AppLayout :user="user" title="Cart" :items="cart.length">
         <v-row justify="center">
             <v-col cols="12">
                 <v-card class="mx-auto my-12" max-width="900" v-for="(item, id) in cart" :key="id">

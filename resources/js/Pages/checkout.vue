@@ -1,5 +1,5 @@
 <template>
-    <AppLayout :user="user" title="Checkout">
+    <AppLayout :user="user" title="Checkout" :items="cart.length">
         <v-row justify="center" class="my-5 mx-2">
             <v-col cols="10">
                 <v-card class="py-3">
@@ -100,9 +100,7 @@
                                     label="My delivery and mailing addresses are the same."></v-checkbox>
                             </v-col>
                         </v-row>
-                        <v-row>
-                            <p class="mx-5 mb-5" style="font-size: 20px;">Choos shipping method</p>
-                        </v-row>
+                       
                         <v-row justify="center">
                             <v-btn :disabled="!validStep1 || !validStep2" @click="makeOrder()"
                                 color="blue-grey" class="mb-5">save & Continue</v-btn>
@@ -267,12 +265,14 @@ export default {
             return item.quantity * (p + sumOptions);
         },
         async makeOrder(){
-            this.allDataDone = !this.allDataDone
             const res = await axios.post('/checkout', {
                 billing_address: this.personalData,
                 shipping_address: this.shippingData,
             });
-            console.log(res);
+            if (res.status === 200 || res.status === 201) {
+                this.allDataDone = !this.allDataDone
+            }
+            // console.log(res);
         }
     },
     props: {

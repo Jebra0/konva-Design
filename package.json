@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@mdi/font": "^7.4.47",
+        "jspdf": "^2.5.2",
         "konva": "^9.3.13",
         "uuid": "^10.0.0",
         "vue-konva": "^3.0.2",
