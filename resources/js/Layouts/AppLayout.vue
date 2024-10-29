@@ -88,11 +88,6 @@ export default {
     data() {
         return {
             selectedOptions: {},
-            acountNavItems: [
-                { title: 'Profile' },
-                { title: 'Cart' },
-                { title: 'Log out' },
-            ],
             icons: [
                 {
                     icon: 'mdi-facebook',
@@ -130,6 +125,9 @@ export default {
                     break;
                 case 'Design':
                     window.location.href = '/';
+                    break;
+                case 'Dashboard':
+                    window.location.href = '/admin/dashboard';
                     break;
 
             }

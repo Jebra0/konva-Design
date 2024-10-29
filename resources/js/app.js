@@ -18,9 +18,22 @@ import VueKonva from 'vue-konva';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+const light = {
+    dark: false,
+    colors: {
+        background: '#bebebe',
+    },
+}
+
 const vuetify = createVuetify({
     components,
     directives,
+    theme: {
+        light: 'light',
+        themes: {
+            light,
+        },
+    },
 })
 
 createInertiaApp({

@@ -806,6 +806,9 @@ export default {
                 case 'login':
                     window.location.href = '/login';
                     break;
+                case 'Dashboard':
+                    window.location.href = '/admin/dashboard';
+                    break;
 
             }
         },

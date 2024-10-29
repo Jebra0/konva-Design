@@ -49,7 +49,7 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function categories(): BelongsToMany
+    public function items(): BelongsToMany
     {
         return $this->belongsToMany(
             TemplateCategory::class,

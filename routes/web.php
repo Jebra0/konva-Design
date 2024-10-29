@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
@@ -37,7 +38,7 @@ Route::get('/', function () {
             ->get();
     }
 
-    return Inertia::render('AdminPanel', [
+    return Inertia::render('DesignPage', [
         'categories'=> $categories,
         'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
@@ -75,6 +76,16 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
     ->name('checkout.store')
     ->middleware('auth');
 
+// Admin Dashboard
+Route::group(['middleware' => "auth"], function(){
+    Route::group([
+        'prefix' => "admin",
+        'middleware' => "is_admin",
+        'as' => "admin."
+    ], function(){
+        Route::resource('/dashboard', DashboardController::class);
+    });
+});
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {
