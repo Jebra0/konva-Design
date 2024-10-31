@@ -61,8 +61,8 @@
         </v-row>
         <v-row justify="center">
             <v-col cols="12">
-                <v-card class="text-center">
-                    <v-card-title class="mb-0">Top silling products</v-card-title>
+                <v-card>
+                    <v-card-title class="mb-0 text-center">Top silling products</v-card-title>
                     <v-table fixed-header>
                         <thead>
                             <tr>

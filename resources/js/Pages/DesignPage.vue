@@ -252,6 +252,7 @@
                     </v-btn>
 
                 </div>
+                <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch>
             </template>
         </v-app-bar>
 
@@ -334,11 +335,11 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-navigation-drawer style="background-color: #ebebeb;" permanent>
+        <v-navigation-drawer style=" " permanent>
 
             <!-- my designs -->
             <v-row class="mx-2 my-2" v-if="selectedOption.myDesigns && this.user && !this.isAdmin"
-                style="background-color: #ebebeb;">
+                style=" ">
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in my_designs" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click="getSelectedTemplate(temp.id, 'myDesigns')" style="cursor: pointer">
@@ -352,7 +353,7 @@
                 </v-col>
             </v-row>
 
-            <v-row v-if="selectedOption.templates" style="background-color: #ebebeb;">
+            <v-row v-if="selectedOption.templates" style=" ">
                 <v-col cols="12">
                     <div class="input-with-button p-1">
                         <v-text-field v-model="templateName" label="search" hide-details
@@ -398,7 +399,7 @@
                 </v-col>
             </v-row>
 
-            <v-card v-if="selectedOption.text" style="background-color: #ebebeb;">
+            <v-card v-if="selectedOption.text" style=" ">
                 <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
                     style=" text-transform: none; font-size: 25px;">
                     <h1>Create header</h1>
@@ -425,7 +426,7 @@
                 </div>
             </v-card>
 
-            <v-card v-if="selectedOption.photos" style="background-color: #ebebeb;" elevation="1" outlined>
+            <v-card v-if="selectedOption.photos" style=" " elevation="1" outlined>
                 <v-row>
                     <v-col>
                         <div class="input-with-button p-1">
@@ -465,7 +466,7 @@
                 </div>
             </div>
 
-            <v-card v-if="selectedOption.upload" elevation="0" outlined style="background-color: #ebebeb;">
+            <v-card v-if="selectedOption.upload" elevation="0" outlined style=" ">
                 <div class="d-flex m-1">
                     <v-file-input label="file" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                         <template v-slot:selection="{ fileNames }">
@@ -508,7 +509,7 @@
                 </v-row>  -->
             </v-card>
 
-            <v-card v-if="selectedOption.addCategory && this.isAdmin" style="background-color: #ebebeb;" elevation="0"
+            <v-card v-if="selectedOption.addCategory && this.isAdmin" style=" " elevation="0"
                 class=" m-2">
                 <v-text-field v-model="categoryName" label="category name"></v-text-field>
                 <div class="d-flex justify-center mt-3">
@@ -617,7 +618,7 @@
         </transition>
 
         <v-main class="d-flex align-center justify-center"
-            style="min-height: 100vh; max-height: 100%; background-color: #ebebeb;">
+            style="min-height: 100vh; max-height: 100%; ">
             <div class="my-3" id="container"></div>
         </v-main>
     </v-app>
@@ -899,6 +900,20 @@ export default {
     }
 }
 </script>
+
+<script setup>
+import { ref } from 'vue'
+import { useTheme } from 'vuetify'
+
+const theme = useTheme()
+const isLightTheme = ref(!theme.global.current.value.dark)
+
+function toggleTheme() {
+    isLightTheme.value = !isLightTheme.value
+    theme.global.name.value = isLightTheme.value ? 'light' : 'dark';
+}
+</script>
+
 <style scoped>
 #container {
     background-color: white;

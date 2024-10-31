@@ -18,6 +18,7 @@
                         <!-- <v-icon class="mx-1" v-bind="props">mdi-bell</v-icon> -->
                     </template>
                     <v-list>
+                        for test
                         <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index">
                             <v-list-item-title @click="this.getPage(item.title)">{{ item.title
                                 }}</v-list-item-title>
@@ -25,12 +26,13 @@
                     </v-list>
                 </v-menu>
 
-                <v-btn-group @click="getPage('Design')" class="mx-2" color="blue-grey" density="comfortable"
+                <!-- <v-btn-group @click="getPage('Design')" class="mx-2" color="blue-grey" density="comfortable"
                     rounded="pill" divided>
                     <v-btn>
                         Design
                     </v-btn>
-                </v-btn-group>
+                </v-btn-group> -->
+                <Link href="/" class="design_btn">Design</Link>
                 <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch>
             </template>
 
@@ -50,19 +52,25 @@
                         </v-list-item>
                     </template>
                     <v-list>
-                        <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index">
-                            <v-list-item-title @click="this.getPage(item.title)">{{ item.title
-                                }}</v-list-item-title>
-                        </v-list-item>
+                        <Link class="nave_list" v-for="(item, index) in this.acountNavItems" :key="index"
+                            :href="item.link">
+                        <v-list-item>{{ item.title }}</v-list-item>
+                        </Link>
                     </v-list>
                 </v-menu>
             </div>
             <v-divider></v-divider>
-
             <v-list density="compact" nav>
-                <v-list-item v-for="item in navItems" :prepend-icon="item.icon" :title="item.title"
-                    :value="item.title" :active="title === item.title" @click="getPage(item.title)"></v-list-item>
+                <Link v-for="item in navItems" :href="item.link">
+                    <v-list-item :active="title === item.title">
+                        <template v-slot:prepend>
+                            <v-icon :icon="item.icon"></v-icon>
+                        </template>
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                </Link>
             </v-list>
+
         </v-navigation-drawer>
         <v-main :class="{ 'light-theme': isLightTheme }">
             <v-container fluid>
@@ -73,10 +81,10 @@
 </template>
 
 <script>
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 export default {
-    components: { Head },
+    components: { Head, Link },
     props: {
         title: { type: String },
         user: {
@@ -88,21 +96,24 @@ export default {
         return {
             drawer: true,
             acountNavItems: [
-                { title: 'Profile' },
-                { title: 'Dashboard' },
-                { title: 'Log out' },
+                { title: 'Profile', link: '/profile' },
+                { title: 'Dashboard', link: '/admin/dashboard' },
+                { title: 'Log out', link: '/logout' },
             ],
             navItems: [
                 {
                     title: 'Dashboard',
+                    link: '/admin/dashboard',
                     icon: 'mdi-view-dashboard',
                 },
                 {
                     title: 'Products',
+                    link: '/admin/dashboard/products',
                     icon: 'mdi-storefront',
                 },
                 {
                     title: 'Orders',
+                    link: '/admin/dashboard/orders',
                     icon: 'mdi-text-box-check',
                 },
             ],
@@ -153,5 +164,15 @@ function toggleTheme() {
 <style>
 .light-theme {
     background-color: #bebebe;
+}
+.design_btn{
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    width: 100px;
+    color: white;
+    background-color: #607D8B;
+    border-radius: 20px;
+    text-align: center;
 }
 </style>
