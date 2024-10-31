@@ -19,6 +19,7 @@ class DashboardController extends Controller
             'user' => Auth()->user(),
             'total_orders' => Order::total_orders(),
             'total_revenue' => Order::total_revenue(),
+            'AOV' => Order::AOV(),
             'top_products' => TemplateCategory::top_products(),
         ]);
     }

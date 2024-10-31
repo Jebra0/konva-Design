@@ -89,4 +89,14 @@ class Order extends Model
             ->sum('total');
     }
 
+    /*
+        the Average Order Value = total_revenue / total_orders        
+    */
+    public static function AOV() : float
+    {
+        $revenue = self::total_revenue();
+        $orders = self::total_orders();
+        return $revenue / $orders;
+    }
+
 }
