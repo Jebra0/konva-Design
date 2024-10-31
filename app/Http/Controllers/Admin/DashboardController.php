@@ -24,55 +24,15 @@ class DashboardController extends Controller
             'pending_orders' => Order::pending_orders(),
             'cancelled_orders' => Order::cancelled_orders(),
             'refunded_orders' => Order::refunded_orders(),
+            //'abandoned_carts'
             'top_products' => TemplateCategory::top_products(),
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function products()
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return inertia()->render('Admin/Products', [
+            'user' => Auth()->user(),
+        ]);
     }
 }

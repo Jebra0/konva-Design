@@ -79,11 +79,14 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
 // Admin Dashboard
 Route::group(['middleware' => "auth"], function(){
     Route::group([
-        'prefix' => "admin",
+        'prefix' => "admin/dashboard",
         'middleware' => "is_admin",
         'as' => "admin."
     ], function(){
-        Route::resource('/dashboard', DashboardController::class);
+        Route::get('/', [DashboardController::class, 'index'])
+            ->name('index');
+        Route::get('/products', [DashboardController::class, 'products'])
+            ->name('products');
     });
 });
 ////////// //////// ////////// ///////// //////// //////////

@@ -61,7 +61,7 @@
 
             <v-list density="compact" nav>
                 <v-list-item v-for="item in navItems" :prepend-icon="item.icon" :title="item.title"
-                    :value="item.title" :active="title === item.title"></v-list-item>
+                    :value="item.title" :active="title === item.title" @click="getPage(item.title)"></v-list-item>
             </v-list>
         </v-navigation-drawer>
         <v-main :class="{ 'light-theme': isLightTheme }">
@@ -123,6 +123,12 @@ export default {
                     break;
                 case 'Dashboard':
                     window.location.href = '/admin/dashboard';
+                    break;
+                case 'Products':
+                    window.location.href = '/admin/dashboard/products';
+                    break;
+                case 'Orders':
+                    window.location.href = '/admin/dashboard/orders';
                     break;
 
             }
