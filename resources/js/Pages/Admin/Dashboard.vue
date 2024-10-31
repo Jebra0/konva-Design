@@ -6,12 +6,12 @@
                     <v-card-title style="font-size: 30px;">Dashboard</v-card-title>
                 </v-card>
             </v-col>
-        </v-row>
-        <v-row>
+        </v-row> 
+        <v-row> 
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Total Orders</v-card-title>
-                    <v-card-text>1500</v-card-text>
+                    <v-card-text>{{total_orders}}</v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="3" class="text-center">
@@ -110,6 +110,7 @@ export default {
             type: Object,
             required: true
         },
+        total_orders: {type: Number},
     },
     data: () => {
         return {

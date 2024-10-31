@@ -42,9 +42,9 @@ class TemplateCategory extends Model
             ->withPivot(['category_name', 'category_price', 'quantity']);
     }
 
-    public function top_products()
+    public static function top_products()
     {
-        return TemplateCategory::withCount('orders')
+        return self::withCount('orders')
             ->orderBy('orders_count', 'desc')
             ->limit(20)
             ->get();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TemplateCategory;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,11 +15,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $products = new TemplateCategory();
-        
         return inertia()->render('Admin/Dashboard', [
             'user' => Auth()->user(),
-            'top_products' => $products->top_products(),
+            'total_orders' => Order::total_orders(),
+            'top_products' => TemplateCategory::top_products(),
         ]);
     }
 

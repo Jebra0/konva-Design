@@ -77,4 +77,9 @@ class Order extends Model
             ->where('type', 'shipping');
     }
 
+    public static function total_orders() :int
+    {
+        return self::count();
+    }
+
 }
