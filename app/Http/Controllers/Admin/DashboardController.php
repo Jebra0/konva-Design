@@ -31,8 +31,16 @@ class DashboardController extends Controller
 
     public function products()
     {
+        $products = TemplateCategory::orderBy('id', 'desc')->paginate(5);
         return inertia()->render('Admin/Products', [
             'user' => Auth()->user(),
+            'products' => $products,
         ]);
+    }
+
+    public function getProductsData()
+    {
+        $products = TemplateCategory::orderBy('id', 'desc')->paginate(5);
+        return response()->json($products);
     }
 }

@@ -85,8 +85,12 @@ Route::group(['middleware' => "auth"], function(){
     ], function(){
         Route::get('/', [DashboardController::class, 'index'])
             ->name('index');
+        
         Route::get('/products', [DashboardController::class, 'products'])
             ->name('products');
+
+        Route::get('/products/data', [DashboardController::class, 'getProductsData'])
+            ->name('products.data');
     });
 });
 ////////// //////// ////////// ///////// //////// //////////
