@@ -99,4 +99,28 @@ class Order extends Model
         return $revenue / $orders;
     }
 
+    public static function completed_orders() :int
+    {
+        return self::where('status', 'completed')
+            ->where('payment_status', 'paid')
+            ->count();
+    }
+
+    public static function pending_orders() :int
+    {
+        return self::where('status', 'pending')
+            ->count();
+    }
+
+    public static function cancelled_orders() :int
+    {
+        return self::where('status', 'cancelled')
+            ->count();
+    }
+
+    public static function refunded_orders() :int
+    {
+        return self::where('status', 'refunded')
+            ->count();
+    }
 }

@@ -29,7 +29,7 @@
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Completed Orders</v-card-title>
-                    <v-card-text> 1500</v-card-text>
+                    <v-card-text> {{completed_orders}}</v-card-text>
                 </v-card>
             </v-col>
         </v-row>
@@ -37,13 +37,13 @@
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Pending Orders</v-card-title>
-                    <v-card-text>1500</v-card-text>
+                    <v-card-text>{{pending_orders}}</v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Cancelled Orders</v-card-title>
-                    <v-card-text>$ 1500</v-card-text>
+                    <v-card-text>{{cancelled_orders}}</v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="3" class="text-center">
@@ -54,8 +54,8 @@
             </v-col>
             <v-col cols="3" class="text-center">
                 <v-card class="">
-                    <v-card-title>Recovered Carts</v-card-title>
-                    <v-card-text>$ 1500</v-card-text>
+                    <v-card-title>Refunded Orders</v-card-title>
+                    <v-card-text>{{refunded_orders}}</v-card-text>
                 </v-card>
             </v-col>
         </v-row>
@@ -113,6 +113,10 @@ export default {
         total_orders: {type: Number},
         total_revenue: {type: Number},
         AOV: {type: Number},
+        completed_orders: {type: Number},
+        pending_orders: {type: Number},
+        cancelled_orders: {type: Number},
+        refunded_orders: {type: Number},
     },
     data: () => {
         return {

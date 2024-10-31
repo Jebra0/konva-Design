@@ -20,6 +20,10 @@ class DashboardController extends Controller
             'total_orders' => Order::total_orders(),
             'total_revenue' => Order::total_revenue(),
             'AOV' => Order::AOV(),
+            'completed_orders' => Order::completed_orders(),
+            'pending_orders' => Order::pending_orders(),
+            'cancelled_orders' => Order::cancelled_orders(),
+            'refunded_orders' => Order::refunded_orders(),
             'top_products' => TemplateCategory::top_products(),
         ]);
     }
