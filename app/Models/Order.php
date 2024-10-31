@@ -82,4 +82,11 @@ class Order extends Model
         return self::count();
     }
 
+    public static function total_revenue() : float
+    {
+        return self::where('status', 'completed')
+            ->where('payment_status', 'paid')
+            ->sum('total');
+    }
+
 }

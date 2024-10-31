@@ -18,6 +18,7 @@ class DashboardController extends Controller
         return inertia()->render('Admin/Dashboard', [
             'user' => Auth()->user(),
             'total_orders' => Order::total_orders(),
+            'total_revenue' => Order::total_revenue(),
             'top_products' => TemplateCategory::top_products(),
         ]);
     }

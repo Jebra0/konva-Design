@@ -17,7 +17,7 @@
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Total Revenue</v-card-title>
-                    <v-card-text>$ 1500</v-card-text>
+                    <v-card-text>$ {{total_revenue}}</v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="3" class="text-center">
@@ -111,6 +111,7 @@ export default {
             required: true
         },
         total_orders: {type: Number},
+        total_revenue: {type: Number},
     },
     data: () => {
         return {
