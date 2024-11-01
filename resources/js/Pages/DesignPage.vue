@@ -252,7 +252,7 @@
                     </v-btn>
 
                 </div>
-                <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch>
+                <!-- <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch> -->
             </template>
         </v-app-bar>
 
@@ -899,20 +899,20 @@ export default {
         }
     }
 }
-</script>
+// </script>
 
-<script setup>
-import { ref } from 'vue'
-import { useTheme } from 'vuetify'
+// <script setup>
+// import { ref } from 'vue'
+// import { useTheme } from 'vuetify'
 
-const theme = useTheme()
-const isLightTheme = ref(!theme.global.current.value.dark)
+// const theme = useTheme()
+// const isLightTheme = ref(!theme.global.current.value.dark)
 
-function toggleTheme() {
-    isLightTheme.value = !isLightTheme.value
-    theme.global.name.value = isLightTheme.value ? 'light' : 'dark';
-}
-</script>
+// function toggleTheme() {
+//     isLightTheme.value = !isLightTheme.value
+//     theme.global.name.value = isLightTheme.value ? 'light' : 'dark';
+// }
+// </script>
 
 <style scoped>
 #container {

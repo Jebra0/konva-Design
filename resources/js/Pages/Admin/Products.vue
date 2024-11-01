@@ -24,20 +24,23 @@
                         </tbody>
                     </v-table>  
                 </v-card>
-                <TailwindPagination align="center" limit="15" :data="products" @pagination-change-page="getResults"/>
+                <v-card class="mt-5">
+                    <v-pagination v-model="currentPage" :length="totalPages" class="" @input="getResults" ></v-pagination>
+                </v-card>
             </v-col>
         </v-row>
     </AdminLayout>
 </template>
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { TailwindPagination } from 'laravel-vue-pagination';
 
 export default {
-    components: {AdminLayout, TailwindPagination},
+    components: {AdminLayout},
     data(){
         return {
-            data: this.products,
+            data: { data: [] },
+            currentPage: 1,
+            totalPages: 1
         };
     },
     props:{
@@ -45,21 +48,30 @@ export default {
             type: Object,
             required: true
         },
-        products: {
-            type: Object,
-            required: true
-        },
+        
     },
     mounted(){
-        //console.log(products);
+        // console.log(products);
+        // console.log(data);
+        this.getResults();
     },
     methods: {
-        getResults(page) {
-            axios.get(`/admin/dashboard/products/data?page=${page}`).then(response => {
-                this.data = response.data; 
-            });
+        getResults() {
+            axios.get(`/admin/dashboard/products/data?page=${this.currentPage}`)
+                .then(response => {
+                    this.data = response.data; 
+                    this.totalPages = response.data.last_page;
+                })
+                .catch(error => {
+                    console.error("Error fetching products:", error);
+                });
         }
-    }
+    },
+    watch: {
+        currentPage() {
+          this.getResults(); 
+        }
+    },
 
 }
 </script>

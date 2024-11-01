@@ -25,13 +25,7 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-
-                <!-- <v-btn-group @click="getPage('Design')" class="mx-2" color="blue-grey" density="comfortable"
-                    rounded="pill" divided>
-                    <v-btn>
-                        Design
-                    </v-btn>
-                </v-btn-group> -->
+                
                 <Link href="/" class="design_btn">Design</Link>
                 <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch>
             </template>
