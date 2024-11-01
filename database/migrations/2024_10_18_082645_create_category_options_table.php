@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('category_options', function (Blueprint $table) {
             $table->foreignId('category_id')
-                ->constrained('templates_categories');
+                ->constrained('templates_categories')
+                ->cascadeOnDelete();
 
             $table->foreignId('option_id')
-                ->constrained('options');
+                ->constrained('options')
+                ->cascadeOnDelete();
             
             $table->unique(['category_id', 'option_id']);
         });

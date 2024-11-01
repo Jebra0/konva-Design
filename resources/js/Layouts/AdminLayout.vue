@@ -46,8 +46,8 @@
                         </v-list-item>
                     </template>
                     <v-list>
-                        <Link class="nave_list" v-for="(item, index) in this.acountNavItems" :key="index"
-                            :href="item.link">
+                        <Link class="nave_list" v-for="(item, index) in acountNavItems" :key="index"
+                            :href="route(item.link)">
                         <v-list-item>{{ item.title }}</v-list-item>
                         </Link>
                     </v-list>
@@ -55,7 +55,7 @@
             </div>
             <v-divider></v-divider>
             <v-list density="compact" nav>
-                <Link v-for="item in navItems" :href="item.link">
+                <Link v-for="item in navItems" :href="route(item.link)">
                     <v-list-item :active="title === item.title">
                         <template v-slot:prepend>
                             <v-icon :icon="item.icon"></v-icon>
@@ -90,26 +90,26 @@ export default {
         return {
             drawer: true,
             acountNavItems: [
-                { title: 'Profile', link: '/profile' },
-                { title: 'Dashboard', link: '/admin/dashboard' },
-                { title: 'Log out', link: '/logout' },
+                { title: 'Profile', link: 'profile.edit' },
+                { title: 'Dashboard', link: 'admin.index' },
+                { title: 'Log out', link: 'logout' },
             ],
             navItems: [
                 {
                     title: 'Dashboard',
-                    link: '/admin/dashboard',
+                    link: 'admin.index',
                     icon: 'mdi-view-dashboard',
                 },
                 {
                     title: 'Products',
-                    link: '/admin/dashboard/products',
+                    link: 'admin.product.index',
                     icon: 'mdi-storefront',
                 },
-                {
-                    title: 'Orders',
-                    link: '/admin/dashboard/orders',
-                    icon: 'mdi-text-box-check',
-                },
+                // {
+                //     title: 'Orders',
+                //     link: 'admin.order.index',
+                //     icon: 'mdi-text-box-check',
+                // },
             ],
         }
     },

@@ -1,6 +1,7 @@
 <?php
  
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
@@ -51,6 +52,7 @@ Route::get('/', function () {
         
     ]);
 })->name('home');
+
 // tempaltes
 Route::get('/template/{id}/{type}', [TemplateController::class, 'index']);
 Route::post('/template/edit/{id}', [TemplateController::class, 'edit']);
@@ -58,9 +60,6 @@ Route::delete('/template/delete/{id}/{type}', [TemplateController::class, 'destr
 Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
 Route::post('/template/add', [TemplateController::class, 'store']);
 Route::post('/template/search', [TemplateController::class, 'search']);
-// category
-Route::post('/category/add', [TemplateController::class,'addCategory']);
-Route::delete('/category/{templateCategory}', [TemplateController::class,'deleteCategory']);
 
 // cart 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -86,11 +85,9 @@ Route::group(['middleware' => "auth"], function(){
         Route::get('/', [DashboardController::class, 'index'])
             ->name('index');
         
-        Route::get('/products', [DashboardController::class, 'products'])
-            ->name('products');
+        Route::resource('/product', CategoryController::class);
 
-        Route::get('/products/data', [DashboardController::class, 'getProductsData'])
-            ->name('products.data');
+        Route::get('/api/products', [CategoryController::class, 'getProducts']);  
     });
 });
 ////////// //////// ////////// ///////// //////// //////////

@@ -45,6 +45,7 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(vuetify)
             .use(VueKonva)
+            .mixin({ methods: { route } })
             .mount(el);
     },
     progress: {

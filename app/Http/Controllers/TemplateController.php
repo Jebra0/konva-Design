@@ -95,53 +95,6 @@ class TemplateController extends Controller
         return response()->json(['paths' => $paths]);
     }
 
-    // public function addFont(Request $request)
-    // {
-    //     $file = $request->file('font');
-    //     $name = $request->name;
-
-    //     $path = '';
-
-    //     try {
-    //         $originalName = $file->getClientOriginalName();
-
-    //         $path = $file->storeAs('fonts/', $originalName, ['disk' => 'public_fonts']);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Error uploading file: ' . $e->getMessage()], 500);
-    //     }
-    //     // to add the font src to the fonts.css
-    //     loadFonts();
-    //     $fontImage = pngFont($name, $path);
-
-    //     //add to DB
-    //     Font::create([
-    //         'name'=> $name,
-    //         'font_file' => $path,
-    //         'font_image' => $fontImage,
-    //     ]);
-
-    //     return response()->json(['paths' => $path]);
-    // }
-
-
-    public function addCategory(Request $request)
-    {
-        $category = new TemplateCategory();
-        $category->name = $request->name;
-        $category->save();
-
-        return $category;
-    }
-
-    public function deleteCategory(TemplateCategory $templateCategory)
-    {
-        $templateCategory->delete();
-
-        return response()
-            ->json(['message' => 'Category deleted successfully'], 200);
-    }
-
     public function edit(Request $request, $id)
     {
 
