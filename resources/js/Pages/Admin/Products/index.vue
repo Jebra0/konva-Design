@@ -6,7 +6,7 @@
                     <input 
                         type="text" 
                         v-model="search_data" 
-                        class="searchInput" 
+                        class="textInput" 
                         placeholder="search"
                     >
                     <!-- <div v-if="searchForm.errors.data">{{ searchForm.errors.data }}</div> -->
@@ -76,9 +76,6 @@ export default {
             totalPages: 1,
             //search
             search_data: '',
-            // searchForm: useForm({
-            //     data: '',
-            // }),
 
             loading: false,
 
@@ -157,7 +154,7 @@ export default {
 }
 </script>
 <style>
-.searchInput{
+.textInput{
     width: 90%;
     margin: 12px;
 }
