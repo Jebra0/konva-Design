@@ -27,11 +27,10 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return inertia()->render('Admin/Products/Edit', [
-
+        return inertia()->render('Admin/Products/Create', [
+            'user' => Auth()->user(),
         ]);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -51,10 +50,11 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(TemplateCategory $product)
     {
         return inertia()->render('Admin/Products/Edit', [
-
+            'user' => Auth()->user(),
+            'product' => $product,
         ]);
     }
 
@@ -85,5 +85,19 @@ class CategoryController extends Controller
     {
         $products = TemplateCategory::orderBy('id', 'desc')->paginate(5);
         return response()->json($products);  
+    }
+
+    /*
+        search for produc
+    */
+    public function search(Request $request){
+        $request->validate([
+            'data' => 'required|string|max:250'
+        ]);
+
+        $products = TemplateCategory::where('name', 'like', '%'.$request->post('data').'%')
+            ->paginate(5);
+
+        return response()->json($products);
     }
 }

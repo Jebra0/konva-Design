@@ -56,7 +56,7 @@
             <v-divider></v-divider>
             <v-list density="compact" nav>
                 <Link v-for="item in navItems" :href="route(item.link)">
-                    <v-list-item :active="title === item.title">
+                    <v-list-item :active="title.split(' ').pop() === item.title">
                         <template v-slot:prepend>
                             <v-icon :icon="item.icon"></v-icon>
                         </template>
@@ -68,6 +68,13 @@
         </v-navigation-drawer>
         <v-main :class="{ 'light-theme': isLightTheme }">
             <v-container fluid>
+                <v-row>
+                    <v-col cols="12">
+                        <v-card class="">
+                            <v-card-title style="font-size: 30px;">{{title}}</v-card-title>
+                        </v-card>
+                    </v-col>
+                </v-row> 
                 <slot />
             </v-container>
         </v-main>

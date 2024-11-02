@@ -1,28 +1,26 @@
 <template>
     <AdminLayout title="Products" :user="user">
-        <v-row class="d-flex align-center">
-            <v-col cols="9" class="px-0">
-                <v-card-text>
-                  <v-text-field 
-                    :loading="loading"
-                    append-inner-icon="mdi-magnify"
-                    density="compact"
-                    label="Search"
-                    variant="solo"
-                    hide-details
-                    single-line
-                    @click:append-inner="onClick"
-                  ></v-text-field>
-                </v-card-text>
+        <v-row class="d-flex align-center my-0">
+            <v-col cols="9" class="px-0 py-1">
+                <form @submit.prevent="searchProduct">
+                    <input 
+                        type="text" 
+                        v-model="search_data" 
+                        class="searchInput" 
+                        placeholder="search"
+                    >
+                    <!-- <div v-if="searchForm.errors.data">{{ searchForm.errors.data }}</div> -->
+                    <button type="submit" class="searchBTN"><v-icon>mdi-magnify</v-icon></button>
+                </form>
             </v-col>
             <v-col cols="3" class="d-flex justify-end" >
-                <v-btn width="100%">
-                    <Link :href="route('admin.product.create')">Add New Product</Link>
+                <v-btn width="100%" class="createProductBTN">
+                    <Link :href="route('admin.product.create')" class="mb-2">Add New Product</Link>
                 </v-btn>
             </v-col>    
         </v-row>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="12" class="pt-0">
                 <v-card>
                     <v-table fixed-header>
                         <thead>
@@ -58,7 +56,7 @@
                     </v-table>  
                 </v-card>
                 <v-card class="mt-5">
-                    <v-pagination v-model="currentPage" :length="products.last_page" class="" @input="fetchProducts" ></v-pagination>
+                    <v-pagination v-model="currentPage" :length="totalPages" @input="fetchProducts" ></v-pagination>
                 </v-card>
             </v-col>
         </v-row>
@@ -77,9 +75,14 @@ export default {
             currentPage: 1,
             totalPages: 1,
             //search
-            loaded: false,
+            search_data: '',
+            // searchForm: useForm({
+            //     data: '',
+            // }),
+
             loading: false,
-            form: useForm({
+
+            deleteForm: useForm({
                 id: null
             })
         };
@@ -112,17 +115,9 @@ export default {
                     this.loading = false;
                 });
         },  
-        onClick () {
-            this.loading = true
-
-            setTimeout(() => {
-              this.loading = false
-              this.loaded = true
-            }, 2000)
-        },
         deleteProduct(id) {
             if (confirm('Are you sure?')) {
-                this.form.delete(route('admin.product.destroy', id), {
+                this.deleteForm.delete(route('admin.product.destroy', id), {
                     preserveScroll: true,
                     onSuccess: () => {
                         this.fetchProducts();
@@ -132,14 +127,53 @@ export default {
                     }
                 });
             }
+        },
+        searchProduct() {
+            this.loading = true;
+            this.currentPage = 1; 
+            axios.post(route('admin.product.search'), { data: this.search_data })
+                .then(response => {
+                    console.log(response.data.last_page)
+                    this.data = response.data; 
+                    this.totalPages = response.data.last_page;
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.error("No data found:", error);
+                    this.loading = false;
+                });
         }
-
     },
     watch: {
         currentPage() {
-          this.fetchProducts(); 
-        }
+          if (this.search_data) {
+              this.searchProduct(); 
+          } else {
+              this.fetchProducts();
+          }
+        },
     },
 
 }
 </script>
+<style>
+.searchInput{
+    width: 90%;
+    margin: 12px;
+}
+.searchBTN{
+    background-color: white;
+    padding: 7px;
+    padding-top: 9px;
+    margin-left: -13px;
+    border-left: 1px solid #3333;
+}
+.searchBTN:hover{
+    background-color: #3333;
+    color: white
+}
+.createProductBTN{
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+</style>

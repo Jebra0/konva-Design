@@ -1,12 +1,5 @@
 <template>
     <AdminLayout title="Dashboard" :user="user">
-        <v-row>
-            <v-col cols="12">
-                <v-card class="">
-                    <v-card-title style="font-size: 30px;">Dashboard</v-card-title>
-                </v-card>
-            </v-col>
-        </v-row> 
         <v-row> 
             <v-col cols="3" class="text-center">
                 <v-card class="">

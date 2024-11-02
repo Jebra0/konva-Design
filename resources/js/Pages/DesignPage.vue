@@ -80,17 +80,6 @@
                 <input v-if="SelectedObjectType === 'Shape'" class="ml-2" type="color" style="width: 40px; height: 40px"
                     v-model="selectedFillColor" @input="fillColor(selectedFillColor)" />
 
-                <!-- <v-btn :disabled="undoDisable" icon="mdi-undo" @click="unDo"></v-btn>
-                <v-btn :disabled="redoDisable" icon="mdi-redo" @click="reDo"></v-btn> -->
-
-                <!-- crop image -->
-                <!-- <div v-if="SelectedObjectType === 'Image' && objectSelected.length === 1">
-                    <v-btn @click=" addClip = !addClip; addClippingTool()">
-                        <v-icon icon="mdi-crop"></v-icon>
-                    </v-btn>
-                    <v-btn v-if="this.addClip" @click=" applyClipping(); addClip = !addClip;">crop</v-btn>
-                </div> -->
-
             </template>
 
             <span class="ml-20">
@@ -233,12 +222,6 @@
                         <v-tooltip activator="parent" location="bottom">Save As json</v-tooltip>
                     </v-btn>
 
-                    <!-- duplicate -->
-                    <!-- <v-btn @click="duplicateObjects">
-                        <v-icon icon="mdi-content-copy"></v-icon>
-                        <v-tooltip activator="parent" location="bottom">Duplicate</v-tooltip>
-                    </v-btn> -->
-
                     <!-- delete -->
                     <v-btn @click="destroyObjects()">
                         <v-icon icon="mdi-delete"></v-icon>
@@ -252,7 +235,6 @@
                     </v-btn>
 
                 </div>
-                <!-- <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch> -->
             </template>
         </v-app-bar>
 
@@ -311,18 +293,6 @@
                     <span :style="{ color: selectedOption.active === 'upload' ? '#607D8B' : 'white' }"
                         class="list-title">Upload</span>
                 </v-list-item>
-
-                <!-- add category-->
-                <v-list-item v-if="this.isAdmin"
-                    :style="{ backgroundColor: selectedOption.active === 'addCategory' ? '#ebebeb' : '' }"
-                    @click="selectOption('addCategory')" class="custom-list-item">
-                    <v-icon :color="selectedOption.active === 'addCategory' ? '#607D8B' : 'white'"
-                        class="icon">mdi-format-list-bulleted-square</v-icon>
-                    <span :style="{ color: selectedOption.active === 'addCategory' ? '#607D8B' : 'white' }"
-                        class="list-title">Add
-                        Category</span>
-                </v-list-item>
-
 
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'layers' ? '#ebebeb' : '' }"
                     @click="selectOption('layers')" class="custom-list-item">
@@ -494,34 +464,6 @@
                         </v-img>
                     </v-col>
                 </v-row>
-                <!-- save image temporary -->
-                <!-- <v-row>
-                    <v-col v-for="(image, index) in imageUrls" :key="index" class="mx-2 d-flex child-flex" cols="5">
-                        <v-img @click=" addUploadedImage(image)" style="cursor: pointer;" :src="image"
-                            class="bg-grey-lighten-2" cover>
-                            <template v-slot:placeholder>
-                                <v-row align="center" class="fill-height ma-0" justify="center">
-                                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
-                                </v-row>
-                            </template>
-                        </v-img>
-                    </v-col>
-                </v-row>  -->
-            </v-card>
-
-            <v-card v-if="selectedOption.addCategory && this.isAdmin" style=" " elevation="0"
-                class=" m-2">
-                <v-text-field v-model="categoryName" label="category name"></v-text-field>
-                <div class="d-flex justify-center mt-3">
-                    <v-btn @click="addTemplateCategory(categoryName)" color="blue-grey">Add</v-btn>
-                </div>
-                <div>
-                    <div class="categoryItem" v-for="(category, id) in categories" :key="id">
-                        <p>{{ category.name }}</p>
-                        <v-icon @click="deleteCategory(category.id)" class="icon" color="red">mdi-delete</v-icon>
-                    </div>
-                </div>
-
             </v-card>
 
             <v-card v-if="selectedOption.layers" elevation="1">
@@ -709,7 +651,6 @@ export default {
                     this.selectedOption.elements = false;
                     this.selectedOption.upload = false;
                     this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'myDesigns';
                     break;
                 case 'templates':
@@ -720,7 +661,6 @@ export default {
                     this.selectedOption.elements = false;
                     this.selectedOption.upload = false;
                     this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'templates';
                     break;
                 case 'text':
@@ -731,7 +671,6 @@ export default {
                     this.selectedOption.elements = false;
                     this.selectedOption.upload = false;
                     this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'text';
                     break;
                 case 'photos':
@@ -742,7 +681,6 @@ export default {
                     this.selectedOption.elements = false;
                     this.selectedOption.upload = false;
                     this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'photos';
                     break;
                 case 'elements':
@@ -753,7 +691,6 @@ export default {
                     this.selectedOption.elements = true;
                     this.selectedOption.upload = false;
                     this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'elements';
                     break;
                 case 'upload':
@@ -764,7 +701,6 @@ export default {
                     this.selectedOption.elements = false;
                     this.selectedOption.upload = true;
                     this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'upload';
                     break;
                 case 'layers':
@@ -775,19 +711,7 @@ export default {
                     this.selectedOption.elements = false;
                     this.selectedOption.upload = false;
                     this.selectedOption.layers = true;
-                    this.selectedOption.addCategory = false;
                     this.selectedOption.active = 'layers';
-                    break;
-                case 'addCategory':
-                    this.selectedOption.myDesigns = false;
-                    this.selectedOption.templates = false;
-                    this.selectedOption.text = false;
-                    this.selectedOption.photos = false;
-                    this.selectedOption.elements = false;
-                    this.selectedOption.upload = false;
-                    this.selectedOption.layers = false;
-                    this.selectedOption.addCategory = true;
-                    this.selectedOption.active = 'addCategory';
                     break;
                 default:
             }
