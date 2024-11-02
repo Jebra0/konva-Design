@@ -53,13 +53,11 @@
                                     </v-row>
                                 </div>
 
-                                <!-- Button to add more option values -->
                                 <v-btn @click="addOptionValue(optionIndex)" class="mt-2">Add Option Value</v-btn>
                             </v-col>
                         </v-row>
                     </v-container>
 
-                    <!-- Centered Add Option button at the bottom of the card -->
                     <div class="text-center mt-4" v-if="optionIndex+1 === options.length">
                         <v-btn color="primary" @click="addOption">Add Option</v-btn>
                     </div>
@@ -93,9 +91,6 @@ export default {
         };
     },
     computed: {
-        formattedOptions() {
-            return JSON.stringify(this.options, null, 2); // Pretty print the JSON
-        },
     },
     methods: {
         addProduct() {
@@ -104,30 +99,28 @@ export default {
             })
                 .then(response => {
                     console.log(response);
-                    // Handle success, reset form, or redirect as needed
                 })
                 .catch(error => {
                     console.error(error);
-                    // Handle error if needed
                 });
         },
         addOption() {
             this.options.push({
                 opt_name: '',
                 opt_values: [['', '']]
-            }); // Add a new empty option with a default opt_values
+            });
         },
         addOptionValue(optionIndex) {
-            this.options[optionIndex].opt_values.push(['', '']); // Add a new empty value-price pair to the specified option
+            this.options[optionIndex].opt_values.push(['', '']); 
         },
         removeOption(optionIndex) {
             if (this.options.length > 1) {
-                this.options.splice(optionIndex, 1); // Remove the specified option
+                this.options.splice(optionIndex, 1); 
             }
         },
         removeOptionValue(optionIndex, valIndex) {
             if (this.options[optionIndex].opt_values.length > 1) {
-                this.options[optionIndex].opt_values.splice(valIndex, 1); // Remove the specified value from the option
+                this.options[optionIndex].opt_values.splice(valIndex, 1); 
             }
         },
     },
@@ -157,7 +150,6 @@ export default {
     text-transform: none;
 }
 
-/* Position the Remove Option button in the top right */
 .remove-btn {
     position: absolute;
     top: 8px;
