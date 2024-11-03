@@ -1,5 +1,11 @@
 <template>
     <AdminLayout title="Products" :user="user">
+        <v-alert class="my-3"  type="success" v-if="$page.props.flash.message">
+            {{ $page.props.flash.message }}
+        </v-alert>
+        <v-alert type="error" v-if="$page.props.flash.error">
+            {{ $page.props.flash.error }}
+        </v-alert>
         <v-row class="d-flex align-center my-3">
             <v-col cols="9" class="px-0 py-1">
                 <form @submit.prevent="searchProduct">
@@ -67,10 +73,9 @@
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, useForm } from '@inertiajs/vue3';
-import { Inertia } from "@inertiajs/inertia";
 
 export default {
-    components: { AdminLayout, Link },
+    components: { AdminLayout, Link, useForm },
     data() {
         return {
             data: {},
@@ -152,7 +157,6 @@ export default {
             }
         },
     },
-
 }
 </script>
 <style>

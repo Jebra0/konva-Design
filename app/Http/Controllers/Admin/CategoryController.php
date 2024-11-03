@@ -84,10 +84,12 @@ class CategoryController extends Controller
 
             DB::commit();
             
-            return response()->json(['message' => 'Product and options created successfully.'], 201);
+            return redirect()->route('admin.product.index')
+                ->with('message', 'Product and options created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            return redirect()->route('admin.product.index')
+                ->with('error', 'Try again, Some thing wrong.');
         }
     }
 
@@ -127,7 +129,8 @@ class CategoryController extends Controller
         if ($product) {
             $product->delete();
         }
-        return redirect()->route('admin.product.index');
+        return redirect()->route('admin.product.index')
+            ->with('message', 'Deleted successfully');
     }
 
     /*
