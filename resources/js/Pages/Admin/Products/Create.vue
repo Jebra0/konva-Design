@@ -30,7 +30,7 @@
 
                 <v-col cols="12" v-for="(item, optionIndex) in form.options" :key="optionIndex">
                     <v-card class="pa-4 mb-4 position-relative">
-                        <v-btn icon color="red" class="remove-btn" @click="removeOption(optionIndex)">
+                        <v-btn v-if="optionIndex > 0" icon color="red" class="remove-btn" @click="removeOption(optionIndex)">
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
 
@@ -55,20 +55,20 @@
                                                     type="number" outlined dense></v-text-field>
                                             </v-col>
                                             <v-col cols="2">
-                                                <v-btn color="red" @click="removeOptionValue(optionIndex, valIndex)">
+                                                <v-btn class="Vbtn" v-if="valIndex > 0" color="red" @click="removeOptionValue(optionIndex, valIndex)">
                                                     Remove
                                                 </v-btn>
                                             </v-col>
                                         </v-row>
                                     </div>
 
-                                    <v-btn @click="addOptionValue(optionIndex)" class="mt-2">Add Option Value</v-btn>
+                                    <v-btn @click="addOptionValue(optionIndex)" class="Vbtn mt-2">Add Option Value</v-btn>
                                 </v-col>
                             </v-row>
                         </v-container>
 
                         <div class="text-center mt-4" v-if="optionIndex + 1 === form.options.length">
-                            <v-btn color="primary" @click="addOption">Add Option</v-btn>
+                            <v-btn class="Vbtn" color="primary" @click="addOption">Add Option</v-btn>
                         </div>
                     </v-card>
                     <div v-if="errors.options" class="text-red-600">{{ errors.options }}</div>
@@ -76,7 +76,7 @@
             </v-row>
             <v-row>
                 <v-col cols="12" align="center">
-                    <v-btn type="submit" color="green">Create Product</v-btn>
+                    <v-btn :disabled="form.processing" type="submit" color="green">Create Product</v-btn>
                 </v-col>
             </v-row>
         </form>
@@ -95,8 +95,6 @@ export default {
         return {
 
         };
-    },
-    computed: {
     },
     methods: {
         addOption() {
@@ -165,10 +163,6 @@ export default {
     position: absolute;
     top: 8px;
     right: 8px;
-}
-input[type=text] {
-  color: black; 
-  background-color: rgb(0, 0, 0);
 }
 
 </style>

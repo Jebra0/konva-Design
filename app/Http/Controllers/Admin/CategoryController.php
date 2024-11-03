@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CategoryRequest;
 use App\Models\Option;
 use App\Models\OptionValue;
 use DB;
@@ -38,21 +39,8 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $request->validate([
-            'product_name' => 'required|string|max:250',
-            'product_price' => 'required|string',
-            'product_quantity' => 'required|integer',
-
-            'options' => 'required|array',
-            'options.*.opt_name' => 'required|string',
-            'options.*.opt_values' => 'required|array',
-            'options.*.opt_values.*' => 'array|size:2',
-            'options.*.opt_values.*.0' => 'required|string',
-            'options.*.opt_values.*.1' => 'required|string',
-        ]);
-
         try {
             DB::beginTransaction();
 
@@ -83,7 +71,7 @@ class CategoryController extends Controller
             $category->options()->attach($option_rows);
 
             DB::commit();
-            
+
             return redirect()->route('admin.product.index')
                 ->with('message', 'Product and options created successfully.');
         } catch (\Exception $e) {
@@ -104,8 +92,9 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(TemplateCategory $product)
+    public function edit(string $id)
     {
+        $product = TemplateCategory::with('options')->findOrFail($id);
         return inertia()->render('Admin/Products/Edit', [
             'user' => Auth()->user(),
             'product' => $product,
@@ -117,7 +106,96 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'product_name' => 'required|string|max:250',
+            'product_price' => 'required|integer',
+            'product_quantity' => 'required|integer',
+            'options' => 'required|array',
+            'options.*.opt_id' => 'nullable|exists:options,id',
+            'options.*.opt_values.*.value_id' => 'nullable|exists:option_values,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $category = TemplateCategory::findOrFail($id);
+
+            $category->fill([
+                'name' => $request->post('product_name'),
+                'price' => $request->post('product_price'),
+                'quantity' => $request->post('product_quantity'),
+            ]);
+
+            if ($category->isDirty()) {
+                $category->save();
+            }
+
+            $options = $request->post('options');
+            $option_rows = [];
+
+            foreach ($options as $option) {
+                if (isset($option['opt_id'])) {
+                    $opt = Option::with('values')->findOrFail($option['opt_id']);
+                    $opt->fill(['name' => $option['opt_name']]);
+
+                    if ($opt->isDirty()) {
+                        $opt->save();
+                    }
+
+                    $currentValueIds = $opt->values->pluck('id')->toArray();
+
+                    foreach ($option['opt_values'] as $value) {
+                        if (isset($value['value_id'])) {
+
+                            $val = OptionValue::findOrFail($value['value_id']);
+                            $val->fill([
+                                'option_id' => $opt->id,
+                                'value' => $value['value'],
+                                'price' => $value['price']
+                            ]);
+                            $val->save();
+
+                            $currentValueIds = array_diff($currentValueIds, [$val->id]);
+                        } else {
+                            OptionValue::create([
+                                'option_id' => $opt->id,
+                                'value' => $value['value'],
+                                'price' => $value['price']
+                            ]);
+                        }
+                    }
+
+                    foreach ($currentValueIds as $idToDelete) {
+                        OptionValue::destroy($idToDelete);
+                    }
+
+                    $option_rows[] = $opt->id;
+                } else {
+                    $opt = Option::create(['name' => $option['opt_name']]);
+
+                    foreach ($option['opt_values'] as $value) {
+                        OptionValue::create([
+                            'option_id' => $opt->id,
+                            'value' => $value['value'],
+                            'price' => $value['price']
+                        ]);
+                    }
+
+                    $option_rows[] = $opt->id;
+                }
+            }
+
+            $category->options()->sync($option_rows);
+
+            DB::commit();
+
+            return redirect()->route('admin.product.index')
+                ->with('message', 'Product and options updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.product.index')
+                ->with('error', 'Try again, something went wrong: ' . $e->getMessage());
+        }
     }
 
     /**
