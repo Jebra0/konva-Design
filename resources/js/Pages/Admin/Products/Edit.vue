@@ -1,99 +1,18 @@
 <template>
     <AdminLayout title="Edit Products" :user="user">
-        <form @submit.prevent="form.put(route('admin.product.update', product.id))">
-            <v-row>
-                <v-col cols="12">
-                    <v-card title="Product Info" class="pa-4">
-                        <v-container fluid>
-                            <v-row>
-                                <v-col cols="4">
-                                    <v-text-field label="Product Name" v-model="form.product_name" outlined dense
-                                        color="black" class="custom-input"></v-text-field>
-                                    <div v-if="errors.product_name" class="text-red-600">{{ errors.product_name }}</div>
-                                </v-col>
-                                <v-col cols="4">
-                                    <v-text-field label="Product Price" v-model="form.product_price" outlined
-                                        dense></v-text-field>
-                                    <div v-if="errors.product_price" class="text-red-600">{{ errors.product_price }}
-                                    </div>
-                                </v-col>
-                                <v-col cols="4">
-                                    <v-text-field label="Product Quantity" v-model="form.product_quantity" outlined
-                                        dense></v-text-field>
-                                    <div v-if="errors.product_quantity" class="text-red-600">{{ errors.product_quantity
-                                        }}
-                                    </div>
-                                </v-col>
-                            </v-row>
-                        </v-container>
-                    </v-card>
-                </v-col>
-
-                <v-col cols="12" v-for="(item, optionIndex) in form.options" :key="optionIndex">
-                    <v-card class="pa-4 mb-4 position-relative">
-                        <v-btn v-if="optionIndex + 1 === form.options.length" icon color="red" class="remove-btn"
-                            @click="removeOption(optionIndex)">
-                            <v-icon>mdi-close</v-icon>
-                        </v-btn>
-
-                        <v-card-title>Option [{{ optionIndex + 1 }}]</v-card-title>
-                        <v-container fluid>
-                            <v-row>
-                                <v-col cols="4">
-                                    <v-text-field label="Option Name" v-model="item.opt_name" outlined
-                                        dense></v-text-field>
-                                </v-col>
-
-                                <v-col cols="8">
-                                    <div v-for="(val, valIndex) in item.opt_values" :key="valIndex">
-                                        <v-row>
-                                            <v-col cols="5">
-                                                <v-text-field label="Option Value"
-                                                    v-model="item.opt_values[valIndex]['value']" outlined
-                                                    dense></v-text-field>
-                                            </v-col>
-                                            <v-col cols="5">
-                                                <v-text-field label="Value Price"
-                                                    v-model="item.opt_values[valIndex]['price']" type="number" outlined
-                                                    dense></v-text-field>
-                                            </v-col>
-                                            <v-col cols="2">
-                                                <v-btn class="Vbtn" v-if="item.opt_values.length !== 1" color="red"
-                                                    @click="removeOptionValue(optionIndex, valIndex)">
-                                                    Remove
-                                                </v-btn>
-                                            </v-col>
-                                        </v-row>
-                                    </div>
-
-                                    <v-btn @click="addOptionValue(optionIndex)" class="Vbtn mt-2">Add Option
-                                        Value</v-btn>
-                                </v-col>
-                            </v-row>
-                        </v-container>
-
-                        <div class="text-center mt-4" v-if="optionIndex + 1 === form.options.length">
-                            <v-btn class="Vbtn" color="primary" @click="addOption">Add Option</v-btn>
-                        </div>
-                    </v-card>
-                    <div v-if="errors.options" class="text-red-600">{{ errors.options }}</div>
-                </v-col>
-            </v-row>
-            <v-row>
-                <v-col cols="12" align="center">
-                    <v-btn :disabled="form.processing" type="submit" color="green">Create Product</v-btn>
-                </v-col>
-            </v-row>
-            <!-- <pre>{{ product }}</pre> -->
-        </form>
+    <form @submit.prevent="form.put(route('admin.product.update', product.id))">
+        <Form :form="form" :errors="errors" />
+    </form>
     </AdminLayout>
 </template>
 
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import Form from '@/Pages/Admin/Products/Partials/_form.vue'
+
 export default {
-    components: { AdminLayout, Link, useForm },
+    components: { AdminLayout, Link, useForm, Form },
     data() {
         return {
         };
@@ -151,27 +70,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.textInput {
-    padding: 10px;
-    border: 1px solid #3333335c;
-    display: flex;
-    width: 90%;
-    flex-direction: column;
-}
-
-.textInput:hover {
-    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.5);
-}
-
-.Vbtn {
-    text-transform: none;
-}
-
-.remove-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-}
-</style>

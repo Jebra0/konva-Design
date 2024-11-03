@@ -61,8 +61,8 @@ class CategoryController extends Controller
                 foreach ($option['opt_values'] as $value) {
                     OptionValue::create([
                         'option_id' => $opt->id,
-                        'value' => $value[0],
-                        'price' => $value[1]
+                        'value' => $value['value'],
+                        'price' => $value['price']
                     ]);
                 }
 

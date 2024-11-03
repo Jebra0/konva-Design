@@ -30,8 +30,8 @@ class CategoryRequest extends FormRequest
             'options.*.opt_name' => 'required|string',
             'options.*.opt_values' => 'required|array',
             'options.*.opt_values.*' => 'array|size:2',
-            'options.*.opt_values.*.0' => 'required|string',
-            'options.*.opt_values.*.1' => 'required|string',
+            'options.*.opt_values.*.value' => 'required|string',
+            'options.*.opt_values.*.price' => 'required|integer',
         ];
     }
 }
