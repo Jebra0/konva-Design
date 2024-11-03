@@ -12,7 +12,7 @@ class TemplateCategory extends Model
 
     protected $table = 'templates_categories';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'price', 'quantity'];
 
     public function templates()
     {
@@ -26,8 +26,6 @@ class TemplateCategory extends Model
             'category_options',
             'category_id',
             'option_id',
-            'id',
-            'id'
         )->with('values');
     }
 

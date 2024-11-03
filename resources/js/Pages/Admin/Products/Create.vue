@@ -6,14 +6,15 @@
                     <v-container fluid>
                         <v-row>
                             <v-col cols="4">
-                                <v-text-field label="Product Name" v-model="product.name" outlined dense></v-text-field>
+                                <v-text-field label="Product Name" v-model="product_name" outlined dense></v-text-field>
+                                <div v-if="errors.product_name" class="text-red-600">{{ errors.product_name }}</div>
                             </v-col>
                             <v-col cols="4">
-                                <v-text-field label="Product Price" v-model="product.price" outlined
+                                <v-text-field label="Product Price" v-model="product_price" outlined
                                     dense></v-text-field>
                             </v-col>
                             <v-col cols="4">
-                                <v-text-field label="Product Quantity" v-model="product.quantity" outlined
+                                <v-text-field label="Product Quantity" v-model="product_quantity" outlined
                                     dense></v-text-field>
                             </v-col>
                         </v-row>
@@ -58,10 +59,15 @@
                         </v-row>
                     </v-container>
 
-                    <div class="text-center mt-4" v-if="optionIndex+1 === options.length">
+                    <div class="text-center mt-4" v-if="optionIndex + 1 === options.length">
                         <v-btn color="primary" @click="addOption">Add Option</v-btn>
                     </div>
                 </v-card>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12" align="center">
+                <v-btn @click="addProduct" color="green">Create Product</v-btn>
             </v-col>
         </v-row>
     </AdminLayout>
@@ -69,19 +75,17 @@
 
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import { Inertia } from "@inertiajs/inertia";
 import axios from 'axios';
 
 export default {
-    components: { AdminLayout, Link },
+    components: { AdminLayout, Link, useForm },
     data() {
         return {
-            product: {
-                name: '',
-                price: '',
-                quantity: ''
-            },
+            product_name: '',
+            product_price: '',
+            product_quantity: '',
             options: [
                 {
                     opt_name: '',
@@ -95,6 +99,9 @@ export default {
     methods: {
         addProduct() {
             axios.post(route('admin.product.store'), {
+                product_name: this.product_name,
+                product_price: this.product_price,
+                product_quantity: this.product_quantity,
                 options: this.options,
             })
                 .then(response => {
@@ -111,16 +118,16 @@ export default {
             });
         },
         addOptionValue(optionIndex) {
-            this.options[optionIndex].opt_values.push(['', '']); 
+            this.options[optionIndex].opt_values.push(['', '']);
         },
         removeOption(optionIndex) {
             if (this.options.length > 1) {
-                this.options.splice(optionIndex, 1); 
+                this.options.splice(optionIndex, 1);
             }
         },
         removeOptionValue(optionIndex, valIndex) {
             if (this.options[optionIndex].opt_values.length > 1) {
-                this.options[optionIndex].opt_values.splice(valIndex, 1); 
+                this.options[optionIndex].opt_values.splice(valIndex, 1);
             }
         },
     },
@@ -129,6 +136,7 @@ export default {
             type: Object,
             required: true
         },
+        errors: {type: Object}, 
     },
 };
 </script>

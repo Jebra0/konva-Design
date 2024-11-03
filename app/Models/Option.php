@@ -9,18 +9,18 @@ class Option extends Model
 {
     use HasFactory;
 
-    public $incrementing = false;
+    //public $incrementing = false;
+
+    public $timestamps = false;
 
     protected $fillable = ['name'];
 
-    public function options(){
+    public function categories(){
         return $this->belongsToMany(
             TemplateCategory::class,
             'category_options',
             'option_id',
             'category_id',
-            'id',
-            'id'
         );
     }
 
