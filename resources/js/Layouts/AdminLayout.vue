@@ -25,7 +25,7 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                
+
                 <Link href="/" class="design_btn">Design</Link>
                 <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch>
             </template>
@@ -56,12 +56,12 @@
             <v-divider></v-divider>
             <v-list density="compact" nav>
                 <Link v-for="item in navItems" :href="route(item.link)">
-                    <v-list-item :active="title.split(' ').pop() === item.title">
-                        <template v-slot:prepend>
-                            <v-icon :icon="item.icon"></v-icon>
-                        </template>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item>
+                <v-list-item :active="title.split(' ').pop() === item.title">
+                    <template v-slot:prepend>
+                        <v-icon :icon="item.icon"></v-icon>
+                    </template>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item>
                 </Link>
             </v-list>
 
@@ -71,10 +71,16 @@
                 <v-row>
                     <v-col cols="12">
                         <v-card class="">
-                            <v-card-title style="font-size: 30px;">{{title}}</v-card-title>
+                            <v-card-title style="font-size: 30px;">{{ title }}</v-card-title>
                         </v-card>
+                        <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
+                            {{ $page.props.flash.message }}
+                        </v-alert>
+                        <v-alert type="error" v-if="$page.props.flash.error">
+                            {{ $page.props.flash.error }}
+                        </v-alert>
                     </v-col>
-                </v-row> 
+                </v-row>
                 <slot />
             </v-container>
         </v-main>
@@ -112,39 +118,15 @@ export default {
                     link: 'admin.product.index',
                     icon: 'mdi-storefront',
                 },
-                // {
-                //     title: 'Orders',
-                //     link: 'admin.order.index',
-                //     icon: 'mdi-text-box-check',
-                // },
+                {
+                    title: 'Orders',
+                    link: 'admin.orders.index',
+                    icon: 'mdi-text-box-check',
+                },
             ],
         }
     },
     methods: {
-        async getPage(name) {
-            switch (name) {
-                case 'Profile':
-                    window.location.href = '/profile';
-                    break;
-                case 'Log out':
-                    axios.post('/logout');
-                    window.location.reload();
-                    break;
-                case 'Design':
-                    window.location.href = '/';
-                    break;
-                case 'Dashboard':
-                    window.location.href = '/admin/dashboard';
-                    break;
-                case 'Products':
-                    window.location.href = '/admin/dashboard/products';
-                    break;
-                case 'Orders':
-                    window.location.href = '/admin/dashboard/orders';
-                    break;
-
-            }
-        },
     }
 }
 </script>
@@ -166,7 +148,8 @@ function toggleTheme() {
 .light-theme {
     background-color: #bebebe;
 }
-.design_btn{
+
+.design_btn {
     margin-left: 10px;
     margin-right: 10px;
     padding: 10px;

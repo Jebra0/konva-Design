@@ -1,11 +1,5 @@
 <template>
-    <AdminLayout title="Products" :user="user">
-        <v-alert class="my-3"  type="success" v-if="$page.props.flash.message">
-            {{ $page.props.flash.message }}
-        </v-alert>
-        <v-alert type="error" v-if="$page.props.flash.error">
-            {{ $page.props.flash.error }}
-        </v-alert>
+    <AdminLayout title="Products" :user="$page.props.auth.user">
         <v-row class="d-flex align-center my-3">
             <v-col cols="9" class="px-0 py-1">
                 <form @submit.prevent="searchProduct">
@@ -92,15 +86,10 @@ export default {
         };
     },
     props: {
-        user: {
-            type: Object,
-            required: true
-        },
         products: {
             type: Object,
             required: true
         },
-
     },
     mounted() {
         this.fetchProducts();
@@ -137,7 +126,6 @@ export default {
             this.currentPage = 1;
             axios.post(route('admin.product.search'), { data: this.search_data })
                 .then(response => {
-                    console.log(response.data.last_page)
                     this.data = response.data;
                     this.totalPages = response.data.last_page;
                     this.loading = false;

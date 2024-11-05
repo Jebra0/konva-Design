@@ -1,7 +1,8 @@
 <?php
- 
+
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    
+
     $categories = TemplateCategory::select('id', 'name')->get();
 
     $texts = getTexts();
@@ -31,25 +32,25 @@ Route::get('/', function () {
     $repo = new CartModelRepository();
     $cart = $repo->get();
 
-    $my_designs='';
+    $my_designs = '';
 
-    if($user){
+    if ($user) {
         $my_designs = $user->designs()
             ->orderBy('created_at', 'desc')
             ->get();
     }
 
     return Inertia::render('DesignPage', [
-        'categories'=> $categories,
+        'categories' => $categories,
         'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
         'templates' => $templates,
         'templateImages' => $tmplateImages,
         'isAdmin' => $isAdmin,
         'user' => $user,
-        'my_designs'=> $my_designs,
+        'my_designs' => $my_designs,
         'items' => $cart->count(),
-        
+
     ]);
 })->name('home');
 
@@ -76,19 +77,33 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
     ->middleware('auth');
 
 // Admin Dashboard
-Route::group(['middleware' => "auth"], function(){
+Route::group(['middleware' => "auth"], function () {
     Route::group([
         'prefix' => "admin/dashboard",
         'middleware' => "is_admin",
         'as' => "admin."
-    ], function(){
+    ], function () {
         Route::get('/', [DashboardController::class, 'index'])
             ->name('index');
-        
+
         Route::resource('/product', CategoryController::class);
-        Route::get('/api/products', [CategoryController::class, 'getProducts']);  
+        Route::get('/api/products', [CategoryController::class, 'getProducts']);
         Route::post('products/search', [CategoryController::class, 'search'])
             ->name('product.search');
+
+        Route::resource('/orders', OrderController::class);
+
+        Route::post('/order/status-update/{order}', [OrderController::class, 'statusUpdate'])
+            ->name('orders.status_update');
+
+        Route::post('/order/payment-status-update/{order}', [OrderController::class, 'paymentStatusUpdate'])
+            ->name('orders.payment_status_update');
+
+        Route::post('/orders', [OrderController::class, 'filter'])
+            ->name('orders.filter');
+
+        Route::get('/api/orders', [OrderController::class, 'getOrders']);
+
     });
 });
 ////////// //////// ////////// ///////// //////// //////////
