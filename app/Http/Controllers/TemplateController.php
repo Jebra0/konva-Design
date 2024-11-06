@@ -9,6 +9,7 @@ use App\Models\Text;
 use App\Models\Shape;
 use App\Models\Font;
 use App\Models\TemplateCategory;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use PhpParser\Node\Stmt\TryCatch;
@@ -36,9 +37,9 @@ class TemplateController extends Controller
     {
         $request->validate([
             "name" => "required|string",
-            "data" => "required|json",
-            "type" => "required",
-            "category_id" => "required_if:type,template",
+            "jsonData" => "required|json",
+            "type" => "required|in:text,shape,template,myDesigns",
+            "category_id" => "nullable|required_if:type,template|exists:templates_categories,id",
             "image" => "required|image|mimes:png|max:2048",
         ]);
 
@@ -57,20 +58,19 @@ class TemplateController extends Controller
         }
         if ($request->type == 'myDesigns') {
             $template = new Design();
-            $template->user_id = $request->user_id;
+            $template->user_id = auth()->user()->id;
             $folder = 'user_design_images';
         }
 
         $file = $request->file('image');
         $path = $file->store('images/' . $folder, ['disk' => 'public_images']);
-
         
         $template->name = $request->name;
-        $template->data = $request->data;
+        $template->data = $request->jsonData;
         $template->image = $path;
         $template->save();
 
-        return $template;
+        return redirect()->back()->with('message', 'Added Successfully.');
     }
 
     public function uploadTemplate(Request $request)

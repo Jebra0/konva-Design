@@ -10,12 +10,14 @@
 
             <template v-slot:prepend>
                 <!-- login button -->
-                <v-btn-group @click="getPage('login')" class="mx-2" v-if="this.user == null" color="green"
-                    density="comfortable" rounded="pill" divided>
+                <Link href="/login" class="mx-2" v-if="this.user == null">
+                <v-btn-group class="mx-2" v-if="this.user == null" color="green" density="comfortable" rounded="pill"
+                    divided>
                     <v-btn>
                         Login
                     </v-btn>
                 </v-btn-group>
+                </Link>
 
                 <div class="text-center" v-if="this.user">
                     <v-menu open-on-hover>
@@ -29,11 +31,16 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index"
+                            <Link class="nave_list" v-for="(item, index) in acountNavItems" :key="index"
+                                :href="route(item.link)"
                                 v-show="item.for === 'all' || (item.for === 'admin' && isAdmin) || (item.for === 'user' && !isAdmin)">
-                                <v-list-item-title @click="this.getPage(item.title)">{{ item.title
-                                    }}</v-list-item-title>
-                            </v-list-item>
+                            <v-list-item>{{ item.title }}</v-list-item>
+                            </Link>
+                            <form @submit.prevent="logoutForm.post(route('logout'))">
+                                <v-list-item>
+                                    <button type="submit">Log out</button>
+                                </v-list-item>
+                            </form>
                         </v-list>
                     </v-menu>
                 </div>
@@ -47,33 +54,47 @@
                         </v-btn-group>
                     </template>
                     <template v-slot:default="{ isActive }">
-                        <v-card title="Add to cart">
-                            <v-number-input :reverse="false" v-model="productQuantity" controlVariant="split"
-                                label="Quantity" :hideInput="false" :inset="false" :min="10"
-                                :max="1000"></v-number-input>
+                        <form>
+                            <v-card title="Add to cart">
+                                <v-number-input :reverse="false" v-model="printForm.quantity" controlVariant="split"
+                                    label="Quantity" :hideInput="false" :inset="false" :min="10"
+                                    :max="1000"></v-number-input>
+                                <div v-if="errors.quantity" class="text-red-600">{{ errors.quantity }}</div>
 
-                            <v-select label="Category" required v-model="categoryId" :items="categories"
-                                item-title="name" item-value="id"></v-select>
+                                <v-select label="Category" required v-model="printForm.category_id" :items="categories"
+                                    item-title="name" item-value="id"></v-select>
+                                <div v-if="errors.category_id" class="text-red-600">{{ errors.category_id }}</div>
 
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <p style="color: #607D8B; font-weight: bolder">pleas justify your design at the center
-                                </p>
-                                <v-spacer></v-spacer>
-                                <v-btn-group color="blue-grey"
-                                    @click="addToCart(productQuantity, categoryId); isActive.value = false">
-                                    <v-btn text="Add to cart"></v-btn>
-                                </v-btn-group>
-                            </v-card-actions>
-                        </v-card>
+                                <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
+                                    {{ $page.props.flash.message }}
+                                </v-alert>
+
+                                <v-card-actions>
+
+                                    <v-spacer></v-spacer>
+                                    <p style="color: #607D8B; font-weight: bolder">pleas justify your design at the
+                                        center
+                                    </p>
+                                    <v-spacer></v-spacer>
+                                    <v-btn-group color="blue-grey" :disable="printForm.processing" @click="addToCart">
+                                        <v-btn text="Add to cart"></v-btn>
+                                    </v-btn-group>
+                                    <v-btn @click="isActive.value = false">close</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </form>
+
                     </template>
                 </v-dialog>
+
                 <v-badge :content="items" color="red" v-if="!this.isAdmin && items > 0">
-                    <v-icon v-if="!this.isAdmin" @click="getPage('Cart')" class="ml-5 "
-                        color="blue-grey">mdi-cart</v-icon>
+                    <Link v-if="!this.isAdmin" :href="route('cart.index')">
+                    <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
+                    </Link>
                 </v-badge>
-                <v-icon v-else v-if="!this.isAdmin" @click="getPage('Cart')" class="ml-5 "
-                    color="blue-grey">mdi-cart</v-icon>
+                <Link :href="route('cart.index')" v-else v-if="!this.isAdmin">
+                <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
+                </Link>
                 <!-- <v-btn @click="saveAsPDF()">Export PDF</v-btn> -->
 
 
@@ -109,21 +130,25 @@
                     <template v-slot:default="{ isActive }">
                         <v-card title="Add to my designs">
 
-                            <v-text-field label="Template Name" required v-model="designName"></v-text-field>
+                            <v-text-field label="Template Name" required v-model="myDesignForm.name"></v-text-field>
+                            <div v-if="errors.name" class="text-red-600">{{ errors.name }}</div>
+
+                            <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
+                                {{ $page.props.flash.message }}
+                            </v-alert>
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-
-                                <v-btn-group color="blue-grey"
-                                    @click="saveAsTemplate(designName, 'myDesigns', 0, this.user.id); isActive.value = false">
+                                <v-btn-group color="blue-grey" @click="saveAsTemplate('myDesigns')">
                                     <v-btn text="Save"></v-btn>
                                 </v-btn-group>
+                                <v-btn @click="isActive.value = false">Cancel</v-btn>
                             </v-card-actions>
                         </v-card>
                     </template>
                 </v-dialog>
 
-                <div style="">
+                <div>
                     <!-- save as template -->
                     <v-dialog v-if="!this.editingTemp && this.isAdmin" max-width="500">
                         <template v-slot:activator="{ props: activatorProps }">
@@ -135,25 +160,33 @@
                         </template>
                         <template v-slot:default="{ isActive }">
                             <v-card title="Save as template">
-                                <v-text-field label="Template Name" required v-model="templateName"></v-text-field>
+                                <v-text-field label="Template Name" required
+                                    v-model="addTemplateForm.name"></v-text-field>
+                                <div v-if="errors.name" class="text-red-600">{{ errors.name }}</div>
 
-                                <v-radio-group label="Category" v-model="templateType1">
+                                <v-radio-group label="Category" v-model="addTemplateForm.type">
                                     <v-radio label="Text" value="text"></v-radio>
                                     <v-radio label="Shape" value="shape"></v-radio>
                                     <v-radio label="Template" value="template"></v-radio>
                                 </v-radio-group>
+                                <div v-if="errors.type" class="text-red-600">{{ errors.type }}</div>
 
-                                <v-select v-if="templateType1 === 'template'" label="Template Type" required
-                                    v-model="templateType2" :items="categories" item-title="name"
+                                <v-select v-if="addTemplateForm.type === 'template'" label="Template Type" required
+                                    v-model="addTemplateForm.category_id" :items="categories" item-title="name"
                                     item-value="id"></v-select>
+                                <div v-if="errors.category_id" class="text-red-600">{{ errors.category_id }}</div>
+
+                                <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
+                                    {{ $page.props.flash.message }}
+                                </v-alert>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
 
-                                    <v-btn-group color="blue-grey"
-                                        @click=" saveAsTemplate(templateName, templateType1, templateType2); isActive.value = false">
+                                    <v-btn-group color="blue-grey" @click="saveAsTemplate('any')">
                                         <v-btn text="Save"></v-btn>
                                     </v-btn-group>
+                                    <v-btn @click="isActive.value = false">cancel</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -308,8 +341,7 @@
         <v-navigation-drawer style=" " permanent>
 
             <!-- my designs -->
-            <v-row class="mx-2 my-2" v-if="selectedOption.myDesigns && this.user && !this.isAdmin"
-                style=" ">
+            <v-row class="mx-2 my-2" v-if="selectedOption.myDesigns && this.user && !this.isAdmin" style=" ">
                 <v-col cols="6" class="imgParent" v-for="(temp, id) in my_designs" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click="getSelectedTemplate(temp.id, 'myDesigns')" style="cursor: pointer">
@@ -559,8 +591,7 @@
             </v-app-bar>
         </transition>
 
-        <v-main class="d-flex align-center justify-center"
-            style="min-height: 100vh; max-height: 100%; ">
+        <v-main class="d-flex align-center justify-center" style="min-height: 100vh; max-height: 100%; ">
             <div class="my-3" id="container"></div>
         </v-main>
     </v-app>
@@ -568,14 +599,14 @@
 <script>
 import allFunctions from '@/Utils/allFunctions.js';
 import { rectConfig } from '../Utils/shapesConfig.js';
-import { headerText, subHeaderText, bodyText } from '../Utils/textConfig.js';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
+import { Inertia } from '@inertiajs/inertia';
 
 export default {
     mixins: [allFunctions],
-    components: { Head, VNumberInput },
+    components: { Head, VNumberInput, Link, useForm, Inertia },
     data() {
         return {
             selectedOption: {
@@ -633,6 +664,28 @@ export default {
             selectedFont: null,
 
             categoryName: '',
+
+            logoutForm: useForm({}),
+            printForm: useForm({
+                quantity: null,
+                category_id: null,
+                jsonData: null,
+                image: null,
+            }),
+            addTemplateForm: useForm({
+                name: null,
+                type: null,
+                category_id: null,
+                image: null,
+                jsonData: null,
+            }),
+            myDesignForm: useForm({
+                name: null,
+                type: "myDesigns",
+                category_id: null,
+                image: null,
+                jsonData: null,
+            })
         }
     },
     async mounted() {
@@ -786,6 +839,7 @@ export default {
         }
     },
     props: {
+        errors: { type: Object },
         textTemplates: {
             type: Object,
             required: true,
@@ -823,20 +877,7 @@ export default {
         }
     }
 }
-// </script>
-
-// <script setup>
-// import { ref } from 'vue'
-// import { useTheme } from 'vuetify'
-
-// const theme = useTheme()
-// const isLightTheme = ref(!theme.global.current.value.dark)
-
-// function toggleTheme() {
-//     isLightTheme.value = !isLightTheme.value
-//     theme.global.name.value = isLightTheme.value ? 'light' : 'dark';
-// }
-// </script>
+</script>
 
 <style scoped>
 #container {

@@ -34,6 +34,11 @@
                             :href="route(item.link)">
                         <v-list-item>{{ item.title }}</v-list-item>
                         </Link>
+                        <form @submit.prevent="logoutForm.post(route('logout'))">
+                            <v-list-item>
+                                <button type="submit">Log out</button>
+                            </v-list-item>
+                        </form>
                     </v-list>
                 </v-menu>
             </div>
@@ -72,7 +77,7 @@
 </template>
 
 <script>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
 export default {
     components: { Head, Link },
@@ -85,11 +90,11 @@ export default {
     },
     data: () => {
         return {
+            logoutForm: useForm({}),
             drawer: true,
             acountNavItems: [
                 { title: 'Profile', link: 'profile.edit' },
                 { title: 'Dashboard', link: 'admin.index' },
-                { title: 'Log out', link: 'logout' },
             ],
             navItems: [
                 {

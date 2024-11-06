@@ -51,7 +51,7 @@ Route::get('/', function () {
         'my_designs' => $my_designs,
         'items' => $cart->count(),
 
-    ]);
+    ])->with('message', 'testtetstett etettst');
 })->name('home');
 
 // tempaltes
@@ -60,19 +60,19 @@ Route::group([
     'as' => "template."
 ], function () {
     Route::get('/{id}/{type}', [TemplateController::class, 'getTemplate'])
-        ->name('getTemplate');
+        ->name('get');
 
     Route::post('/edit/{id}', [TemplateController::class, 'edit'])
-        ->name('editTemplate');
+        ->name('edit');
 
     Route::delete('/delete/{id}/{type}', [TemplateController::class, 'destroy'])
-        ->name('destroyTemplate');
+        ->name('delete');
 
     Route::post('/picture/add', [TemplateController::class, 'uploadTemplate'])
-        ->name('addTemplateImage');
+        ->name('addImage');
 
     Route::post('/add', [TemplateController::class, 'store'])
-        ->name('addTemplate');
+        ->name('add');
 
     Route::post('/search', [TemplateController::class, 'search'])
         ->name('search');
@@ -134,9 +134,6 @@ Route::group(['middleware' => "auth"], function () {
 
         Route::post('/orders', [OrderController::class, 'filter'])
             ->name('orders.filter');
-
-        Route::get('/api/orders', [OrderController::class, 'getOrders']);
-
     });
 });
 ////////// //////// ////////// ///////// //////// //////////

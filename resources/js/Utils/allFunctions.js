@@ -2,6 +2,7 @@ import Konva from "konva";
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import jsPDF from 'jspdf';
+import { useForm } from "@inertiajs/vue3";
 
 // Import the snapping functions
 import {
@@ -60,10 +61,9 @@ const allFunctions = {
             allTemplates: null,
             isPrintActive: false,
             acountNavItems: [
-                { title: 'Profile', for: 'all' },
-                { title: 'Cart', for: 'user' },
-                { title: 'Dashboard', for: 'admin' },
-                { title: 'Log out', for: 'all' },
+                { title: 'Profile', for: 'all', link: 'profile.edit' },
+                { title: 'Cart', for: 'user', link: 'cart.index' },
+                { title: 'Dashboard', for: 'admin', link: 'admin.index' },
             ],
 
             designName: '',
@@ -72,6 +72,7 @@ const allFunctions = {
             productQuantity: 1,
         }
     },
+    
     methods: {
         initializeKonva(template = null) {
             const container = document.getElementById('container');
@@ -1077,36 +1078,21 @@ const allFunctions = {
             });
         },
 
-        async saveAsTemplate(name, type, category_id, user = null) {
-            console.log(category_id)
+        async saveAsTemplate(type) {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
-
                 let blob = await this.resizeImage(dataURL, 700, 700);
-
-                let formData = new FormData();
-                formData.append('name', name);
-                formData.append('data', this.stage.toJSON());
-                formData.append('type', type);
-                formData.append('category_id', category_id);
-                if (user) {
-                    formData.append('user_id', user);
+                
+                if(type === 'myDesigns'){
+                    var form = this.myDesignForm;
+                }else{
+                    var form = this.addTemplateForm;
                 }
-                formData.append('image', blob, `${name}.png`);
-
-                let res = await axios.post('/template/add', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-
-                console.log(res);
-
-                if (res.status === 201) {
-                    alert('Template created successfully!');
-                } else {
-                    alert('Try again!');
-                }
+                form.jsonData = this.stage.toJSON();
+                form.image = blob;
+                form.post(route('template.add'));
+                
+                console.log(form)
             } catch (error) {
                 console.error('Error saving template:', error);
                 alert('An error occurred. Please try again.');
@@ -1595,7 +1581,7 @@ const allFunctions = {
                 }
             }
         },
-        async addToCart(quantity, category_id) {
+        async addToCart() {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
                 let blob = await this.createImage(dataURL);
@@ -1603,22 +1589,13 @@ const allFunctions = {
                 // Get the PDF Blob from saveAsPDF
                 // let pdfBlob = await this.saveAsPDF();
 
-                let formData = new FormData();
-                formData.append('quantity', quantity);
-                formData.append('category_id', category_id);
-                formData.append('data', this.stage.toJSON());
-                formData.append('image', blob, `new.png`);
-                // formData.append('file', pdfBlob, `design.pdf`);
+                this.printForm.jsonData = this.stage.toJSON();
+                this.printForm.image = blob;
 
-                let res = await axios.post(`/cart`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                console.log(res);
-            } catch(error) {
+                this.printForm.post(route('cart.add'));
+            } catch (error) {
                 console.log(error)
-             }
+            }
 
         },
     }

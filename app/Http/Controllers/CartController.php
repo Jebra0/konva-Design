@@ -28,29 +28,29 @@ class CartController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'category_id' => 'required|exists:templates_categories,id',
-                'quantity' => 'integer|required',
-                'data' => 'json|required',
-                'image' => 'required|image|mimes:png|max:2048',
-            ]);
-            // 'file' => 'required|file|mimes:pdf|max:20480'
-  
-            $cart = new CartModelRepository();
-  
-            $cart->add(
-                $request->post('category_id'),
-                $request->post('data'),
-                $request->file('image'),
-                $request->post('quantity'),
-                'test'
-            );
+        $request->validate([
+            'category_id' => 'required|exists:templates_categories,id',
+            'quantity' => 'integer|required',
+            'jsonData' => 'json|required',
+            'image' => 'required|image|mimes:png|max:2048',
+        ]);
+        // 'file' => 'required|file|mimes:pdf|max:20480'
 
-            return redirect()->route('cart.index');
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        $cart = new CartModelRepository();
+
+        $cart->add(
+            $request->post('category_id'),
+            $request->post('jsonData'),
+            $request->file('image'),
+            $request->post('quantity'),
+            'test'
+        );
+
+        return redirect()->back()->with('message', 'The item added to the cart. ');
+        // try {
+        // } catch (\Exception $e) {
+        //     return $e->getMessage();
+        // }
 
     }
 
