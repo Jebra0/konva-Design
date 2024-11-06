@@ -10,22 +10,6 @@
             </template>
 
             <template v-slot:append>
-                <v-menu open-on-hover>
-                    <template v-slot:activator="{ props }">
-                        <v-badge content="2" class="mx-2" color="red">
-                            <v-icon v-bind="props">mdi-bell</v-icon>
-                        </v-badge>
-                        <!-- <v-icon class="mx-1" v-bind="props">mdi-bell</v-icon> -->
-                    </template>
-                    <v-list>
-                        for test
-                        <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index">
-                            <v-list-item-title @click="this.getPage(item.title)">{{ item.title
-                                }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-
                 <Link href="/" class="design_btn">Design</Link>
                 <v-switch @click="toggleTheme" label="toggle theme" class="mr-5 mt-5"></v-switch>
             </template>

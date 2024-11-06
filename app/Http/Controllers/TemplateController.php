@@ -15,7 +15,8 @@ use PhpParser\Node\Stmt\TryCatch;
 
 class TemplateController extends Controller
 {
-    public function index(Request $request, $id)
+    
+    public function getTemplate(Request $request, $id)
     {
 
         if ($request->type == 'template') {

@@ -55,26 +55,60 @@ Route::get('/', function () {
 })->name('home');
 
 // tempaltes
-Route::get('/template/{id}/{type}', [TemplateController::class, 'index']);
-Route::post('/template/edit/{id}', [TemplateController::class, 'edit']);
-Route::delete('/template/delete/{id}/{type}', [TemplateController::class, 'destroy']);
-Route::post('/template/picture/add', [TemplateController::class, 'uploadTemplate']);
-Route::post('/template/add', [TemplateController::class, 'store']);
-Route::post('/template/search', [TemplateController::class, 'search']);
+Route::group([
+    'prefix' => "template",
+    'as' => "template."
+], function () {
+    Route::get('/{id}/{type}', [TemplateController::class, 'getTemplate'])
+        ->name('getTemplate');
+
+    Route::post('/edit/{id}', [TemplateController::class, 'edit'])
+        ->name('editTemplate');
+
+    Route::delete('/delete/{id}/{type}', [TemplateController::class, 'destroy'])
+        ->name('destroyTemplate');
+
+    Route::post('/picture/add', [TemplateController::class, 'uploadTemplate'])
+        ->name('addTemplateImage');
+
+    Route::post('/add', [TemplateController::class, 'store'])
+        ->name('addTemplate');
+
+    Route::post('/search', [TemplateController::class, 'search'])
+        ->name('search');
+});
 
 // cart 
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store']);
-Route::delete('/cart/delete/{cart}', [CartController::class, 'destroy']);
-Route::post('/cart/update', [CartController::class, 'update']);
+Route::group([
+    'prefix' => "cart",
+    'as' => "cart."
+], function () {
+    Route::get('/', [CartController::class, 'index'])
+        ->name('index');
+
+    Route::post('/', [CartController::class, 'store'])
+        ->name('add');
+
+    Route::delete('/delete/{cart}', [CartController::class, 'destroy'])
+        ->name('delete');
+
+    Route::post('/cart/update', [CartController::class, 'update'])
+        ->name('update');
+});
 
 //checkout
-Route::get('/checkout', [CheckoutController::class, 'index'])
-    ->name('checkout.index')
-    ->middleware('auth');
-Route::post('/checkout', [CheckoutController::class, 'store'])
-    ->name('checkout.store')
-    ->middleware('auth');
+Route::group([
+    'prefix' => "checkout",
+    'middleware' => "auth",
+    'as' => "checkout."
+], function () {
+    
+    Route::get('/', [CheckoutController::class, 'index'])
+        ->name('index');
+
+    Route::post('/', [CheckoutController::class, 'store'])
+        ->name('store');
+});
 
 // Admin Dashboard
 Route::group(['middleware' => "auth"], function () {

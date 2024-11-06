@@ -6,14 +6,14 @@
                     <v-col cols="3">
                         <v-card>
                             <v-text-field label="Order Number" v-model="filterForm.number" outlined dense
-                                @input="filter()"></v-text-field>
+                                @input="filter()" hide-details ></v-text-field>
                             <div v-if="errors.number" class="text-red-600">{{ errors.number }}</div>
                         </v-card>
                     </v-col>
 
                     <v-col cols="3">
                         <v-card>
-                            <v-text-field label="User Id" v-model="filterForm.user" outlined dense
+                            <v-text-field hide-details label="User Id" v-model="filterForm.user" outlined dense
                                 @input="filter()"></v-text-field>
                             <div v-if="errors.user" class="text-red-600">{{ errors.user }}</div>
                         </v-card>
@@ -21,7 +21,8 @@
 
                     <v-col cols="3">
                         <v-card>
-                            <select @change="filter()" v-model="order_status">
+                            <label class="m-3">Order Status</label>
+                            <select @change="filter()" v-model="order_status" class="my-2">
                                 <option value=""></option>
                                 <option value="pending">pending</option>
                                 <option value="processing">processing</option>
@@ -35,12 +36,13 @@
 
                     <v-col cols="3">
                         <v-card>
-                            <select @change="filter()" v-model="payment_status">
+                            <label class="ml-3">Payment Status</label>
+                            <select @change="filter()" v-model="payment_status" class="my-2">
                                 <option value=""></option>
                                 <option value="pending">pending</option>
                                 <option value="paid">paid</option>
                                 <option value="failed">failed</option>
-                            </select>
+                            </select><br>
                             <div v-if="errors.payment_status" class="text-red-600">{{ errors.payment_status
                                 }}</div>
                         </v-card>
@@ -49,7 +51,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col cols="12" class="pt-0">
+            <v-col cols="12" class="pt-0 mt-3">
                 <v-card>
                     <v-table fixed-header>
                         <thead>
@@ -111,7 +113,7 @@
                         </tbody>
                     </v-table>
                 </v-card>
-                <Pagination :links="orders.links"/>
+                <Pagination :links="orders.links" />
             </v-col>
         </v-row>
     </AdminLayout>
