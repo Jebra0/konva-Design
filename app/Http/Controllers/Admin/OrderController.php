@@ -13,56 +13,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::latest()->paginate(1);
+        $orders = Order::latest()->paginate(20);
         return inertia('Admin/Orders/Index', compact('orders'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 
     public function getOrders()
@@ -102,10 +54,8 @@ class OrderController extends Controller
             'payment_status' => 'nullable|string|in:pending,paid,failed',
         ]);
 
-        // Start a query builder instance for Order
         $ordersQuery = Order::query();
 
-        // Apply filters only if the request data is present
         if ($request->filled('number')) {
             $ordersQuery->where('number', $request->post('number'));
         }
@@ -119,29 +69,9 @@ class OrderController extends Controller
             $ordersQuery->where('payment_status', $request->post('payment_status'));
         }
 
-        // Paginate the results
-        $orders = $ordersQuery->paginate(1);
+        $orders = $ordersQuery->paginate(20);
 
         return inertia('Admin/Orders/Index', compact('orders'));
     }
 
-
-    // public function filter(Request $request)
-    // {
-    //     $request->validate([
-    //         'number' => 'nullable|integer|exists:orders,number',
-    //         'user' => 'nullable|integer|exists:users,id',
-    //         'status' => 'nullable|string|in:pending,processing,completed,cancelled,refunded',
-    //         'payment_status' => 'nullable|max:255|in:pending,paid,failed'
-    //     ]);
-
-    //     $orders = Order::where('number', $request->post('number'))
-    //         ->where('user_id', $request->post('user'))
-    //         ->where('status', $request->post('status'))
-    //         ->where('payment_status', $request->post('payment_status'))
-    //         ->paginate(1);
-
-    //     return inertia('Admin/Orders/Index', compact('orders'));
-
-    // }
 }

@@ -19,10 +19,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $products = TemplateCategory::orderBy('id', 'desc')->paginate(5);
+        $products = TemplateCategory::orderBy('id', 'desc')
+            ->paginate(10);
         return inertia()
             ->render('Admin/Products/index', [
-                'user' => Auth()->user(),
                 'products' => $products,
             ]);
     }
@@ -217,13 +217,16 @@ class CategoryController extends Controller
     */
     public function search(Request $request)
     {
-        $request->validate([
-            'data' => 'required|string|max:250'
-        ]);
+        $data = $request->query('searshData');
+        if ($data) {
+            $request->validate([
+                'searshData' => 'required|string|min:2|max:250'
+            ]);
+        }
 
-        $products = TemplateCategory::where('name', 'like', '%' . $request->post('data') . '%')
-            ->paginate(5);
+        $products = TemplateCategory::where('name', 'like', '%' . $data . '%')
+            ->paginate(10)->withQueryString();
 
-        return response()->json($products);
+        return inertia('Admin/Products/index', compact('products'));
     }
 }

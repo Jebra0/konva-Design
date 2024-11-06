@@ -111,15 +111,7 @@
                         </tbody>
                     </v-table>
                 </v-card>
-                <v-card class="mt-5" align="center">
-                    <nav class="my-5" >
-                        <template v-for="link in orders.links" :key="link.label">
-
-                            <Link :href="link.url ?? ''" v-html="link.label" :class="{ 'bg-grey': link.active, 'text-grey': !link.url }"
-                                class="m-3 px-4 py-2" preserve-scroll />
-                        </template>
-                    </nav>
-                </v-card>
+                <Pagination :links="orders.links"/>
             </v-col>
         </v-row>
     </AdminLayout>
@@ -128,9 +120,10 @@
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import Pagination from '@/Components/Pagination.vue';
 
 export default {
-    components: { Link, useForm, AdminLayout },
+    components: { Link, useForm, AdminLayout, Pagination },
     data() {
         return {
             statusForm: useForm({

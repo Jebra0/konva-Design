@@ -87,8 +87,7 @@ Route::group(['middleware' => "auth"], function () {
             ->name('index');
 
         Route::resource('/product', CategoryController::class);
-        Route::get('/api/products', [CategoryController::class, 'getProducts']);
-        Route::post('products/search', [CategoryController::class, 'search'])
+        Route::get('products/search', [CategoryController::class, 'search'])
             ->name('product.search');
 
         Route::resource('/orders', OrderController::class);
