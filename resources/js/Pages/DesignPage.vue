@@ -84,11 +84,11 @@
 
                 <v-badge :content="items" color="red" v-if="!this.isAdmin && items > 0">
                     <Link v-if="!this.isAdmin" :href="route('cart.index')">
-                    <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
+                        <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
                     </Link>
                 </v-badge>
                 <Link :href="route('cart.index')" v-else v-if="!this.isAdmin">
-                <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
+                    <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
                 </Link>
                 <!-- <v-btn @click="saveAsPDF()">Export PDF</v-btn> -->
 
@@ -578,22 +578,7 @@
         </transition>
 
         <v-main class="d-flex align-center justify-center" style="min-height: 100vh; max-height: 100%; ">
-            <v-dialog v-model="showAlert" max-width="500" class="d-flex">
-                <v-alert
-                    v-if="flash.message || flash.error"
-                    :type="flash.error ? 'error' : 'success'"
-                    class=""
-                >
-                    <v-row>
-                        <v-col cols="6">
-                            {{ flash.message || flash.error }}
-                        </v-col>
-                        <v-col cols="6" class="d- flex justify-end">
-                            <v-btn color="white" @click="closeAlert">Close</v-btn>
-                        </v-col>
-                    </v-row>
-                </v-alert>
-            </v-dialog>
+            <Alert />
             <div class="my-3" id="container"></div>
         </v-main>
     </v-app>
@@ -602,19 +587,14 @@
 import allFunctions from '@/Utils/allFunctions.js';
 import { rectConfig } from '../Utils/shapesConfig.js';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import axios from 'axios';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
 import { Inertia } from '@inertiajs/inertia';
-
+import Alert from "@/Components/Alert.vue";
 export default {
     mixins: [allFunctions],
-    components: { Head, VNumberInput, Link, useForm, Inertia },
+    components: { Head, VNumberInput, Link, useForm, Inertia, Alert },
     data() {
         return {
-            //alert
-            showAlert: false,
-            alertMessage: '',
-
             selectedOption: {
                 templates: true,
                 text: false,
@@ -705,25 +685,7 @@ export default {
         this.initializeKonva();
         this.fetchFonts();
     },
-    //alert
-    watch: {
-        flash: {
-            immediate: true,
-            handler(newFlash) {
-                if (newFlash.message || newFlash.error) {
-                    this.alertTitle = newFlash.message ? 'Success' : 'Error';
-                    this.alertMessage = newFlash.message || newFlash.error;
-                    this.showAlert = true;
-                }
-            },
-        },
-    },
     methods: {
-        //alert
-        closeAlert() {
-            this.showAlert = false;
-        },
-
         selectOption(type) {
             switch (type) {
                 case 'myDesigns':
@@ -799,27 +761,6 @@ export default {
                 default:
             }
         },
-        async getPage(name) {
-            switch (name) {
-                case 'Profile':
-                    window.location.href = '/profile';
-                    break;
-                case 'Cart':
-                    window.location.href = '/cart';
-                    break;
-                case 'Log out':
-                    axios.post('/logout');
-                    window.location.reload();
-                    break;
-                case 'login':
-                    window.location.href = '/login';
-                    break;
-                case 'Dashboard':
-                    window.location.href = '/admin/dashboard';
-                    break;
-
-            }
-        },
         canDisplay(item) {
             if (this.isAdmin && item.for === 'admin') {
                 return true;
@@ -828,11 +769,6 @@ export default {
         },
     },
     computed: {
-        //test
-        flash() {
-            return this.$page.props.flash;
-        },
-
         reversedLayers() {
             return [...this.layers].reverse();
         },

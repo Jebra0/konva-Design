@@ -1,5 +1,4 @@
 <template>
-
     <AppLayout :user="user" title="Cart" :items="cart.length">
         <v-row justify="center">
             <v-col cols="12">
@@ -25,11 +24,18 @@
 
                             <v-row>
                                 <v-col cols="6" class="ml-5">
-                                    quantity
-                                    <v-number-input v-model="item.quantity" :reverse="false" controlVariant="default"
-                                        name="quantity" :hideInput="false" inset min="5" max="1000">
-                                    </v-number-input>
-
+                                    <div class="d-flex">
+                                        <label class="mt-2 mr-3">Quantity</label>
+                                        <select v-model="item.quantity" @change="updateQuantity(item.id, $event)">
+                                            <option disabled selected>Select</option>
+                                            <option value="10">10</option>
+                                            <option value="15">15</option>
+                                            <option value="20">20</option>
+                                            <option value="25">25</option>
+                                            <option value="30">30</option>
+                                        </select>
+                                    </div>
+                                    <div v-if="errors.quantity" class="text-red-600">{{ errors.quantity }}</div>
                                 </v-col>
                                 <v-col cols="1"></v-col>
                                 <v-col cols="4" class="my-4">
@@ -44,7 +50,7 @@
 
                             <label>{{ i.name }}</label><br>
                             <select class="select_options" @change="selectOption($event, item.id, item.quantity)">
-                                <option value="select">select</option>
+                                <option value="" disabled selected>select</option>
                                 <option v-for="(v, idx) in i.values" :value="v.id" :key="idx"
                                     :selected="isSelectedOption(v.id, item.id, i.id)">{{ v.value }}</option>
                             </select>
@@ -76,8 +82,9 @@
 </template>
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { VNumberInput } from 'vuetify/labs/VNumberInput'
+import {VNumberInput} from 'vuetify/labs/VNumberInput'
 import axios from 'axios';
+import {useForm} from "@inertiajs/vue3";
 
 export default {
     components: { AppLayout, VNumberInput },
@@ -85,6 +92,12 @@ export default {
         return {
             selectedOptions: {},
             shippingEstimate: 0,
+
+            deleteForm: useForm({}),
+            updateForm: useForm({
+                quantity: null,
+                option_val_id: null
+            }),
         }
     },
     mounted() {
@@ -107,15 +120,17 @@ export default {
         isSelectedOption(optionId, itemId, optionGroupId) {
             return this.selectedOptions[itemId] && this.selectedOptions[itemId][optionGroupId] === optionId;
         },
-        async selectOption(event, cart_id, quantity) {
-            if (event.target.value !== 'select') {
-                const res = await axios.post('/cart/update', {
-                    id: cart_id,
-                    quantity: quantity,
-                    option_val_id: event.target.value
-                });
-                window.location.reload();
+        updateQuantity(cart_id, quantityEvent){
+            this.updateForm.quantity = quantityEvent.target.value;
+            this.updateForm.post(route('cart.update', cart_id));
+        },
+        selectOption(event, cart_id, quantity) {
+            this.updateForm.quantity = quantity;
+
+            if(event && event.target ){
+                this.updateForm.option_val_id = event.target.value;
             }
+            this.updateForm.post(route('cart.update', cart_id));
         },
         calcSupTotal(item) {
             if (!item || !item.category) return 0;
@@ -126,9 +141,6 @@ export default {
         },
         cartTotal() {
             return this.cart.reduce((acc, item) => acc + this.calcSupTotal(item), 0);
-        },
-        goToLink(link) {
-            window.open(link, '_blank');
         },
         async getPage(name) {
             switch (name) {
@@ -151,14 +163,9 @@ export default {
         },
         async deleteCartItem(cart) {
             try {
-                const res = await axios.delete(`/cart/delete/${cart}`);
-                console.log(res);
-                if (res.status === 200) {
-                    alert(res.data.message);
-                }
-                this.getPage('Cart');
+                 this.deleteForm.delete(route('cart.delete', cart));
             } catch (error) {
-                alert(res.data.message);
+                alert('error happened try again');
             }
         },
     },
@@ -179,6 +186,7 @@ export default {
             type: Object,
             required: true
         },
+        errors: {type: Object}
     },
 }
 </script>

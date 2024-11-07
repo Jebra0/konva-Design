@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Repositories\Cart\CartModelRepository;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -29,6 +30,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $cart = new CartModelRepository();
         return [
             ...parent::share($request),
             'auth' => [
@@ -38,6 +40,9 @@ class HandleInertiaRequests extends Middleware
                 'message' => session('message'),
                 'error' => session('error')
             ],
+            'cart' => [
+                'itemsCount' => $cart->get()->count()
+            ]
         ];
     }
 }

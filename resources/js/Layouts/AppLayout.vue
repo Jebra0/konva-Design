@@ -7,12 +7,13 @@
         <v-app-bar>
             <template v-slot:prepend>
                 <!-- login button -->
-                <v-btn-group @click="getPage('login')" class="mx-2" v-if="this.user == null" color="green"
-                    density="comfortable" rounded="pill" divided>
-                    <v-btn>
-                        Login
-                    </v-btn>
-                </v-btn-group>
+                <Link href="/login" class="mx-2" v-if="user == null">
+                    <v-btn-group class="mx-2" v-if="user == null" color="green" density="comfortable" rounded="pill" divided>
+                        <v-btn>
+                            Login
+                        </v-btn>
+                    </v-btn-group>
+                </Link>
 
                 <div class="text-center" v-if="this.user">
                     <v-menu open-on-hover>
@@ -22,14 +23,20 @@
                                     mdi-account
                                 </v-icon>
                                 {{ this.user?.name }}
-                                <v-icon>mdi-menu-down</v-icon>
+                                <v-icon> mdi-menu-down</v-icon>
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item v-for="(item, index) in this.acountNavItems" :key="index" :value="index">
-                                <v-list-item-title @click="this.getPage(item.title)">{{ item.title
-                                    }}</v-list-item-title>
-                            </v-list-item>
+                            <Link class="nave_list" v-for="(item, index) in acountNavItems" :key="index"
+                                  :href="route(item.link)"
+                                  v-show="item.for === 'all' || (item.for === 'admin' && isAdmin) || (item.for === 'user' && !isAdmin)">
+                                <v-list-item>{{ item.title }}</v-list-item>
+                            </Link>
+                            <form @submit.prevent="logoutForm.post(route('logout'))">
+                                <v-list-item>
+                                    <button type="submit">Log out</button>
+                                </v-list-item>
+                            </form>
                         </v-list>
                     </v-menu>
                 </div>
@@ -41,22 +48,21 @@
 
             <v-spacer></v-spacer>
 
-
             <template v-slot:append>
-                <v-btn-group @click="getPage('Design')" class="mx-2" color="blue-grey" density="comfortable"
-                    rounded="pill" divided>
-                    <v-btn>
-                        Back To Design
-                    </v-btn>
-                </v-btn-group>
+                <Link href="/" class="design_btn mx-6" >Design</Link>
+
                 <v-badge :content="items" color="red" class="mr-5" v-if="items > 0">
-                    <v-icon  @click="getPage('Cart')" color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
+                    <Link href="/cart" >
+                      <v-icon color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
+                    </Link>
                 </v-badge>
-                <v-icon v-else @click="getPage('Cart')" color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
+                <Link href="/cart" v-else>
+                    <v-icon  color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
+                </Link>
             </template>
         </v-app-bar>
-
         <v-main>
+            <Alert />
             <slot />
         </v-main>
         <v-footer class="text-center d-flex flex-column">
@@ -81,10 +87,10 @@
     </v-app>
 </template>
 <script>
-import { Head } from '@inertiajs/vue3';
-
+import { Head, Link } from '@inertiajs/vue3';
+import Alert from "@/Components/Alert.vue";
 export default {
-    components: { Head },
+    components: { Head, Link, Alert },
     data() {
         return {
             selectedOptions: {},
@@ -102,35 +108,17 @@ export default {
                     link: ''
                 },
             ],
+            acountNavItems: [
+                { title: 'Profile', for: 'all', link: 'profile.edit' },
+                { title: 'Cart', for: 'user', link: 'cart.index' },
+                { title: 'Dashboard', for: 'admin', link: 'admin.index' },
+            ],
+
         }
     },
     methods: {
         goToLink(link) {
             window.open(link, '_blank');
-        },
-        async getPage(name) {
-            switch (name) {
-                case 'Profile':
-                    window.location.href = '/profile';
-                    break;
-                case 'Cart':
-                    window.location.href = '/cart';
-                    break;
-                case 'Log out':
-                    axios.post('/logout');
-                    window.location.reload();
-                    break;
-                case 'login':
-                    window.location.href = '/login';
-                    break;
-                case 'Design':
-                    window.location.href = '/';
-                    break;
-                case 'Dashboard':
-                    window.location.href = '/admin/dashboard';
-                    break;
-
-            }
         },
     },
     props: {
@@ -160,7 +148,14 @@ export default {
 }
 </script>
 <style>
-main {
-    background-color: #ebebeb;
+.design_btn {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    width: 100px;
+    color: white;
+    background-color: #607D8B;
+    border-radius: 20px;
+    text-align: center;
 }
 </style>

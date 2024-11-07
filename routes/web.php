@@ -92,7 +92,7 @@ Route::group([
     Route::delete('/delete/{cart}', [CartController::class, 'destroy'])
         ->name('delete');
 
-    Route::post('/cart/update', [CartController::class, 'update'])
+    Route::post('/cart/update/{cart}', [CartController::class, 'update'])
         ->name('update');
 });
 

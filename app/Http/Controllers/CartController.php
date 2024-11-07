@@ -54,44 +54,28 @@ class CartController extends Controller
 
     }
 
-    public function update(Request $request)
+    public function update(Request $request, string $id)
     {
-        try {
             $request->validate([
-                'id' => 'required|exists:carts,id',
-                'quantity' => 'integer|required',
-                'option_val_id' => 'required|exists:option_values,id'
+                'quantity' => 'required|integer',
+                'option_val_id' => 'nullable|exists:option_values,id'
             ]);
 
             $cart = new CartModelRepository();
             $cart->updateCart(
-                $request->id,
-                $request->quantity,
-                $request->option_val_id
+                $id,
+                $request->post('quantity'),
+                $request->post('option_val_id')
             );
 
-            return response()->json(['updatedItem' => $cart->get()]);
-        }catch(\Exception $e){
-            return $e->getMessage();
-        }
-
-
+            return redirect()->back()->with('message', 'The item updated to the cart. ');
     }
 
     public function destroy(Cart $cart)
     {
-        try {
-            $cart->delete();
-            return response()->json([
-                'message' => 'Cart item deleted successfully',
-            ]);
-        } catch (\Exception $e) {
-            // return $e->getMessage();
-            return response()->json([
-                'message' => 'Failed to delete cart item',
-                'err' => $e->getMessage()
-            ]);
+        if($cart->delete()){
+            return redirect()->back()->with('message', 'The item has been deleted.');
         }
-
+        return redirect()->back()->with('error', 'There was an error deleting the item.');
     }
 }
