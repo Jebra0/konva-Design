@@ -51,7 +51,7 @@ Route::get('/', function () {
         'my_designs' => $my_designs,
         'items' => $cart->count(),
 
-    ])->with('message', 'testtetstett etettst');
+    ]);
 })->name('home');
 
 // tempaltes
@@ -65,7 +65,7 @@ Route::group([
     Route::post('/edit/{id}', [TemplateController::class, 'edit'])
         ->name('edit');
 
-    Route::delete('/delete/{id}/{type}', [TemplateController::class, 'destroy'])
+    Route::delete('/delete/{id}', [TemplateController::class, 'destroy'])
         ->name('delete');
 
     Route::post('/picture/add', [TemplateController::class, 'uploadTemplate'])
@@ -78,7 +78,7 @@ Route::group([
         ->name('search');
 });
 
-// cart 
+// cart
 Route::group([
     'prefix' => "cart",
     'as' => "cart."
@@ -102,7 +102,7 @@ Route::group([
     'middleware' => "auth",
     'as' => "checkout."
 ], function () {
-    
+
     Route::get('/', [CheckoutController::class, 'index'])
         ->name('index');
 

@@ -16,7 +16,7 @@ use PhpParser\Node\Stmt\TryCatch;
 
 class TemplateController extends Controller
 {
-    
+
     public function getTemplate(Request $request, $id)
     {
 
@@ -64,7 +64,7 @@ class TemplateController extends Controller
 
         $file = $request->file('image');
         $path = $file->store('images/' . $folder, ['disk' => 'public_images']);
-        
+
         $template->name = $request->name;
         $template->data = $request->jsonData;
         $template->image = $path;
@@ -98,13 +98,11 @@ class TemplateController extends Controller
 
     public function edit(Request $request, $id)
     {
-
         $request->validate([
-            "data" => "required|json",
+            "jsonData" => "required|json",
             "image" => "required|image|mimes:png|max:2048",
-            "type" => "string"
+            "type" => "Required|string|in:text,shape,template,myDesigns"
         ]);
-
 
         if ($request->type == 'template') {
             $template = Template::findOrFail($id);
@@ -129,11 +127,12 @@ class TemplateController extends Controller
         $file = $request->file('image');
         $path = $file->store('images/' . $category, ['disk' => 'public_images']);
 
-        return $template->update([
-            'data' => $request->data,
+        $template->update([
+            'data' => $request->post('jsonData'),
             'image' => $path,
         ]);
 
+        return redirect()->back()->with('message', 'Edited Successfully.');
     }
 
     public function destroy(Request $request, $id)
@@ -152,9 +151,11 @@ class TemplateController extends Controller
         }
 
         $image = '/'.$template->pluck('image');
-        
+
         Storage::disk('public_images')->delete($image);
         $template->delete();
+
+        return redirect()->back()->with('message', 'Deleted Successfully.');
     }
 
     public function search(Request $request)
@@ -165,7 +166,7 @@ class TemplateController extends Controller
         $templates = Template::where('name', 'like', '%' . $request->name . '%')
             ->select(['id', 'image'])
             ->get();
-        
+
         return response()->json($templates);
     }
 }

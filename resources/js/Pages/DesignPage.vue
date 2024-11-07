@@ -64,11 +64,6 @@
                                 <v-select label="Category" required v-model="printForm.category_id" :items="categories"
                                     item-title="name" item-value="id"></v-select>
                                 <div v-if="errors.category_id" class="text-red-600">{{ errors.category_id }}</div>
-
-                                <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
-                                    {{ $page.props.flash.message }}
-                                </v-alert>
-
                                 <v-card-actions>
 
                                     <v-spacer></v-spacer>
@@ -133,10 +128,6 @@
                             <v-text-field label="Template Name" required v-model="myDesignForm.name"></v-text-field>
                             <div v-if="errors.name" class="text-red-600">{{ errors.name }}</div>
 
-                            <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
-                                {{ $page.props.flash.message }}
-                            </v-alert>
-
                             <v-card-actions>
                                 <v-spacer></v-spacer>
                                 <v-btn-group color="blue-grey" @click="saveAsTemplate('myDesigns')">
@@ -174,11 +165,6 @@
                                 <v-select v-if="addTemplateForm.type === 'template'" label="Template Type" required
                                     v-model="addTemplateForm.category_id" :items="categories" item-title="name"
                                     item-value="id"></v-select>
-                                <div v-if="errors.category_id" class="text-red-600">{{ errors.category_id }}</div>
-
-                                <v-alert class="my-3" type="success" v-if="$page.props.flash.message">
-                                    {{ $page.props.flash.message }}
-                                </v-alert>
 
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
@@ -191,7 +177,7 @@
                             </v-card>
                         </template>
                     </v-dialog>
-                    <!-- save edited template -->
+                    <!-- save edited template for myDesigns and admin-->
                     <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
                         <v-btn v-if="this.editingTemp" @click="saveEditedTemplate(this.editedId)">Save</v-btn>
                     </v-btn-group>
@@ -592,6 +578,22 @@
         </transition>
 
         <v-main class="d-flex align-center justify-center" style="min-height: 100vh; max-height: 100%; ">
+            <v-dialog v-model="showAlert" max-width="500" class="d-flex">
+                <v-alert
+                    v-if="flash.message || flash.error"
+                    :type="flash.error ? 'error' : 'success'"
+                    class=""
+                >
+                    <v-row>
+                        <v-col cols="6">
+                            {{ flash.message || flash.error }}
+                        </v-col>
+                        <v-col cols="6" class="d- flex justify-end">
+                            <v-btn color="white" @click="closeAlert">Close</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-alert>
+            </v-dialog>
             <div class="my-3" id="container"></div>
         </v-main>
     </v-app>
@@ -609,6 +611,10 @@ export default {
     components: { Head, VNumberInput, Link, useForm, Inertia },
     data() {
         return {
+            //alert
+            showAlert: false,
+            alertMessage: '',
+
             selectedOption: {
                 templates: true,
                 text: false,
@@ -663,8 +669,6 @@ export default {
 
             selectedFont: null,
 
-            categoryName: '',
-
             logoutForm: useForm({}),
             printForm: useForm({
                 quantity: null,
@@ -685,6 +689,14 @@ export default {
                 category_id: null,
                 image: null,
                 jsonData: null,
+            }),
+            deleteTemplateForm: useForm({
+                type: null
+            }),
+            editTemplateForm: useForm({
+                type: null,
+                image: null,
+                jsonData: null
             })
         }
     },
@@ -693,7 +705,25 @@ export default {
         this.initializeKonva();
         this.fetchFonts();
     },
+    //alert
+    watch: {
+        flash: {
+            immediate: true,
+            handler(newFlash) {
+                if (newFlash.message || newFlash.error) {
+                    this.alertTitle = newFlash.message ? 'Success' : 'Error';
+                    this.alertMessage = newFlash.message || newFlash.error;
+                    this.showAlert = true;
+                }
+            },
+        },
+    },
     methods: {
+        //alert
+        closeAlert() {
+            this.showAlert = false;
+        },
+
         selectOption(type) {
             switch (type) {
                 case 'myDesigns':
@@ -798,6 +828,11 @@ export default {
         },
     },
     computed: {
+        //test
+        flash() {
+            return this.$page.props.flash;
+        },
+
         reversedLayers() {
             return [...this.layers].reverse();
         },
@@ -880,6 +915,17 @@ export default {
 </script>
 
 <style scoped>
+
+.v-alert--success {
+    background-color: #4caf50; /* Green background */
+    color: white;
+}
+
+.v-alert--error {
+    background-color: #f44336; /* Red background */
+    color: white;
+}
+
 #container {
     background-color: white;
     border: 1px solid rgba(184, 184, 184, 0.78);

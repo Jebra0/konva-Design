@@ -2,7 +2,8 @@ import Konva from "konva";
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import { useForm } from "@inertiajs/vue3";
+import { Inertia } from '@inertiajs/inertia';
+
 
 // Import the snapping functions
 import {
@@ -54,10 +55,6 @@ const allFunctions = {
             editingTemp: false,
             editedId: null,
 
-            templateName: '',
-            templateType1: '',
-            templateType2: null,
-
             allTemplates: null,
             isPrintActive: false,
             acountNavItems: [
@@ -72,7 +69,7 @@ const allFunctions = {
             productQuantity: 1,
         }
     },
-    
+
     methods: {
         initializeKonva(template = null) {
             const container = document.getElementById('container');
@@ -822,7 +819,7 @@ const allFunctions = {
             newLayer.add(text);
             newLayer.batchDraw();
 
-            // // undo redo add 
+            // // undo redo add
             this.undoDisable = false;
             const layerJson = newLayer.toObject();
             undoStack.push({
@@ -1082,7 +1079,7 @@ const allFunctions = {
             try {
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
                 let blob = await this.resizeImage(dataURL, 700, 700);
-                
+
                 if(type === 'myDesigns'){
                     var form = this.myDesignForm;
                 }else{
@@ -1091,7 +1088,7 @@ const allFunctions = {
                 form.jsonData = this.stage.toJSON();
                 form.image = blob;
                 form.post(route('template.add'));
-                
+
                 console.log(form)
             } catch (error) {
                 console.error('Error saving template:', error);
@@ -1153,7 +1150,7 @@ const allFunctions = {
                 newLayer.add(image);
                 newLayer.batchDraw();
 
-                // // undo redo add 
+                // // undo redo add
                 this.undoDisable = false;
                 const layerJson = newLayer.toObject();
                 undoStack.push({
@@ -1306,7 +1303,7 @@ const allFunctions = {
         //     } else {
         //         console.error('Clipping tool not initialized.');
         //     }
-        // },        
+        // },
 
         // // applyClipping() {
         // //     if (this.clippingRect && this.clippingTool) {
@@ -1550,23 +1547,15 @@ const allFunctions = {
         },
         async saveEditedTemplate(id) {
             try {
-
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
-
                 let blob = await this.resizeImage(dataURL, 300, 300);
 
-                let formData = new FormData();
-                formData.append('data', this.stage.toJSON());
-                formData.append('image', blob, `new.png`);
-                formData.append('type', this.editedType);
+                this.editTemplateForm.type = this.editedType;
+                this.editTemplateForm.image = blob;
+                this.editTemplateForm.jsonData = this.stage.toJSON();
 
-                let res = await axios.post(`/template/edit/${id}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-
-                alert('Updated successfully!')
+                this.editTemplateForm.post(route('template.edit', id));
+                console.log(this.editTemplateForm)
             } catch (error) {
                 alert('Error while saving!')
             }
@@ -1574,8 +1563,8 @@ const allFunctions = {
         async deleteTemplate(id, type) {
             if (confirm("Are you sure ? ")) {
                 try {
-                    let res = await axios.delete(`/template/delete/${id}/${type}`);
-                    alert('deleted successfully')
+                    this.deleteTemplateForm.type = type;
+                    this.deleteTemplateForm.delete(route('template.delete', id));
                 } catch (error) {
                     alert('Error while deleting')
                 }
