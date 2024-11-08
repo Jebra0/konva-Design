@@ -68,7 +68,7 @@ class CartController extends Controller
                 $request->post('option_val_id')
             );
 
-            return redirect()->back()->with('message', 'The item updated to the cart. ');
+            return redirect()->back();
     }
 
     public function destroy(Cart $cart)

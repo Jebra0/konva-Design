@@ -20,9 +20,8 @@ return new class extends Migration
             $table->foreignId('category_id')
                 ->constrained('templates_categories')
                 ->cascadeOnDelete();
-            $table->unsignedSmallInteger('quantity')->default(1);   
+            $table->unsignedSmallInteger('quantity')->default(1);
             $table->json('options')->nullable();
-            $table->unique(['cookie_id', 'category_id']);
             $table->timestamps();
         });
     }

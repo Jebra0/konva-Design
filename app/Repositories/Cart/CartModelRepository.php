@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Cart;
 use App\Models\Cart;
+use App\Models\OptionValue;
 use App\Models\TemplateCategory;
 use Cookie;
 use Log;
@@ -42,12 +43,17 @@ class CartModelRepository implements CartRepository
         $cart = Cart::with('options')
             ->where('id', $id)
             ->first();
+        $option_id = OptionValue::where('id', $option_val_id)->value('option_id');
+        $option = $cart->options->where('option_id', $option_id)->first();
 
         if ($cart) {
             $cart->update([
                 'quantity' => $quantity,
             ]);
-            $cart->options()->attach( $option_val_id);
+            if($option != null){
+                $cart->options()->detach($option->pivot->option_value_id);
+            }
+            $cart->options()->attach($option_val_id, ['option_id' => $option_id]);
         }
     }
 
