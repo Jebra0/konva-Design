@@ -23,7 +23,7 @@ defineProps({
 
     <Head title="Profile" />
 
-    <AppLayout :user="user" :items="$page.props.cart.itemsCount">
+    <AppLayout :user="user" title="Profile" :items="$page.props.cart.itemsCount">
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">

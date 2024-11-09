@@ -77,23 +77,22 @@ class TemplateController extends Controller
     {
         $files = $request->file('images');
 
+        if($request->post('type') == 'admin'){
+            $path = 'Templates';
+        }else{
+            $path = 'user_images';
+        }
+
         if (!is_array($files)) {
             return response()->json(['error' => 'No files provided or invalid data'], 400);
         }
 
-        $paths = [];
-
         foreach ($files as $file) {
-            try {
-                $newFileName = time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('images/Templates', $newFileName, ['disk' => 'public_images']);
-                $paths[] = $path;
-            } catch (\Exception $e) {
-                return response()->json(['error' => 'Error uploading file: ' . $e->getMessage()], 500);
-            }
+            $newFileName = time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('images/'.$path, $newFileName, ['disk' => 'public_images']);
         }
 
-        return response()->json(['paths' => $paths]);
+        return redirect()->back()->with('message', 'images uploaded successfully.');
     }
 
     public function edit(Request $request, $id)

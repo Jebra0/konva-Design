@@ -23,11 +23,15 @@ Route::get('/', function () {
 
     $templates = getTemplates();
 
-    $tmplateImages = getTemplateImages();
-
     $isAdmin = isAdmin();
 
     $user = Auth::user();
+
+    if($user?->is_admin){
+        $tmplateImages = getImages('admin');
+    }else{
+        $tmplateImages = getImages('user');
+    }
 
     $repo = new CartModelRepository();
     $cart = $repo->get();
@@ -59,20 +63,24 @@ Route::group([
     'prefix' => "template",
     'as' => "template."
 ], function () {
-    Route::get('/{id}/{type}', [TemplateController::class, 'getTemplate'])
-        ->name('get');
+    Route::group([
+        'middleware' => "auth",
+    ], function () {
+        Route::post('/edit/{id}', [TemplateController::class, 'edit'])
+            ->name('edit');
 
-    Route::post('/edit/{id}', [TemplateController::class, 'edit'])
-        ->name('edit');
+        Route::delete('/delete/{id}', [TemplateController::class, 'destroy'])
+            ->name('delete');
 
-    Route::delete('/delete/{id}', [TemplateController::class, 'destroy'])
-        ->name('delete');
 
+        Route::post('/add', [TemplateController::class, 'store'])
+            ->name('add');
+    });
     Route::post('/picture/add', [TemplateController::class, 'uploadTemplate'])
         ->name('addImage');
 
-    Route::post('/add', [TemplateController::class, 'store'])
-        ->name('add');
+    Route::get('/{id}/{type}', [TemplateController::class, 'getTemplate'])
+        ->name('get');
 
     Route::post('/search', [TemplateController::class, 'search'])
         ->name('search');

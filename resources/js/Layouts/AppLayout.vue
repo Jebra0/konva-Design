@@ -87,12 +87,14 @@
     </v-app>
 </template>
 <script>
-import { Head, Link } from '@inertiajs/vue3';
+import {Head, Link, useForm} from '@inertiajs/vue3';
 import Alert from "@/Components/Alert.vue";
 export default {
     components: { Head, Link, Alert },
     data() {
         return {
+            isAdmin: this.user.is_admin,
+            logoutForm: useForm({}),
             selectedOptions: {},
             icons: [
                 {

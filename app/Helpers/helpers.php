@@ -54,21 +54,26 @@ function getTexts()
     ->get();
 }
 
-function getTemplateImages(): array
+function getImages($type): array
 {
+    if($type == 'admin'){
+        $path = 'Templates/';
+    }else{
+        $path = 'user_images/';
+    }
     $images = [];
-    $directory = public_path('images/Templates');
+    $directory = public_path('images/'.$path);
 
     $files = glob($directory . '/*.png');
 
     foreach ($files as $file) {
         $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
 
-        $fontFiles[] = [
-            'src' => 'images/Templates/' . $filenameWithoutExtension . '.png'
+        $images[] = [
+            'src' => 'images/'. $path . $filenameWithoutExtension . '.png'
         ];
     }
-    return $fontFiles;
+    return $images;
 }
 
 // function loadFonts()

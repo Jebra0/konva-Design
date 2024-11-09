@@ -1215,185 +1215,6 @@ const allFunctions = {
             }
 
         },
-        // ///////////// test crop ///////////////////
-        // addClippingTool() {
-        //     if (this.clippingTool) {
-        //         this.removeClippingTool();
-        //     }
-
-        //     this.clippingTool = new Konva.Layer();
-        //     this.stage.add(this.clippingTool);
-
-        //     this.clippingRect = new Konva.Rect({
-        //         x: 200,
-        //         y: 200,
-        //         width: 200,
-        //         height: 200,
-        //         draggable: true,
-        //         fill: 'rgba(255, 0, 0, 0.3)',
-        //     });
-
-        //     this.clippingTransformer = new Konva.Transformer({
-        //         nodes: [this.clippingRect],
-        //         resizeEnabled: true,
-        //         rotateEnabled: false,
-        //         borderStroke: 'blue',
-        //         borderStrokeWidth: 2,
-        //         cornerRadius: 6,
-        //         enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-        //     });
-
-        //     this.clippingTool.add(this.clippingRect);
-        //     this.clippingTool.add(this.clippingTransformer);
-        //     this.clippingTool.batchDraw();
-        // },
-
-        // applyClipping() {
-        //     if (this.clippingRect && this.clippingTool) {
-        //         const selectedId = this.selectedObjectIds[0];
-        //         const image = this.stage.findOne(`#${selectedId}`);
-
-        //         if (!image || image.className !== 'Image') {
-        //             console.error('Selected object is not an image.');
-        //             return;
-        //         }
-
-        //         // Get the attributes of the clipping rectangle
-        //         const { x, y, width, height } = this.clippingRect.attrs;
-
-        //         // Create a canvas to perform the cropping operation
-        //         const cropCanvas = document.createElement('canvas');
-        //         const cropCtx = cropCanvas.getContext('2d');
-
-        //         cropCanvas.width = width;
-        //         cropCanvas.height = height;
-
-        //         const imageObj = image.image();
-
-        //         // Calculate the relative position of the clipping rectangle within the image
-        //         const clipX = x - image.x();
-        //         const clipY = y - image.y();
-
-        //         // Draw the image onto the canvas, cropping it based on the clipping rectangle's position
-        //         cropCtx.drawImage(
-        //             imageObj,
-        //             clipX,    // Relative x position of the clipping rect within the image
-        //             clipY,    // Relative y position of the clipping rect within the image
-        //             width,    // Width of the clipping rect
-        //             height,   // Height of the clipping rect
-        //             0, 0,     // Top-left corner of the canvas
-        //             width,    // Canvas width
-        //             height    // Canvas height
-        //         );
-
-        //         // Create a new Image object from the cropped canvas
-        //         const croppedImage = new Image();
-        //         croppedImage.src = cropCanvas.toDataURL();
-        //         croppedImage.onload = () => {
-        //             // Replace the original image with the cropped image
-        //             image.image(croppedImage);
-        //             image.size({ width, height }); // Update image size to the cropped dimensions
-        //             image.position({ x, y }); // Reposition the image to match the clipping rectangle's position
-
-        //             this.stage.batchDraw(); // Redraw the stage to reflect changes
-        //         };
-
-        //         this.removeClippingTool();
-
-        //     } else {
-        //         console.error('Clipping tool not initialized.');
-        //     }
-        // },
-
-        // // applyClipping() {
-        // //     if (this.clippingRect && this.clippingTool) {
-        // //         const selectedId = this.selectedObjectIds[0];
-        // //         const image = this.stage.findOne(`#${selectedId}`);
-
-        // //         const { x, y, width, height } = this.clippingRect.attrs;
-
-        // //         const imagLayer = image.getLayer();
-
-        // //         image.cache();
-        // //         imagLayer.clip({
-        // //             x: x,
-        // //             y: y,
-        // //             width: width,
-        // //             height: height
-        // //         });
-
-        // //         imagLayer.batchDraw();
-        // //         ///////////////////////
-        // //         const cropCanvas = document.createElement('canvas');
-        // //         const cropCtx = cropCanvas.getContext('2d');
-
-        // //         cropCanvas.width = width;
-        // //         cropCanvas.height = height;
-
-        // //         const imageObj = image.image();
-
-        // //         cropCtx.drawImage(
-        // //             imageObj,
-        // //             x - image.x(),
-        // //             y - image.y(),
-        // //             width,
-        // //             height,
-        // //             0, 0,
-        // //             width,
-        // //             height
-        // //         );
-
-        // //         const croppedImage = new Image();
-        // //         croppedImage.src = cropCanvas.toDataURL();
-        // //         croppedImage.onload = () => {
-        // //             image.image(croppedImage);
-        // //             this.stage.batchDraw();
-        // //         };
-        // //         ///////////////////////
-        // //         this.removeClippingTool();
-
-        // //     } else {
-        // //         console.error('Clipping tool not initialized.');
-        // //     }
-        // // },
-
-        // removeClippingTool() {
-        //     if (this.clippingTool) {
-        //         this.clippingTool.destroy();
-        //         this.clippingTool = null;
-        //         this.clippingRect = null;
-        //         this.clippingTransformer = null;
-        //         this.stage.batchDraw();
-        //     }
-        // },
-        // ///////////// test crop ///////////////////
-        async addTemplateImages(images) {
-            let formData = new FormData();
-            let fetchPromises = images.map(async (image, index) => {
-                try {
-                    let response = await fetch(image);
-                    let blob = await response.blob();
-
-                    let fileName = `temp-${index}-${Date.now()}.png`;
-                    formData.append('images[]', blob, fileName);
-                } catch (error) {
-                    console.error(`Failed to fetch image from ${image}:`, error);
-                }
-            });
-
-            // Wait for all fetch operations to complete
-            await Promise.all(fetchPromises);
-
-            try {
-                let res = await axios.post('/template/picture/add', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-            } catch (error) {
-                console.error('Error uploading images:', error);
-            }
-        },
         /////////////////////////
         handleFileUpload(event) {
             const files = event.target.files;
@@ -1406,6 +1227,25 @@ const allFunctions = {
                 reader.readAsDataURL(file);
             });
         },
+
+        async addTemplateImages(images, type) {
+            this.addImageForm.images = [];
+
+            this.addImageForm.type = type;
+
+            let fetchPromises = images.map(async (image, index) => {
+                let response = await fetch(image);
+                let blob = await response.blob();
+
+                this.addImageForm.images.push(new File([blob], `temp-${index}-${Date.now()}.png`, { type: blob.type }));
+            });
+
+            // Wait for all fetch operations to complete
+            await Promise.all(fetchPromises);
+
+            this.addImageForm.post(route('template.addImage'));
+        },
+
         fetchUnsplashImages() {
             this.isDataRedy = true;
             fetch(`${this.unsplashUrl}?client_id=${this.unsplashAccessKey}`)

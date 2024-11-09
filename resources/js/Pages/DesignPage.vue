@@ -454,7 +454,7 @@
                 </div>
             </div>
 
-            <v-card v-if="selectedOption.upload" elevation="0" outlined style=" ">
+            <v-card v-if="user && selectedOption.upload" elevation="0" outlined style=" ">
                 <div class="d-flex m-1">
                     <v-file-input label="file" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
                         <template v-slot:selection="{ fileNames }">
@@ -465,7 +465,7 @@
                             </template>
                         </template>
                     </v-file-input>
-                    <v-btn class="my-2 ml-2" @click="addTemplateImages(imageUrls)" color="blue-grey">Add</v-btn>
+                    <v-btn class="my-2 ml-2" @click="addTemplateImages(imageUrls, imageType)" color="blue-grey">Add</v-btn>
                 </div>
 
                 <!-- save images to storage -->
@@ -474,6 +474,34 @@
                         cols="5">
                         <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src" aspect-ratio="1"
                             class="bg-grey-lighten-2" cover>
+                            <template v-slot:placeholder>
+                                <v-row align="center" class="fill-height ma-0" justify="center">
+                                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
+                    </v-col>
+                </v-row>
+            </v-card>
+
+            <v-card class="scroll m-3" v-if=" !user && selectedOption.upload" elevation="0" outlined>
+                <v-file-input label="Upload image" prepend-icon="mdi-camera" multiple @change="handleFileUpload">
+                    <template v-slot:selection="{ fileNames }">
+                        <template v-for="(fileName, index) in fileNames" :key="fileName">
+                            <v-chip v-if="index < 2" class="me-2" color="deep-purple-accent-4" size="small" label>
+                                {{ fileName }}
+                            </v-chip>
+
+                            <span v-else-if="index === 2" class="text-overline text-grey-darken-3 mx-2">
+                                    +{{ files.length - 2 }} File(s)
+                                </span>
+                        </template>
+                    </template>
+                </v-file-input>
+                <v-row>
+                    <v-col v-for="(image, index) in imageUrls" :key="index" class="d-flex child-flex" cols="6">
+                        <v-img @click=" addUploadedImage(image)" style="cursor: pointer;" :src="image"
+                               aspect-ratio="1" class="bg-grey-lighten-2" cover>
                             <template v-slot:placeholder>
                                 <v-row align="center" class="fill-height ma-0" justify="center">
                                     <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
@@ -677,15 +705,28 @@ export default {
                 type: null,
                 image: null,
                 jsonData: null
-            })
+            }),
+            addImageForm: useForm({
+                images: [],
+                type: ''
+            }),
+            imageType: '', // to determine to which path save the images { user or admin }
         }
     },
     async mounted() {
         this.fetchUnsplashImages();
         this.initializeKonva();
-        this.fetchFonts();
+        await this.fetchFonts();
+        this.check();
     },
     methods: {
+        check(){
+            if(this.isAdmin){
+                this.imageType = 'admin'
+            }else{
+                this.imageType = 'user'
+            }
+        },
         selectOption(type) {
             switch (type) {
                 case 'myDesigns':
