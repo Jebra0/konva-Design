@@ -73,7 +73,9 @@
                         <span>$ {{ this.cartTotal() + this.shippingEstimate }}</span>
                     </div>
                     <v-row justify="center" class="my-5">
-                        <v-btn @click="getPage('checkout')" color="primary">checkout</v-btn>
+                        <Link href="/checkout">
+                            <v-btn color="primary">checkout</v-btn>
+                        </Link>
                     </v-row>
                 </v-card>
             </v-col>
@@ -83,11 +85,10 @@
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {VNumberInput} from 'vuetify/labs/VNumberInput'
-import axios from 'axios';
-import {useForm} from "@inertiajs/vue3";
+import {useForm, Link} from "@inertiajs/vue3";
 
 export default {
-    components: { AppLayout, VNumberInput },
+    components: { AppLayout, VNumberInput, Link },
     data() {
         return {
             selectedOptions: {},
@@ -141,25 +142,6 @@ export default {
         },
         cartTotal() {
             return this.cart.reduce((acc, item) => acc + this.calcSupTotal(item), 0);
-        },
-        async getPage(name) {
-            switch (name) {
-                case 'Profile':
-                    window.location.href = '/profile';
-                    break;
-                case 'Cart':
-                    window.location.href = '/cart';
-                    break;
-                case 'Log out':
-                    axios.post('/logout');
-                    window.location.reload();
-                    break;
-                case 'login':
-                    window.location.href = '/login';
-                    break;
-                case 'checkout':
-                    window.location.href = '/checkout';
-            }
         },
         async deleteCartItem(cart) {
             try {

@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Design;
 use App\Models\Order;
-use App\Models\OrderAddress;
 use App\Models\OrderItem;
 use App\Repositories\Cart\CartModelRepository;
-use App\Repositories\Cart\CartRepository;
 use Auth;
-use DB;
+use \Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
@@ -87,9 +85,9 @@ class CheckoutController extends Controller
             $order->addresses()->create($billing_address);
 
             DB::commit();
+            return redirect()->route('home')->with('message', 'Order placed successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            // return $e->getMessage();
         }
     }
 }

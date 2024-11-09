@@ -122,18 +122,6 @@ export default {
         },
     },
     props: {
-        cart: {
-            type: Object,
-            required: true,
-        },
-        all_options: {
-            type: Object,
-            required: true,
-        },
-        total: {
-            type: parseFloat,
-            required: true,
-        },
         user: {
             type: Object,
             required: true

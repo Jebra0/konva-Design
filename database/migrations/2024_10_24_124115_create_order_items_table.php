@@ -23,7 +23,6 @@ return new class extends Migration
             $table->float('category_price');
             $table->unsignedSmallInteger('quantity')->default(1);
             // have pivot table with option_values
-            $table->unique(['order_id', 'category_id']);
             $table->timestamps();
         });
     }
