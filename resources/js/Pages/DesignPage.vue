@@ -468,9 +468,9 @@
                     <v-btn class="my-2 ml-2" @click="addTemplateImages(imageUrls, imageType)" color="blue-grey">Add</v-btn>
                 </div>
 
-                <!-- save images to storage -->
-                <v-row>
-                    <v-col v-for="(image, index) in templateImages" :key="index" class="mx-2 d-flex child-flex"
+                <!--admin -->
+                <v-row v-if="isAdmin">
+                    <v-col style="position: relative" v-for="(image, index) in templateImages" :key="index" class="mx-2 d-flex child-flex"
                         cols="5">
                         <v-img @click=" addImage(image.src)" style="cursor: pointer;" :src="image.src" aspect-ratio="1"
                             class="bg-grey-lighten-2" cover>
@@ -480,6 +480,27 @@
                                 </v-row>
                             </template>
                         </v-img>
+                        <v-icon @click="deleteImage(image.src, imageType)" size="25"
+                                style="background-color: white; cursor: pointer; position: absolute; top: 10px; right: 8px; z-index: 10;" color="red"
+                                icon="mdi-delete"></v-icon>
+                    </v-col>
+                </v-row>
+
+                <!-- user -->
+                <v-row v-if="!isAdmin && user">
+                    <v-col style="position: relative" v-for="(image, index) in user_images" :key="index" class="mx-2 d-flex child-flex"
+                        cols="5">
+                        <v-img @click=" addImage(image.image)" style="cursor: pointer;" :src="image.image" aspect-ratio="1"
+                            class="bg-grey-lighten-2" cover>
+                            <template v-slot:placeholder>
+                                <v-row align="center" class="fill-height ma-0" justify="center">
+                                    <v-progress-circular color="grey-lighten-5" indeterminate></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
+                        <v-icon @click="deleteImage(image.id, imageType)" size="25"
+                                style="background-color: white; cursor: pointer; position: absolute; top: 10px; right: 8px; z-index: 10;" color="red"
+                                icon="mdi-delete"></v-icon>
                     </v-col>
                 </v-row>
             </v-card>
@@ -710,6 +731,8 @@ export default {
                 images: [],
                 type: ''
             }),
+            deleteImageForm: useForm({}),
+            deleteAdminImages: useForm({ image: null }),
             imageType: '', // to determine to which path save the images { user or admin }
         }
     },
@@ -881,6 +904,10 @@ export default {
             required: true
         },
         my_designs: {
+            type: Object,
+            required: true
+        },
+        user_images: {
             type: Object,
             required: true
         },

@@ -1244,6 +1244,16 @@ const allFunctions = {
             await Promise.all(fetchPromises);
 
             this.addImageForm.post(route('template.addImage'));
+            // console.log(this.addImageForm)
+        },
+
+        deleteImage(image, type){
+            if (type === 'admin'){
+                this.deleteAdminImages.image = image;
+                this.deleteAdminImages.delete(route('template.deleteAdminImages'));
+            }else{
+                this.deleteImageForm.delete(route('template.deleteImage', image));
+            }
         },
 
         fetchUnsplashImages() {

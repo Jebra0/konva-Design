@@ -23,24 +23,24 @@ Route::get('/', function () {
 
     $templates = getTemplates();
 
+    $tmplateImages = getImages();
+
     $isAdmin = isAdmin();
 
     $user = Auth::user();
-
-    if($user?->is_admin){
-        $tmplateImages = getImages('admin');
-    }else{
-        $tmplateImages = getImages('user');
-    }
 
     $repo = new CartModelRepository();
     $cart = $repo->get();
 
     $my_designs = '';
+    $user_images = '';
 
     if ($user) {
         $my_designs = $user->designs()
             ->orderBy('created_at', 'desc')
+            ->get();
+
+        $user_images = $user->images()->orderBy('created_at', 'desc')
             ->get();
     }
 
@@ -53,6 +53,7 @@ Route::get('/', function () {
         'isAdmin' => $isAdmin,
         'user' => $user,
         'my_designs' => $my_designs,
+        'user_images' => $user_images,
         'items' => $cart->count(),
 
     ]);
@@ -75,9 +76,16 @@ Route::group([
 
         Route::post('/add', [TemplateController::class, 'store'])
             ->name('add');
+
+        Route::post('/picture/add', [TemplateController::class, 'uploadTemplate'])
+            ->name('addImage');
+
+        Route::delete('/picture/delete/{id}', [TemplateController::class, 'deleteImage'])
+            ->name('deleteImage');
+
+        Route::delete('/picture/delete', [TemplateController::class, 'deleteAdminImages'])
+            ->name('deleteAdminImages');
     });
-    Route::post('/picture/add', [TemplateController::class, 'uploadTemplate'])
-        ->name('addImage');
 
     Route::get('/{id}/{type}', [TemplateController::class, 'getTemplate'])
         ->name('get');

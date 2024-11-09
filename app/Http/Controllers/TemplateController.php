@@ -8,11 +8,10 @@ use App\Models\Template;
 use App\Models\Text;
 use App\Models\Shape;
 use App\Models\Font;
-use App\Models\TemplateCategory;
-use Auth;
+use App\Models\UserImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use PhpParser\Node\Stmt\TryCatch;
 
 class TemplateController extends Controller
 {
@@ -75,6 +74,12 @@ class TemplateController extends Controller
 
     public function uploadTemplate(Request $request)
     {
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:png,jpeg,jpg|max:2048',
+            'type' => 'required|in:admin,user',
+        ]);
+
         $files = $request->file('images');
 
         if($request->post('type') == 'admin'){
@@ -83,16 +88,32 @@ class TemplateController extends Controller
             $path = 'user_images';
         }
 
-        if (!is_array($files)) {
-            return response()->json(['error' => 'No files provided or invalid data'], 400);
-        }
-
         foreach ($files as $file) {
             $newFileName = time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('images/'.$path, $newFileName, ['disk' => 'public_images']);
-        }
+            $image_path = $file->storeAs('images/'.$path, $newFileName, ['disk' => 'public_images']);
 
-        return redirect()->back()->with('message', 'images uploaded successfully.');
+            if($request->post('type') == 'user'){
+                UserImage::create([
+                    'user_id' => auth()->user()->id,
+                    'image' => $image_path,
+                ]);
+            }
+        }
+        return redirect()->back();
+    }
+
+    public function deleteImage(string $id){
+        $image = UserImage::findOrFail($id);
+        $image->delete();
+
+        Storage::disk('public_images')->delete($image->image);
+
+        return redirect()->back();
+    }
+
+    public function deleteAdminImages(Request $request){
+        Storage::disk('public_images')->delete($request->image);
+        return redirect()->back();
     }
 
     public function edit(Request $request, $id)

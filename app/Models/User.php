@@ -21,7 +21,6 @@ class User extends Authenticatable
         'email',
         'password',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -48,4 +47,8 @@ class User extends Authenticatable
     public function designs(){
         return $this->hasMany(Design::class, 'user_id', 'id');
     }
+    public function images(){
+        return $this->hasMany(UserImage::class);
+    }
+
 }

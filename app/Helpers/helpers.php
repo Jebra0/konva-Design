@@ -54,15 +54,10 @@ function getTexts()
     ->get();
 }
 
-function getImages($type): array
+function getImages(): array
 {
-    if($type == 'admin'){
-        $path = 'Templates/';
-    }else{
-        $path = 'user_images/';
-    }
     $images = [];
-    $directory = public_path('images/'.$path);
+    $directory = public_path('images/Templates');
 
     $files = glob($directory . '/*.png');
 
@@ -70,7 +65,7 @@ function getImages($type): array
         $filenameWithoutExtension = pathinfo($file, PATHINFO_FILENAME);
 
         $images[] = [
-            'src' => 'images/'. $path . $filenameWithoutExtension . '.png'
+            'src' => 'images/Templates/' . $filenameWithoutExtension . '.png'
         ];
     }
     return $images;
