@@ -93,7 +93,7 @@ export default {
     components: { Head, Link, Alert },
     data() {
         return {
-            isAdmin: this.user.is_admin,
+            isAdmin: this.user?.is_admin,
             logoutForm: useForm({}),
             selectedOptions: {},
             icons: [
@@ -137,7 +137,7 @@ export default {
     },
 }
 </script>
-<style>
+<style scoped>
 .design_btn {
     margin-left: 10px;
     margin-right: 10px;

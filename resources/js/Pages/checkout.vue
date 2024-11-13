@@ -122,75 +122,75 @@
                     </v-card>
                 </v-col>
             </v-row>
-            <v-row justify="center" class="mb-5">
-                <v-col cols="10">
-                    <v-row>
-                        <v-col cols="8">
-                            <v-card class="py-5">
-                                <v-card-title>Payment Info</v-card-title>
-                                    <v-row justify="center">
-                                        <v-col cols="9">
-                                            <v-text-field label="Cardholder Name" required :rules="[rules.required]"
-                                                          v-model="paymentData.cardHolderName"></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                    <v-row justify="center">
-                                        <v-col cols="9">
-                                            <v-text-field label=" Card Number " required :rules="[rules.required]"
-                                                          v-model="paymentData.cardNumber"></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                    <v-row justify="center">
-                                        <v-col cols="9" class="my-4">
-                                            <v-row>
-                                                <v-col cols="3">Expiration</v-col>
-                                                <v-col cols="6"></v-col>
-                                                <v-col cols="3">CVC/CVV</v-col>
-                                            </v-row>
-                                            <v-row>
-                                                <v-col cols="4">
-                                                    <v-text-field label="MM" required :rules="[rules.required]"
-                                                                  v-model="paymentData.expirationMm"></v-text-field>
-                                                </v-col>
-                                                <v-col cols="4">
-                                                    <v-text-field label="YYY" required :rules="[rules.required]"
-                                                                  v-model="paymentData.expirationYyy"></v-text-field>
-                                                </v-col>
-                                                <v-col cols="4">
-                                                    <v-text-field autocomplete="off" name="cvv" type="password" label="***"
-                                                                  required :rules="[rules.required]"
-                                                                  v-model="paymentData.cvv"></v-text-field>
-                                                </v-col>
-                                            </v-row>
-                                        </v-col>
-                                    </v-row>
-                                    <v-row justify="center" class="mb-3">
-                                        <v-col cols="5">
-                                            <v-btn @click="" :disabled="allDataDone" color="green" width="100%" height="50px">Pay
-                                                now</v-btn>
-                                        </v-col>
-                                    </v-row>
-                            </v-card>
-                        </v-col>
-                        <v-col cols="4">
-                            <v-card class="mx-auto">
-                                <v-card-title>Order Price</v-card-title>
-                                <hr>
-                                <div v-for="(item, index) in cart" style="font-size: 20px;"
-                                     class="d-flex justify-space-between my-4 mx-5">
-                                    <span>{{ item.category.name }}</span>
-                                    <span>$ {{ calcSupTotal(item) }}</span>
-                                </div>
-                                <hr />
-                                <div style="font-size: 20px;" class="d-flex justify-space-between my-4 mx-5">
-                                    <span>Total</span>
-                                    <span>$ {{ total }}</span>
-                                </div>
-                            </v-card>
-                        </v-col>
-                    </v-row>
-                </v-col>
-            </v-row>{{orderForm}}
+<!--            <v-row justify="center" class="mb-5">-->
+<!--                <v-col cols="10">-->
+<!--                    <v-row>-->
+<!--                        <v-col cols="8">-->
+<!--                            <v-card class="py-5">-->
+<!--                                <v-card-title>Payment Info</v-card-title>-->
+<!--                                    <v-row justify="center">-->
+<!--                                        <v-col cols="9">-->
+<!--                                            <v-text-field label="Cardholder Name" required :rules="[rules.required]"-->
+<!--                                                          v-model="paymentData.cardHolderName"></v-text-field>-->
+<!--                                        </v-col>-->
+<!--                                    </v-row>-->
+<!--                                    <v-row justify="center">-->
+<!--                                        <v-col cols="9">-->
+<!--                                            <v-text-field label=" Card Number " required :rules="[rules.required]"-->
+<!--                                                          v-model="paymentData.cardNumber"></v-text-field>-->
+<!--                                        </v-col>-->
+<!--                                    </v-row>-->
+<!--                                    <v-row justify="center">-->
+<!--                                        <v-col cols="9" class="my-4">-->
+<!--                                            <v-row>-->
+<!--                                                <v-col cols="3">Expiration</v-col>-->
+<!--                                                <v-col cols="6"></v-col>-->
+<!--                                                <v-col cols="3">CVC/CVV</v-col>-->
+<!--                                            </v-row>-->
+<!--                                            <v-row>-->
+<!--                                                <v-col cols="4">-->
+<!--                                                    <v-text-field label="MM" required :rules="[rules.required]"-->
+<!--                                                                  v-model="paymentData.expirationMm"></v-text-field>-->
+<!--                                                </v-col>-->
+<!--                                                <v-col cols="4">-->
+<!--                                                    <v-text-field label="YYY" required :rules="[rules.required]"-->
+<!--                                                                  v-model="paymentData.expirationYyy"></v-text-field>-->
+<!--                                                </v-col>-->
+<!--                                                <v-col cols="4">-->
+<!--                                                    <v-text-field autocomplete="off" name="cvv" type="password" label="***"-->
+<!--                                                                  required :rules="[rules.required]"-->
+<!--                                                                  v-model="paymentData.cvv"></v-text-field>-->
+<!--                                                </v-col>-->
+<!--                                            </v-row>-->
+<!--                                        </v-col>-->
+<!--                                    </v-row>-->
+<!--                                    <v-row justify="center" class="mb-3">-->
+<!--                                        <v-col cols="5">-->
+<!--                                            <v-btn @click="" :disabled="allDataDone" color="green" width="100%" height="50px">Pay-->
+<!--                                                now</v-btn>-->
+<!--                                        </v-col>-->
+<!--                                    </v-row>-->
+<!--                            </v-card>-->
+<!--                        </v-col>-->
+<!--                        <v-col cols="4">-->
+<!--                            <v-card class="mx-auto">-->
+<!--                                <v-card-title>Order Price</v-card-title>-->
+<!--                                <hr>-->
+<!--                                <div v-for="(item, index) in cart" style="font-size: 20px;"-->
+<!--                                     class="d-flex justify-space-between my-4 mx-5">-->
+<!--                                    <span>{{ item.category.name }}</span>-->
+<!--                                    <span>$ {{ calcSupTotal(item) }}</span>-->
+<!--                                </div>-->
+<!--                                <hr />-->
+<!--                                <div style="font-size: 20px;" class="d-flex justify-space-between my-4 mx-5">-->
+<!--                                    <span>Total</span>-->
+<!--                                    <span>$ {{ total }}</span>-->
+<!--                                </div>-->
+<!--                            </v-card>-->
+<!--                        </v-col>-->
+<!--                    </v-row>-->
+<!--                </v-col>-->
+<!--            </v-row>{{orderForm}}-->
         </v-form>
     </AppLayout>
 </template>

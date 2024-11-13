@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TemplateController;
 use App\Models\Design;
@@ -124,6 +125,9 @@ Route::group([
 
     Route::post('/', [CheckoutController::class, 'store'])
         ->name('store');
+
+    Route::post('/{order}/stripe/payment-intent', [PaymentController::class, 'createStripePaymentIntent'])
+        ->name('stripe.payment.create');
 });
 
 // Admin Dashboard
@@ -151,6 +155,18 @@ Route::group(['middleware' => "auth"], function () {
         Route::post('/orders', [OrderController::class, 'filter'])
             ->name('orders.filter');
     });
+});
+
+Route::group([
+    'prefix' => "payment",
+    'middleware' => "auth",
+    'as' => "payment."
+], function (){
+    Route::get('/', [PaymentController::class, 'index'])
+        ->name('index');
+
+    Route::get('/getSession', [PaymentController::class, 'getSession'])
+        ->name('getSession');
 });
 ////////// //////// ////////// ///////// //////// //////////
 

@@ -42,6 +42,10 @@ class HandleInertiaRequests extends Middleware
             ],
             'cart' => [
                 'itemsCount' => $cart->get()->count()
+            ],
+            'stripe' => [
+                'publishable_Key' => config('services.stripe.publish_key'),
+                'secret_key' => config('services.stripe.secret_key'),
             ]
         ];
     }

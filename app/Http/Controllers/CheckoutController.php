@@ -85,7 +85,9 @@ class CheckoutController extends Controller
             $order->addresses()->create($billing_address);
 
             DB::commit();
-            return redirect()->route('home')->with('message', 'Order placed successfully.');
+
+            return redirect()->route('payment.index', $order->id);
+
         } catch (\Exception $e) {
             DB::rollBack();
         }
