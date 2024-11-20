@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->float('amount');
             $table->char('currency')->default('USD');
@@ -20,6 +21,8 @@ return new class extends Migration
             $table->enum('status', ['pending', 'completed', 'failed', 'cancelled'])->default('pending');
             $table->string('transaction_id')->nullable();
             $table->json('data')->nullable()->comment('transaction data that may be different from methode to another');
+            $table->unique('order_id');
+            $table->unique('transaction_id');
             $table->timestamps();
         });
     }

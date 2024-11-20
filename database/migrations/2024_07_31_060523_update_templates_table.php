@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('templates', function (Blueprint $table) {
-            $table->dropColumn('type'); 
-            $table->unsignedBigInteger('category_id')->default(1);
-            $table->foreign('category_id')->references('id')->on('templates_categories')->nullOnDelete();
+            $table->dropColumn('type');
+            $table->foreignId('category_id')->nullable()->constrained('templates_categories');
         });
     }
 

@@ -5,11 +5,3 @@
         </v-main>
     </v-app>
 </template>
-<script>
-
-</script>
-<style>
-body{
-    
-}
-</style>

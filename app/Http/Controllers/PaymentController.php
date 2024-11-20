@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Payment;
+use App\Repositories\Cart\CartModelRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Stripe\StripeClient;
-use Stripe\PaymentIntent;
-use Illuminate\Support\Str;
-use Stripe\Stripe as StripeGateway;
 class PaymentController extends Controller
 {
     public function index(Order $order){
-        return inertia('Payment', compact('order'));
+        return inertia('Payment',['order' => $order]);
     }
 
     public function createStripePaymentIntent(Order $order)
@@ -19,32 +19,51 @@ class PaymentController extends Controller
         $stripe = new StripeClient(config('services.stripe.secret_key'));
 
         $paymentIntent = $stripe->paymentIntents->create([
-            'amount' => $order->total,
+            'amount' => $order->total * 100,
             'currency' => 'usd',
-            'payment_methods_types' => ['card'],
+            'payment_method_types' => ['card'],
         ]);
+
+        $payment = Payment::where('order_id', $order->id)->first();
+        if(!$payment){
+            Payment::create([
+                'user_id' => Auth::user()->id,
+                'order_id' => $order->id,
+                'amount' => $paymentIntent->amount,
+                'currency' => $paymentIntent->currency,
+                'status' => 'pending',
+                'method' => 'stripe',
+                'transaction_id' => $paymentIntent->id,
+                'data' => json_encode($paymentIntent),
+            ]);
+        }
         return ['clientSecret' => $paymentIntent->client_secret];
     }
 
-    public function getSession()
-    {
+    public function confirm(Request $request, Order $order){
         $stripe = new StripeClient(config('services.stripe.secret_key'));
 
-        return $stripe->checkout->sessions->create([
-            'success_url' => 'http://127.0.0.1:8000/success',
-            'line_items' => [
-                [
-                    'price_data' => [
-                        'currency' => 'usd',
-                        'unit_amount' => 449,
-                        'product_data' => [
-                            'name' => 'business card'
-                        ]
-                    ],
-                    'quantity' => 1,
-                ],
-            ],
-            'mode' => 'payment',
-        ]);
+        $paymentIntent = $stripe->paymentIntents->retrieve($request->query('payment_intent'), []);
+
+        if ($paymentIntent->status == 'succeeded') {
+            $payment = Payment::where('order_id', $order->id)->first();
+            if($payment){
+                $payment->update([
+                    'status' => 'completed',
+                    'data' => json_encode($paymentIntent),
+                ]);
+                // update order payment status
+                 $order->update(['payment_status' => 'paid']);
+
+                 // delete cart
+                $cart = new CartModelRepository();
+                $cart->empty();
+
+                return redirect()->route('home')->with('message', 'Payment successful!');
+            }
+        }
+
+        return redirect()->back()->with('error', 'Payment Failed!');
     }
+
 }

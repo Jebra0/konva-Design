@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\TemplateController;
 use App\Models\Design;
 use App\Models\TemplateCategory;
@@ -120,14 +121,27 @@ Route::group([
     'as' => "checkout."
 ], function () {
 
-    Route::get('/', [CheckoutController::class, 'index'])
+    Route::post('/', [CheckoutController::class, 'index'])
         ->name('index');
 
-    Route::post('/', [CheckoutController::class, 'store'])
+    Route::post('/store', [CheckoutController::class, 'store'])
         ->name('store');
+});
 
-    Route::post('/{order}/stripe/payment-intent', [PaymentController::class, 'createStripePaymentIntent'])
-        ->name('stripe.payment.create');
+// payment
+Route::group([
+    'prefix' => "payment",
+    'middleware' => "auth",
+    'as' => "payment."
+], function (){
+    Route::get('/{order}', [PaymentController::class, 'index'])
+        ->name('index');
+
+    Route::post('/stripe/create/{order}', [PaymentController::class, 'createStripePaymentIntent'])
+        ->name('stripe.create');
+
+    Route::get('/stripe/callback/{order}', [PaymentController::class, 'confirm'])
+        ->name('stripe.callback');
 });
 
 // Admin Dashboard
@@ -157,17 +171,19 @@ Route::group(['middleware' => "auth"], function () {
     });
 });
 
-Route::group([
-    'prefix' => "payment",
-    'middleware' => "auth",
-    'as' => "payment."
-], function (){
-    Route::get('/', [PaymentController::class, 'index'])
-        ->name('index');
 
-    Route::get('/getSession', [PaymentController::class, 'getSession'])
-        ->name('getSession');
+Route::group([
+    'prefix' => "auth",
+    'as' => "auth.socialite."
+], function (){
+    Route::get('/{provider}/redirect', [SocialLoginController::class, 'redirect'])
+        ->name('redirect');
+
+    Route::get('/{provider}/callback', [SocialLoginController::class, 'callback'])
+        ->name('callback');
 });
+
+
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {

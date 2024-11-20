@@ -56,9 +56,6 @@
                       <v-icon color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
                     </Link>
                 </v-badge>
-                <Link href="/cart" v-else>
-                    <v-icon  color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
-                </Link>
             </template>
         </v-app-bar>
         <v-main>
@@ -112,7 +109,6 @@ export default {
             ],
             acountNavItems: [
                 { title: 'Profile', for: 'all', link: 'profile.edit' },
-                { title: 'Cart', for: 'user', link: 'cart.index' },
                 { title: 'Dashboard', for: 'admin', link: 'admin.index' },
             ],
 

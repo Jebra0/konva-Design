@@ -90,13 +90,16 @@ class Order extends Model
     }
 
     /*
-        the Average Order Value = total_revenue / total_orders        
+        the Average Order Value = total_revenue / total_orders
     */
     public static function AOV() : float
     {
         $revenue = self::total_revenue();
         $orders = self::total_orders();
-        return $revenue / $orders;
+        if($orders){
+            return $revenue / $orders;
+        }
+        return 0;
     }
 
     public static function completed_orders() :int

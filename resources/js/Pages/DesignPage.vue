@@ -87,9 +87,6 @@
                         <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
                     </Link>
                 </v-badge>
-                <Link :href="route('cart.index')" v-else v-if="!this.isAdmin">
-                    <v-icon class="ml-5 " color="blue-grey">mdi-cart</v-icon>
-                </Link>
                 <!-- <v-btn @click="saveAsPDF()">Export PDF</v-btn> -->
 
 

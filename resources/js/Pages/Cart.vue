@@ -73,9 +73,9 @@
                         <span>$ {{ this.cartTotal() + this.shippingEstimate }}</span>
                     </div>
                     <v-row justify="center" class="my-5">
-                        <Link href="/checkout">
-                            <v-btn color="primary">checkout</v-btn>
-                        </Link>
+                        <form @submit.prevent="getCheckout">
+                            <v-btn :disabled="cart.length === 0" type="submit" color="primary">checkout</v-btn>
+                        </form>
                     </v-row>
                 </v-card>
             </v-col>
@@ -99,6 +99,7 @@ export default {
                 quantity: null,
                 option_val_id: null
             }),
+            checkoutForm: useForm({})
         }
     },
     mounted() {
@@ -150,6 +151,9 @@ export default {
                 alert('error happened try again');
             }
         },
+        getCheckout(){
+            this.checkoutForm.post(route('checkout.index'))
+        }
     },
     props: {
         cart: {

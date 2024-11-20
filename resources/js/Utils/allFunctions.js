@@ -59,7 +59,6 @@ const allFunctions = {
             isPrintActive: false,
             acountNavItems: [
                 { title: 'Profile', for: 'all', link: 'profile.edit' },
-                { title: 'Cart', for: 'user', link: 'cart.index' },
                 { title: 'Dashboard', for: 'admin', link: 'admin.index' },
             ],
 
