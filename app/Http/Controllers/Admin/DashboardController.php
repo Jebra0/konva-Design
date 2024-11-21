@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\TemplateCategory;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class DashboardController extends Controller
             'pending_orders' => Order::pending_orders(),
             'cancelled_orders' => Order::cancelled_orders(),
             'refunded_orders' => Order::refunded_orders(),
-            //'abandoned_carts'
+            'abandoned_carts' => Order::abandoned_cart(),
             'top_products' => TemplateCategory::top_products(),
         ]);
     }

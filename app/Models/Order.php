@@ -121,6 +121,12 @@ class Order extends Model
             ->count();
     }
 
+    public static function abandoned_cart()
+    {
+        return self::where('payment_status', 'pending')
+            ->count();
+    }
+
     public static function refunded_orders() :int
     {
         return self::where('status', 'refunded')

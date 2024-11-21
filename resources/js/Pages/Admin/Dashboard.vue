@@ -1,6 +1,6 @@
 <template>
     <AdminLayout title="Dashboard" :user="user">
-        <v-row> 
+        <v-row>
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Total Orders</v-card-title>
@@ -42,7 +42,7 @@
             <v-col cols="3" class="text-center">
                 <v-card class="">
                     <v-card-title>Abandoned Cart</v-card-title>
-                    <v-card-text>1500</v-card-text>
+                    <v-card-text>{{ abandoned_carts }}</v-card-text>
                 </v-card>
             </v-col>
             <v-col cols="3" class="text-center">
@@ -109,6 +109,7 @@ export default {
         completed_orders: {type: Number},
         pending_orders: {type: Number},
         cancelled_orders: {type: Number},
+        abandoned_carts: {type: Number},
         refunded_orders: {type: Number},
     },
     data: () => {
