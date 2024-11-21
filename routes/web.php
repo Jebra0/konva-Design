@@ -9,6 +9,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\TestController;
 use App\Models\Design;
 use App\Models\TemplateCategory;
 use App\Repositories\Cart\CartModelRepository;

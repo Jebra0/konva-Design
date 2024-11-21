@@ -11,6 +11,10 @@ use Stripe\StripeClient;
 class PaymentController extends Controller
 {
     public function index(Order $order){
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return inertia('Payment',['order' => $order]);
     }
 
