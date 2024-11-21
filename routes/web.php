@@ -171,7 +171,7 @@ Route::group(['middleware' => "auth"], function () {
     });
 });
 
-
+// socialize
 Route::group([
     'prefix' => "auth",
     'as' => "auth.socialite."

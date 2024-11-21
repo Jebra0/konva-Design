@@ -22,7 +22,7 @@
                                 <v-icon color="blue-grey" class="mx-1">
                                     mdi-account
                                 </v-icon>
-                                {{ this.user?.name }}
+                                {{ this.user?.name?.split(' ')[0] }}
                                 <v-icon> mdi-menu-down</v-icon>
                             </v-btn>
                         </template>

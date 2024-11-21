@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_admin')->default(0)->after('remember_token');
+            $table->string('provider')->nullable()->after('email');
+            $table->string('provider_id')->nullable()->after('provider');
         });
     }
 

@@ -27,6 +27,10 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
+
+const googleAuth = () => {
+    axios.get(`auth/google/redirect`);
+};
 </script>
 
 <template>
@@ -97,25 +101,15 @@ const submit = () => {
 
             <div class="mb-6" align="center">
                 <p class="mb-5">Login With :</p>
-                <Link :href="route('auth.socialite.redirect', 'google')">
-                    <v-btn
-                    prepend-icon="mdi-google"
-                    class="mx-2"
-                    style="background-color: #DB4437; color: white; text-transform: lowercase;"
-                >
-                    google
-                </v-btn>
-                </Link>
 
-                <Link :href="route('auth.socialite.redirect', 'facebook')">
-                    <v-btn
-                    prepend-icon="mdi-facebook"
-                    class="mx-2"
-                    style="background-color: #1877F2; color: white; text-transform: lowercase;"
+                <Link :href="route('register')">Email</Link>
+
+                <a href="auth/google/redirect" class="ml-12"
+                   style="background-color: #DB4437; color: white; text-transform: lowercase; display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 500;"
                 >
-                    facebook
-                </v-btn>
-                </Link>
+                    <span class="mdi mdi-google" style="margin-right: 8px;"></span>
+                    google
+                </a>
             </div>
         </v-card>
 
