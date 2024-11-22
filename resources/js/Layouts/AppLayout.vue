@@ -58,7 +58,7 @@
                 </v-badge>
             </template>
         </v-app-bar>
-        <v-main>
+        <v-main :class="{ 'light-theme': true }">
             <Alert />
             <slot />
         </v-main>
@@ -134,6 +134,9 @@ export default {
 }
 </script>
 <style scoped>
+.light-theme {
+    background-color: #bebebe;
+}
 .design_btn {
     margin-left: 10px;
     margin-right: 10px;

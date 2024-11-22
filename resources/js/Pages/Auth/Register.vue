@@ -23,8 +23,9 @@ const submit = () => {
 <template>
     <GuestLayout>
         <Head title="Register" />
-
-        <form @submit.prevent="submit">
+        <v-card>
+            <v-card-title align="center">Konva Design</v-card-title>
+            <form class="m-5" @submit.prevent="submit">
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -99,5 +100,6 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+        </v-card>
     </GuestLayout>
 </template>

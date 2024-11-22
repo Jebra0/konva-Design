@@ -255,7 +255,7 @@
         </v-app-bar>
 
         <v-navigation-drawer permanent color="blue-grey" width="90">
-            <v-list density="compact">
+            <v-list density="compact" class="pt-0">
 
                 <!-- my designs -->
                 <v-list-item v-if="this.user && !this.isAdmin"
@@ -263,25 +263,21 @@
                     @click="selectOption('myDesigns')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'myDesigns' ? '#607D8B' : 'white'"
                         class="icon">mdi-palette</v-icon>
-                    <span :style="{ color: selectedOption.active === 'myDesigns' ? '#607D8B' : 'white' }"
-                        class="list-title">My
-                        designs</span>
+                    <v-tooltip activator="parent" location="bottom">My designs</v-tooltip>
                 </v-list-item>
 
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'templates' ? '#ebebeb' : '' }"
                     @click="selectOption('templates')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'templates' ? '#607D8B' : 'white'"
                         class="icon">mdi-view-dashboard</v-icon>
-                    <span :style="{ color: selectedOption.active === 'templates' ? '#607D8B' : 'white' }"
-                        class="list-title">Templates</span>
+                    <v-tooltip activator="parent" location="bottom">Templates</v-tooltip>
                 </v-list-item>
 
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'text' ? '#ebebeb' : '' }"
                     @click="selectOption('text')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'text' ? '#607D8B' : 'white'"
                         class="icon">mdi-format-text</v-icon>
-                    <span :style="{ color: selectedOption.active === 'text' ? '#607D8B' : 'white' }"
-                        class="list-title">Text</span>
+                    <v-tooltip activator="parent" location="bottom">Text</v-tooltip>
                 </v-list-item>
 
 
@@ -289,8 +285,7 @@
                     @click="selectOption('photos')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'photos' ? '#607D8B' : 'white'"
                         class="icon">mdi-image-outline</v-icon>
-                    <span :style="{ color: selectedOption.active === 'photos' ? '#607D8B' : 'white' }"
-                        class="list-title">Photos</span>
+                    <v-tooltip activator="parent" location="bottom">photos</v-tooltip>
                 </v-list-item>
 
 
@@ -298,24 +293,21 @@
                     @click="selectOption('elements')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'elements' ? '#607D8B' : 'white'"
                         class="icon">mdi-shape</v-icon>
-                    <span :style="{ color: selectedOption.active === 'elements' ? '#607D8B' : 'white' }"
-                        class="list-title">Elements</span>
+                    <v-tooltip activator="parent" location="bottom">Shapes</v-tooltip>
                 </v-list-item>
 
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'upload' ? '#ebebeb' : '' }"
                     @click="selectOption('upload')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'upload' ? '#607D8B' : 'white'"
                         class="icon">mdi-cloud-upload</v-icon>
-                    <span :style="{ color: selectedOption.active === 'upload' ? '#607D8B' : 'white' }"
-                        class="list-title">Upload</span>
+                    <v-tooltip activator="parent" location="bottom">Upload images</v-tooltip>
                 </v-list-item>
 
                 <v-list-item :style="{ backgroundColor: selectedOption.active === 'layers' ? '#ebebeb' : '' }"
                     @click="selectOption('layers')" class="custom-list-item">
                     <v-icon :color="selectedOption.active === 'layers' ? '#607D8B' : 'white'"
                         class="icon">mdi-layers-triple</v-icon>
-                    <span :style="{ color: selectedOption.active === 'layers' ? '#607D8B' : 'white' }"
-                        class="list-title">Layers</span>
+                    <v-tooltip activator="parent" location="bottom">Layers</v-tooltip>
                 </v-list-item>
 
             </v-list>
@@ -623,7 +615,7 @@
             </v-app-bar>
         </transition>
 
-        <v-main class="d-flex align-center justify-center" style="min-height: 100vh; max-height: 100%; ">
+        <v-main class="d-flex align-center justify-center" style="min-height: 100vh; max-height: 100%; " :class="{ 'light-theme': true }">
             <Alert />
             <div class="my-3" id="container"></div>
         </v-main>
@@ -916,15 +908,8 @@ export default {
 </script>
 
 <style scoped>
-
-.v-alert--success {
-    background-color: #4caf50; /* Green background */
-    color: white;
-}
-
-.v-alert--error {
-    background-color: #f44336; /* Red background */
-    color: white;
+.light-theme {
+    background-color: #bebebe;
 }
 
 #container {
@@ -978,6 +963,8 @@ export default {
 }
 
 .custom-list-item {
+    padding-bottom: 15px;
+    padding-top: 15px;
     flex-direction: column;
     align-items: center;
     text-align: center;

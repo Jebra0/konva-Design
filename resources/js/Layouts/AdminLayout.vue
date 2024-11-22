@@ -15,7 +15,7 @@
             </template>
 
         </v-app-bar>
-        <v-navigation-drawer v-model="drawer">
+        <v-navigation-drawer v-model="drawer" permanent>
             <div v-if="user">
                 <v-menu open-on-hover>
                     <template v-slot:activator="{ props }">

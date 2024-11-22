@@ -1,7 +1,7 @@
 <template>
     <AppLayout :user="user" title="Cart" :items="cart.length">
         <v-row justify="center">
-            <v-col cols="12">
+            <v-col cols="12" style="width: 100%">
                 <v-card class="mx-auto my-12" max-width="900" v-for="(item, id) in cart" :key="id">
                     <v-btn @click="deleteCartItem(item.id)" icon class="ma-2"
                         style="position: absolute; top: 0; right: 0;">

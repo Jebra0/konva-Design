@@ -14,7 +14,7 @@
 
             <v-col cols="3" class="d-flex justify-end">
                 <Link class="" :href="route('admin.product.create')">
-                <v-btn width="240px" height="53px" class="createProductBTN">
+                <v-btn height="53px" class="createProductBTN">
                     Add New Product
                 </v-btn>
                 </Link>
@@ -104,7 +104,7 @@ export default {
             this.searchProductForm.get(route('admin.product.search'));
         }
     },
-    
+
 }
 </script>
 <style>

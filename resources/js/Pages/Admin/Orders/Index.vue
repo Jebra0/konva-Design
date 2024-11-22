@@ -3,7 +3,7 @@
         <v-row>
             <v-col cols="12">
                 <v-row>
-                    <v-col cols="3">
+                    <v-col cols="2">
                         <v-card>
                             <v-text-field label="Order Number" v-model="filterForm.number" outlined dense
                                 @input="filter()" hide-details ></v-text-field>
@@ -11,7 +11,7 @@
                         </v-card>
                     </v-col>
 
-                    <v-col cols="3">
+                    <v-col cols="2">
                         <v-card>
                             <v-text-field hide-details label="User Id" v-model="filterForm.user" outlined dense
                                 @input="filter()"></v-text-field>
@@ -19,9 +19,9 @@
                         </v-card>
                     </v-col>
 
-                    <v-col cols="3">
-                        <v-card>
-                            <label class="m-3">Order Status</label>
+                    <v-col cols="4">
+                        <v-card class="d-flex justify-between">
+                            <label class="ml-3 my-4">Order Status</label>
                             <select @change="filter()" v-model="order_status" class="my-2">
                                 <option value=""></option>
                                 <option value="pending">pending</option>
@@ -34,9 +34,9 @@
                         </v-card>
                     </v-col>
 
-                    <v-col cols="3">
-                        <v-card>
-                            <label class="ml-3">Payment Status</label>
+                    <v-col cols="4">
+                        <v-card class="d-flex justify-between">
+                            <label class="ml-3 my-4">Payment Status</label>
                             <select @change="filter()" v-model="payment_status" class="my-2">
                                 <option value=""></option>
                                 <option value="pending">pending</option>
@@ -64,7 +64,7 @@
                                 <th>Shipping Cost</th>
                                 <th>Tax</th>
                                 <th>Discount</th>
-                                <th>Total</th>
+                                <th>Order Total</th>
                             </tr>
                         </thead>
                         <tbody>

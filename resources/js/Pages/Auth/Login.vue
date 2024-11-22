@@ -37,6 +37,7 @@ const googleAuth = () => {
     <GuestLayout>
         <Head title="Log in" />
         <v-card>
+            <v-card-title align="center">Konva Design</v-card-title>
             <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
                 {{ status }}
             </div>
