@@ -180,41 +180,41 @@
                     </v-btn-group>
 
                     <!-- positions -->
-                    <v-btn>
-                        <v-icon icon="mdi-layers"></v-icon>
-                        <v-tooltip activator="parent" location="bottom">Position</v-tooltip>
-                        <v-menu activator="parent">
-                            <v-list style="width: 200px">
-                                <v-list-item>
-                                    <v-list-item-title>Position</v-list-item-title>
-                                    <v-btn class="mr-9" @click="alignLeft">
-                                        <v-icon icon="mdi-align-horizontal-left"></v-icon>
-                                        <v-tooltip activator="parent" location="bottom">Align Left</v-tooltip>
-                                    </v-btn>
-                                    <v-btn @click="alignRight">
-                                        <v-icon icon="mdi-align-horizontal-right"></v-icon>
-                                        <v-tooltip activator="parent" location="bottom">Align Right</v-tooltip>
-                                    </v-btn>
-                                    <v-btn class="mr-9" @click="alignTop">
-                                        <v-icon icon="mdi-align-vertical-top"></v-icon>
-                                        <v-tooltip activator="parent" location="bottom">Align Top</v-tooltip>
-                                    </v-btn>
-                                    <v-btn @click="alignBottom">
-                                        <v-icon icon="mdi-align-vertical-bottom"></v-icon>
-                                        <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>
-                                    </v-btn>
-                                    <v-btn @click="alignCenter" class="mr-9">
-                                        <v-icon icon="mdi-align-horizontal-center"></v-icon>
-                                        <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>
-                                    </v-btn>
-                                    <v-btn @click="alignMiddle">
-                                        <v-icon icon="mdi-align-vertical-center"></v-icon>
-                                        <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>
-                                    </v-btn>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </v-btn>
+<!--                    <v-btn>-->
+<!--                        <v-icon icon="mdi-layers"></v-icon>-->
+<!--                        <v-tooltip activator="parent" location="bottom">Position</v-tooltip>-->
+<!--                        <v-menu activator="parent">-->
+<!--                            <v-list style="width: 200px">-->
+<!--                                <v-list-item>-->
+<!--                                    <v-list-item-title>Position</v-list-item-title>-->
+<!--                                    <v-btn class="mr-9" @click="alignLeft">-->
+<!--                                        <v-icon icon="mdi-align-horizontal-left"></v-icon>-->
+<!--                                        <v-tooltip activator="parent" location="bottom">Align Left</v-tooltip>-->
+<!--                                    </v-btn>-->
+<!--                                    <v-btn @click="alignRight">-->
+<!--                                        <v-icon icon="mdi-align-horizontal-right"></v-icon>-->
+<!--                                        <v-tooltip activator="parent" location="bottom">Align Right</v-tooltip>-->
+<!--                                    </v-btn>-->
+<!--                                    <v-btn class="mr-9" @click="alignTop">-->
+<!--                                        <v-icon icon="mdi-align-vertical-top"></v-icon>-->
+<!--                                        <v-tooltip activator="parent" location="bottom">Align Top</v-tooltip>-->
+<!--                                    </v-btn>-->
+<!--                                    <v-btn @click="alignBottom">-->
+<!--                                        <v-icon icon="mdi-align-vertical-bottom"></v-icon>-->
+<!--                                        <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>-->
+<!--                                    </v-btn>-->
+<!--                                    <v-btn @click="alignCenter" class="mr-9">-->
+<!--                                        <v-icon icon="mdi-align-horizontal-center"></v-icon>-->
+<!--                                        <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>-->
+<!--                                    </v-btn>-->
+<!--                                    <v-btn @click="alignMiddle">-->
+<!--                                        <v-icon icon="mdi-align-vertical-center"></v-icon>-->
+<!--                                        <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>-->
+<!--                                    </v-btn>-->
+<!--                                </v-list-item>-->
+<!--                            </v-list>-->
+<!--                        </v-menu>-->
+<!--                    </v-btn>-->
 
                     <!-- opacity -->
                     <v-btn>
@@ -230,12 +230,6 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-                    </v-btn>
-
-                    <!-- save As Json -->
-                    <v-btn @click="saveAsJson">
-                        <v-icon icon="mdi-content-save"></v-icon>
-                        <v-tooltip activator="parent" location="bottom">Save As json</v-tooltip>
                     </v-btn>
 
                     <!-- delete -->

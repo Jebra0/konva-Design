@@ -59,6 +59,9 @@ Route::get('/get/design', function () {
         ->paginate(10);
 });
 
+// get templates
+Route::get('/template', [TemplateController::class, 'getAllTemplates'])->name('all');
+
 // get texts data
 Route::get('/texts', function(){
     return Text::select(['id', 'image', 'user_id'])
@@ -74,8 +77,6 @@ Route::group([
     Route::group([
         'middleware' => "auth",
     ], function () {
-        Route::get('/', [TemplateController::class, 'getAllTemplates'])->name('all');
-
         Route::post('/edit/{id}', [TemplateController::class, 'edit'])
             ->name('edit');
 
