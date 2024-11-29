@@ -10,9 +10,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\TestController;
-use App\Models\Design;
 use App\Models\TemplateCategory;
+use App\Models\Text;
 use App\Repositories\Cart\CartModelRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,11 +21,7 @@ Route::get('/', function () {
 
     $categories = TemplateCategory::select('id', 'name')->get();
 
-    $texts = getTexts();
-
     $shapes = getShapes();
-
-    $templates = getTemplates();
 
     $tmplateImages = getImages();
 
@@ -35,34 +32,41 @@ Route::get('/', function () {
     $repo = new CartModelRepository();
     $cart = $repo->get();
 
-    $my_designs = '';
     $user_images = '';
 
     if ($user) {
-        $my_designs = $user->designs()
-            ->orderBy('created_at', 'desc')
-            ->get();
-
         $user_images = $user->images()->orderBy('created_at', 'desc')
             ->get();
     }
 
     return Inertia::render('DesignPage', [
         'categories' => $categories,
-        'textTemplates' => $texts,
         'shapeTemplates' => $shapes,
-        'templates' => $templates,
         'templateImages' => $tmplateImages,
         'isAdmin' => $isAdmin,
         'user' => $user,
-        'my_designs' => $my_designs,
         'user_images' => $user_images,
         'items' => $cart->count(),
 
     ]);
 })->name('home');
 
-// tempaltes
+// get myDesigns data
+Route::get('/get/design', function () {
+    $user = Auth::user();
+    return $user->designs()
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+});
+
+// get texts data
+Route::get('/texts', function(){
+    return Text::select(['id', 'image', 'user_id'])
+        ->orderBy('created_at', 'desc')
+        ->paginate(5);
+});
+
+// templates
 Route::group([
     'prefix' => "template",
     'as' => "template."
@@ -70,6 +74,8 @@ Route::group([
     Route::group([
         'middleware' => "auth",
     ], function () {
+        Route::get('/', [TemplateController::class, 'getAllTemplates'])->name('all');
+
         Route::post('/edit/{id}', [TemplateController::class, 'edit'])
             ->name('edit');
 

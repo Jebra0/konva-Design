@@ -33,27 +33,13 @@ function isAdmin(){
     }
     return false;
 }
-function getTemplates()
-{
-    return Template::with('category')->select(['id', 'image'])
-    ->orderBy('created_at', 'desc')
-    ->get();
-}
 
 function getShapes()
 {
-    return Shape::select(['id', 'image'])
+    return Shape::select(['id', 'image', 'user_id'])
     ->orderBy('created_at', 'desc')
     ->get();
 }
-
-function getTexts()
-{
-    return Text::select(['id', 'image'])
-    ->orderBy('created_at', 'desc')
-    ->get();
-}
-
 function getImages(): array
 {
     $images = [];

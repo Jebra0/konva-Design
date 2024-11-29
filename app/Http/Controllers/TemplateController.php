@@ -10,12 +10,16 @@ use App\Models\Shape;
 use App\Models\Font;
 use App\Models\UserImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class TemplateController extends Controller
 {
 
+    public function getAllTemplates(){
+        return Template::with('category')->select(['id', 'image', 'user_id'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
     public function getTemplate(Request $request, $id)
     {
 
@@ -45,14 +49,17 @@ class TemplateController extends Controller
         if ($request->type == 'template') {
             $template = new Template();
             $template->category_id = $request->category_id;
+            $template->user_id = auth()->user()->id;
             $folder = 'template_images';
         }
         if ($request->type == 'text') {
             $template = new Text();
+            $template->user_id = auth()->user()->id;
             $folder = 'text_images';
         }
         if ($request->type == 'shape') {
             $template = new Shape();
+            $template->user_id = auth()->user()->id;
             $folder = 'shape_images';
         }
         if ($request->type == 'myDesigns') {
@@ -69,7 +76,7 @@ class TemplateController extends Controller
         $template->image = $path;
         $template->save();
 
-        return redirect()->back()->with('message', 'Added Successfully.');
+        return redirect()->route('home')->with('message', 'Added Successfully.');
     }
 
     public function uploadTemplate(Request $request)
@@ -108,7 +115,7 @@ class TemplateController extends Controller
 
         Storage::disk('public_images')->delete($image->image);
 
-        return redirect()->back();
+        return redirect()->route('home')->with('message', 'Deleted Successfully.');
     }
 
     public function deleteAdminImages(Request $request){

@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('templates', function (Blueprint $table) {
-            $table->dropColumn('type');
-            $table->foreignId('category_id')->nullable()->after('image')->constrained('templates_categories');
+            $table->foreignId('user_id')->nullable()->after('category_id')->constrained('users')->cascadeOnDelete();
         });
     }
 

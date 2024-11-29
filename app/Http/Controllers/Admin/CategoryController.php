@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Option;
 use App\Models\OptionValue;
-use DB;
 use Illuminate\Http\Request;
 use App\Models\TemplateCategory;
+use Illuminate\Support\Facades\DB;
 use Log;
 
 
@@ -21,6 +21,11 @@ class CategoryController extends Controller
     {
         $products = TemplateCategory::orderBy('id', 'desc')
             ->paginate(10);
+        // add the authorization attribute
+        $products->getCollection()->transform(function ($product) {
+            $product->authorized = $product->user_id !== null && auth()->id() == $product->user_id;
+            return $product;
+        });
         return inertia()
             ->render('Admin/Products/index', [
                 'products' => $products,
@@ -45,6 +50,7 @@ class CategoryController extends Controller
             DB::beginTransaction();
 
             $category = TemplateCategory::create([
+                'user_id' => auth()->id(),
                 'name' => $request->post('product_name'),
                 'price' => $request->post('product_price'),
                 'quantity' => $request->post('product_quantity'),
@@ -87,6 +93,9 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         $product = TemplateCategory::with('options')->findOrFail($id);
+        if($product->user_id != auth()->id() ){
+            abort(403);
+        }
         return inertia()->render('Admin/Products/Edit', [
             'user' => Auth()->user(),
             'product' => $product,
@@ -112,6 +121,9 @@ class CategoryController extends Controller
 
             $category = TemplateCategory::findOrFail($id);
 
+            if($category->user_id != auth()->id() ){
+                abort(403);
+            }
             $category->fill([
                 'name' => $request->post('product_name'),
                 'price' => $request->post('product_price'),
@@ -196,6 +208,10 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $product = TemplateCategory::findOrFail($id);
+
+        if($product->user_id != auth()->id() ){
+            abort(403);
+        }
         if ($product) {
             $product->delete();
         }
@@ -204,7 +220,7 @@ class CategoryController extends Controller
     }
 
     /*
-        get the pagination data 
+        get the pagination data
     */
     public function getProducts()
     {

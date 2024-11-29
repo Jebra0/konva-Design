@@ -13,6 +13,7 @@ class Text extends Model
         "name",
         "data",
         "image",
+        "user_id"
     ];
 
     protected function casts(): array

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TemplateCategory extends Model
@@ -12,7 +13,7 @@ class TemplateCategory extends Model
 
     protected $table = 'templates_categories';
 
-    protected $fillable = ['name', 'price', 'quantity'];
+    protected $fillable = ['name', 'price', 'quantity', 'user_id'];
 
     public function templates()
     {
@@ -46,5 +47,10 @@ class TemplateCategory extends Model
             ->orderBy('orders_count', 'desc')
             ->limit(20)
             ->get();
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

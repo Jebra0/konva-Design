@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('templates', function (Blueprint $table) {
-            $table->dropColumn('type');
-            $table->foreignId('category_id')->nullable()->after('image')->constrained('templates_categories');
+        Schema::table('templates_categories', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('templates', function (Blueprint $table) {
+        Schema::table('templates_categories', function (Blueprint $table) {
             //
         });
     }

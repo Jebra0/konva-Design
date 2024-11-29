@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Template extends Model
 {
@@ -12,6 +13,7 @@ class Template extends Model
     protected $fillable = [
         "name",
         "category_id",
+        "user_id",
         "data",
         "image",
     ];
@@ -27,13 +29,8 @@ class Template extends Model
         return $this->belongsTo(TemplateCategory::class, 'category_id');
     }
 
-    // public function scopeGetTemplates(Builder $query){
-    //     return $query->where('type', 'Template');
-    // }
-    // public function scopeGetText(Builder $query){
-    //     return $query->where('type', 'text');
-    // }
-    // public function scopeGetShapes(Builder $query){
-    //     return $query->where('type', 'shape');
-    // }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

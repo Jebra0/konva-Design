@@ -91,19 +91,7 @@
                                     <div v-if="errors.statusValue" class="text-red-600">{{ errors.statusValue }}</div>
                                 </td>
 
-                                <td>
-                                    <select @change="selectPayStatus($event, item.id)">
-                                        <option :selected="item.payment_status == 'pending'" value="pending">Pending
-                                        </option>
-
-                                        <option :selected="item.payment_status == 'paid'" value="paid">Paid</option>
-
-                                        <option :selected="item.payment_status == 'failed'" value="failed">Failed
-                                        </option>
-                                    </select>
-                                    <div v-if="errors.payStatusValue" class="text-red-600">{{ errors.payStatusValue }}
-                                    </div>
-                                </td>
+                                <td> {{ item.payment_status }}</td>
                                 <td> {{ item.payment_method }}</td>
                                 <td>$ {{ item.shipping_cost }}</td>
                                 <td>$ {{ item.tax }}</td>

@@ -313,11 +313,11 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-navigation-drawer style=" " permanent>
+        <v-navigation-drawer permanent>
 
             <!-- my designs -->
-            <v-row class="mx-2 my-2" v-if="selectedOption.myDesigns && this.user && !this.isAdmin" style=" ">
-                <v-col cols="6" class="imgParent" v-for="(temp, id) in my_designs" :key="id">
+            <v-row class="mx-2 my-2" v-if="selectedOption.myDesigns && this.user && !this.isAdmin" >
+                <v-col cols="6" class="imgParent" v-for="(temp, id) in myDesign.data" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click="getSelectedTemplate(temp.id, 'myDesigns')" style="cursor: pointer">
                     <v-icon v-if="this.user" @click="editTemplate(temp.id, 'myDesigns')" size="30"
@@ -328,9 +328,12 @@
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
+                <v-col cols="12" class="d-flex justify-center align-center">
+                    <v-btn v-if="currentPage < totalPages" @click="myDesignLoadMore">Load More</v-btn>
+                </v-col>
             </v-row>
 
-            <v-row v-if="selectedOption.templates" style=" ">
+            <v-row v-if="selectedOption.templates">
                 <v-col cols="12">
                     <div class="input-with-button p-1">
                         <v-text-field v-model="templateName" label="search" hide-details
@@ -350,11 +353,11 @@
                     :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
-                    <v-icon v-if="this.isAdmin" @click="editTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin && temp.user_id === user.id" @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin && temp.user_id === user.id" @click="deleteTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
@@ -363,44 +366,48 @@
                     <p>All Templates</p>
                 </v-col>
 
-                <v-col cols="6" class="imgParent" v-for="(temp, id) in templates" :key="id">
+                <v-col cols="6" class="imgParent" v-for="(temp, id) in templates.data" :key="id">
                     <img :src="temp.image" width="250px" alt="Text Image"
                         @click=" getSelectedTemplate(temp.id, 'template')" style="cursor: pointer">
-                    <v-icon v-if="this.isAdmin" @click="editTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin && temp.user_id === user.id" @click="editTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
                         color="blue-grey" icon="mdi-pencil"></v-icon>
 
-                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(temp.id, 'template')" size="30"
+                    <v-icon v-if="this.isAdmin && temp.user_id === user.id" @click="deleteTemplate(temp.id, 'template')" size="30"
                         style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
                         icon="mdi-delete"></v-icon>
                 </v-col>
+                <v-col cols="12" class="d-flex justify-center align-center">
+                    <v-btn v-if="templateCurrentPage < templateTotalPages" @click="templateLoadMore">Load More</v-btn>
+                </v-col>
             </v-row>
 
-            <v-card v-if="selectedOption.text" style=" ">
+            <v-card v-if="selectedOption.text">
                 <v-btn v-on:click.native="addHeader()" elevation="0" width="100%"
-                    style=" text-transform: none; font-size: 25px;">
+                       style=" text-transform: none; font-size: 25px;">
                     <h1>Create header</h1>
                 </v-btn>
                 <v-btn @click="addSubHeader()" elevation="0" width="100%"
-                    style="text-transform: none; font-size: 18px;">
+                       style="text-transform: none; font-size: 18px;">
                     <h4>Create sub header</h4>
                 </v-btn>
                 <v-btn @click="addBodyText()" elevation="0" width="100%"
-                    style="text-transform: none; font-size: 14px;">Create
-                    Body
-                    Text
-                </v-btn>
-                <div class=" imgParent d-flex justify-center" v-for="(temp, id) in textTemplates" :key="id">
-                    <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id, 'text')"
-                        style="cursor: pointer">
-                    <v-icon v-if="this.isAdmin" @click="editTemplate(temp.id, 'text')" size="30"
-                        style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
-                        color="blue-grey" icon="mdi-pencil"></v-icon>
+                       style="text-transform: none; font-size: 14px;">Create Body Text</v-btn>
 
-                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(temp.id, 'text')" size="30"
-                        style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
-                        icon="mdi-delete"></v-icon>
+                <div class="imgParent" v-for="(temp, id) in texts.data" :key="id">
+                    <img :src="temp.image" width="250px" alt="Text Image" @click="getSelectedTemplate(temp.id, 'text')"
+                         style="cursor: pointer">
+                    <v-icon v-if="this.isAdmin && temp.user_id === user.id" @click="editTemplate(temp.id, 'text')" size="30"
+                            style="cursor: pointer; position: absolute; top: 15px; right: 15px; z-index: 10;"
+                            color="blue-grey" icon="mdi-pencil"></v-icon>
+
+                    <v-icon v-if="this.isAdmin && temp.user_id === user.id" @click="deleteTemplate(temp.id, 'text')" size="30"
+                            style="cursor: pointer; position: absolute; top: 15px; left: 15px; z-index: 10;" color="red"
+                            icon="mdi-delete"></v-icon>
                 </div>
+                <v-col cols="12" class="d-flex justify-center align-center">
+                    <v-btn v-if="textCurrentPage < textTotalPages" @click="textLoadMore">Load More</v-btn>
+                </v-col>
             </v-card>
 
             <v-card v-if="selectedOption.photos" style=" " elevation="1" outlined>
@@ -437,9 +444,9 @@
                     :key="id">
                     <img :src="shape.image" width="70px" alt="Text Image"
                         @click=" getSelectedTemplate(shape.id, 'shape')" style="cursor: pointer">
-                    <v-icon v-if="this.isAdmin" @click="deleteTemplate(shape.id, 'shape')" size="25"
+                    <v-icon v-if="this.isAdmin && shape.user_id === user.id" @click="deleteTemplate(shape.id, 'shape')" size="25"
                         style="cursor: pointer; position: absolute; top: 5px; left: 1px; z-index: 10;" color="red"
-                        icon="mdi-delete"></v-icon>
+                            icon="mdi-delete"></v-icon>
                 </div>
             </div>
 
@@ -628,11 +635,24 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
 import { Inertia } from '@inertiajs/inertia';
 import Alert from "@/Components/Alert.vue";
+import axios from "axios";
 export default {
     mixins: [allFunctions],
     components: { Head, VNumberInput, Link, useForm, Inertia, Alert },
     data() {
         return {
+            myDesign: {data: []},
+            currentPage: 1,
+            totalPages: null,
+
+            templates: {data: []},
+            templateCurrentPage: 1,
+            templateTotalPages: null,
+
+            texts: {data: []},
+            textCurrentPage: 1,
+            textTotalPages: null,
+
             selectedOption: {
                 templates: true,
                 text: false,
@@ -649,7 +669,6 @@ export default {
             max: 1,
             opacity: 1,
             ////////////////
-            texts: [],
             images: [],
             hide: true,
             fontWeight: 'normal',
@@ -730,8 +749,84 @@ export default {
         this.initializeKonva();
         await this.fetchFonts();
         this.check();
+
+        await this.fetchInitialDesigns();
     },
     methods: {
+        async fetchInitialDesigns() {
+            // get my designs
+            axios.get(`/get/design`).then(res => {
+                this.myDesign.data = res.data.data
+                this.totalPages = res.data.last_page
+            })
+            // get templates
+            axios.get(`/template`).then(res => {
+                this.templates.data = res.data.data
+                this.templateTotalPages = res.data.last_page
+            })
+            // get texts
+            axios.get(`/texts`).then(res => {
+                this.texts.data = res.data.data
+                this.textTotalPages = res.data.last_page
+            })
+        },
+        async myDesignLoadMore() {
+            if (this.totalPages && this.currentPage >= this.totalPages) {
+                return;
+            }
+
+            try {
+                this.currentPage += 1;
+
+                const response = await axios.get(`/get/design?page=${this.currentPage}`);
+                const newDesigns = response.data.data;
+                const totalPages = response.data.last_page;
+
+                // Update the designs and totalPages
+                this.myDesign.data = [...this.myDesign.data, ...newDesigns];
+                this.totalPages = totalPages;
+            } catch (error) {
+                console.error('Error loading more designs:', error);
+            }
+        },
+        async templateLoadMore() {
+            if (this.templateTotalPages && this.templateCurrentPage >= this.templateTotalPages) {
+                return;
+            }
+
+            try {
+                this.templateCurrentPage += 1;
+
+                const response = await axios.get(`/template?page=${this.templateCurrentPage}`);
+                const newDesigns = response.data.data;
+                const totalPages = response.data.last_page;
+
+                // Update the designs and totalPages
+                this.templates.data = [...this.templates.data, ...newDesigns];
+                this.templateTotalPages = totalPages;
+            } catch (error) {
+                console.error('Error loading more designs:', error);
+            }
+        },
+        async textLoadMore() {
+            if (this.textTotalPages && this.textCurrentPage >= this.textTotalPages) {
+                return;
+            }
+
+            try {
+                this.textCurrentPage += 1;
+
+                const response = await axios.get(`/texts?page=${this.textCurrentPage}`);
+                const newDesigns = response.data.data;
+                const totalPages = response.data.last_page;
+
+                // Update the designs and totalPages
+                this.texts.data = [...this.texts.data, ...newDesigns];
+                this.textTotalPages = totalPages;
+            } catch (error) {
+                console.error('Error loading more designs:', error);
+            }
+        },
         check(){
             if(this.isAdmin){
                 this.imageType = 'admin'
@@ -814,12 +909,6 @@ export default {
                 default:
             }
         },
-        canDisplay(item) {
-            if (this.isAdmin && item.for === 'admin') {
-                return true;
-            }
-            return false;
-        },
     },
     computed: {
         reversedLayers() {
@@ -864,15 +953,7 @@ export default {
     },
     props: {
         errors: { type: Object },
-        textTemplates: {
-            type: Object,
-            required: true,
-        },
         shapeTemplates: {
-            type: Object,
-            required: true,
-        },
-        templates: {
             type: Object,
             required: true,
         },
@@ -889,10 +970,6 @@ export default {
             required: true
         },
         user: {
-            type: Object,
-            required: true
-        },
-        my_designs: {
             type: Object,
             required: true
         },
@@ -944,24 +1021,6 @@ export default {
     width: 250px;
 }
 
-.edit-btn {
-    position: absolute;
-    top: 17px;
-    right: 4px;
-    z-index: 10;
-    background-color: white;
-    padding: 0;
-}
-
-.delete-btn {
-    position: absolute;
-    top: 17px;
-    left: 4px;
-    z-index: 10;
-    background-color: white;
-    padding: 0;
-}
-
 .custom-list-item {
     padding-bottom: 15px;
     padding-top: 15px;
@@ -973,55 +1032,54 @@ export default {
 .icon {
     font-size: 36px;
 }
-
-.list-title {
-    margin-top: 4px;
-    font-weight: bold;
-    color: white;
-}
-
-.active {
-    color: #CFD8DC;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
 .input-with-button {
     display: flex;
     align-items: center;
 }
-
-.categoryItem {
-    margin-top: 10px;
-    display: flex;
-    padding: 5px;
-    justify-content: space-between;
-}
-
-.categoryItem:hover {
-    background-color: white;
-    margin-left: 2px;
-}
-
 .categoryItem .icon {
     cursor: pointer;
 }
 
-.account {
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 10px;
+.pagination {
+    display: inline-flex;
+    padding: 0;
+    margin: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.account:hover {
-    background-color: #CFD8DC;
+.pagination a {
+    color: black;
+    padding: 12px 18px;
+    text-decoration: none;
+    background-color: white;
+    border: 1px solid #ddd;
+    margin-left: -1px;
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination a.active {
+    background-color: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+
+.pagination-arrow {
+    font-weight: bold;
+}
+
+/* First and last items */
+.pagination a:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.pagination a:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 </style>

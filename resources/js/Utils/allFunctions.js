@@ -2,7 +2,6 @@ import Konva from "konva";
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import { Inertia } from '@inertiajs/inertia';
 
 
 // Import the snapping functions
@@ -1087,8 +1086,7 @@ const allFunctions = {
                 form.jsonData = this.stage.toJSON();
                 form.image = blob;
                 form.post(route('template.add'));
-
-                console.log(form)
+                await this.fetchInitialDesigns();
             } catch (error) {
                 console.error('Error saving template:', error);
                 alert('An error occurred. Please try again.');
@@ -1321,31 +1319,6 @@ const allFunctions = {
         addBodyText() {
             this.addText(bodyText);
         },
-        //////////////////
-        async addTemplateCategory(name) {
-            try {
-                const response = await axios.post('/category/add', { name });
-                alert('Created successfully!')
-            } catch (error) {
-                alert('Error while creating');
-                console.error(error);
-            }
-        },
-        async deleteCategory(id) {
-            if (confirm("Confirm Deleting ? ")) {
-                try {
-                    const response = await axios.delete(`/category/${id}`);
-                    console.log(response)
-                    if (response.status === 200) {
-                        alert(response.data.message)
-                    }
-                } catch (error) {
-                    alert('Error while deleting');
-                    console.error(error);
-                }
-            }
-        },
-        //////////////////////////
         async fetchFonts() {
             await fetch(`${this.fontUrl}?key=${this.fontsKey}`)
                 .then(res => res.json())
@@ -1403,8 +1376,8 @@ const allFunctions = {
                 this.editTemplateForm.image = blob;
                 this.editTemplateForm.jsonData = this.stage.toJSON();
 
-                this.editTemplateForm.post(route('template.edit', id));
-                console.log(this.editTemplateForm)
+                this.editTemplateForm.post(route('template.edit', id))
+                await this.fetchInitialDesigns();
             } catch (error) {
                 alert('Error while saving!')
             }
@@ -1414,6 +1387,7 @@ const allFunctions = {
                 try {
                     this.deleteTemplateForm.type = type;
                     this.deleteTemplateForm.delete(route('template.delete', id));
+                    await this.fetchInitialDesigns();
                 } catch (error) {
                     alert('Error while deleting')
                 }

@@ -40,13 +40,16 @@
                                 <td>$ {{ item.price }}</td>
 
                                 <td>
-                                    <Link :href="route('admin.product.edit', item.id)">
-                                    <v-btn color="green">edit</v-btn>
+                                    <Link
+                                        :href="route('admin.product.edit', item.id)"
+                                        v-if="item.authorized"
+                                    >
+                                        <v-btn color="green">edit</v-btn>
                                     </Link>
                                 </td>
 
                                 <td>
-                                    <form @submit.prevent="deleteProduct(item.id)">
+                                    <form v-if="item.authorized" @submit.prevent="deleteProduct(item.id)">
                                         <v-btn color="red" type="submit">
                                             delete
                                         </v-btn>
