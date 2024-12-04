@@ -243,6 +243,11 @@ class CategoryController extends Controller
         $products = TemplateCategory::where('name', 'like', '%' . $data . '%')
             ->paginate(10)->withQueryString();
 
+        $products->getCollection()->transform(function ($product) {
+            $product->authorized = $product->user_id !== null && auth()->id() == $product->user_id;
+            return $product;
+        });
+
         return inertia('Admin/Products/index', compact('products'));
     }
 }

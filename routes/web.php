@@ -163,6 +163,7 @@ Route::group(['middleware' => "auth"], function () {
             ->name('index');
 
         Route::resource('/product', CategoryController::class);
+
         Route::get('products/search', [CategoryController::class, 'search'])
             ->name('product.search');
 
@@ -195,7 +196,7 @@ Route::group([
 ////////// //////// ////////// ///////// //////// //////////
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return redirect()->route('home');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

@@ -54,7 +54,7 @@
                         </v-btn-group>
                     </template>
                     <template v-slot:default="{ isActive }">
-                        <form>
+                        <form @submit.prevent="addToCart">
                             <v-card title="Add to cart">
                                 <v-number-input :reverse="false" v-model="printForm.quantity" controlVariant="split"
                                     label="Quantity" :hideInput="false" :inset="false" :min="10"
@@ -71,9 +71,9 @@
                                         center
                                     </p>
                                     <v-spacer></v-spacer>
-                                    <v-btn-group color="blue-grey" :disable="printForm.processing" @click="addToCart">
-                                        <v-btn text="Add to cart"></v-btn>
-                                    </v-btn-group>
+                                        <v-btn type="submit" text="Add to cart"></v-btn>
+<!--                                    <v-btn-group color="blue-grey" :disable="printForm.processing">-->
+<!--                                    </v-btn-group>-->
                                     <v-btn @click="isActive.value = false">close</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -178,44 +178,6 @@
                     <v-btn-group color="blue-grey" density="comfortable" rounded="pill" divided>
                         <v-btn v-if="this.editingTemp" @click="saveEditedTemplate(this.editedId)">Save</v-btn>
                     </v-btn-group>
-
-                    <!-- positions -->
-<!--                    <v-btn>-->
-<!--                        <v-icon icon="mdi-layers"></v-icon>-->
-<!--                        <v-tooltip activator="parent" location="bottom">Position</v-tooltip>-->
-<!--                        <v-menu activator="parent">-->
-<!--                            <v-list style="width: 200px">-->
-<!--                                <v-list-item>-->
-<!--                                    <v-list-item-title>Position</v-list-item-title>-->
-<!--                                    <v-btn class="mr-9" @click="alignLeft">-->
-<!--                                        <v-icon icon="mdi-align-horizontal-left"></v-icon>-->
-<!--                                        <v-tooltip activator="parent" location="bottom">Align Left</v-tooltip>-->
-<!--                                    </v-btn>-->
-<!--                                    <v-btn @click="alignRight">-->
-<!--                                        <v-icon icon="mdi-align-horizontal-right"></v-icon>-->
-<!--                                        <v-tooltip activator="parent" location="bottom">Align Right</v-tooltip>-->
-<!--                                    </v-btn>-->
-<!--                                    <v-btn class="mr-9" @click="alignTop">-->
-<!--                                        <v-icon icon="mdi-align-vertical-top"></v-icon>-->
-<!--                                        <v-tooltip activator="parent" location="bottom">Align Top</v-tooltip>-->
-<!--                                    </v-btn>-->
-<!--                                    <v-btn @click="alignBottom">-->
-<!--                                        <v-icon icon="mdi-align-vertical-bottom"></v-icon>-->
-<!--                                        <v-tooltip activator="parent" location="bottom">Align Down</v-tooltip>-->
-<!--                                    </v-btn>-->
-<!--                                    <v-btn @click="alignCenter" class="mr-9">-->
-<!--                                        <v-icon icon="mdi-align-horizontal-center"></v-icon>-->
-<!--                                        <v-tooltip activator="parent" location="bottom">Align Center</v-tooltip>-->
-<!--                                    </v-btn>-->
-<!--                                    <v-btn @click="alignMiddle">-->
-<!--                                        <v-icon icon="mdi-align-vertical-center"></v-icon>-->
-<!--                                        <v-tooltip activator="parent" location="bottom">Align Middle</v-tooltip>-->
-<!--                                    </v-btn>-->
-<!--                                </v-list-item>-->
-<!--                            </v-list>-->
-<!--                        </v-menu>-->
-<!--                    </v-btn>-->
-
                     <!-- opacity -->
                     <v-btn>
                         <v-icon icon="mdi-opacity"></v-icon>

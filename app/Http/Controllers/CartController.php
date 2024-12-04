@@ -8,6 +8,7 @@ use App\Repositories\Cart\CartModelRepository;
 use Auth;
 use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Log;
 
@@ -46,12 +47,7 @@ class CartController extends Controller
             'test'
         );
 
-        return redirect()->back()->with('message', 'The item added to the cart. ');
-        // try {
-        // } catch (\Exception $e) {
-        //     return $e->getMessage();
-        // }
-
+        return redirect()->back();
     }
 
     public function update(Request $request, string $id)
@@ -73,8 +69,12 @@ class CartController extends Controller
 
     public function destroy(Cart $cart)
     {
-        if($cart->delete()){
-            return redirect()->back()->with('message', 'The item has been deleted.');
+        $imageDeleted = !Storage::disk('public_images')->exists($cart->image) || Storage::disk('public_images')->delete($cart->image);
+        if($imageDeleted){
+            $cartDeleted = $cart->delete();
+            if($cartDeleted){
+                return redirect()->back()->with('message', 'The item has been deleted.');
+            }
         }
         return redirect()->back()->with('error', 'There was an error deleting the item.');
     }

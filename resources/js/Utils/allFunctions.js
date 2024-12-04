@@ -1075,6 +1075,8 @@ const allFunctions = {
 
         async saveAsTemplate(type) {
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
                 let blob = await this.resizeImage(dataURL, 700, 700);
 
@@ -1085,10 +1087,18 @@ const allFunctions = {
                 }
                 form.jsonData = this.stage.toJSON();
                 form.image = blob;
-                form.post(route('template.add'));
-                await this.fetchInitialDesigns();
+                form.post(route('template.add'), {
+                    _token: csrfToken,
+                    onSuccess: async () => {
+                        await this.fetchInitialDesigns();
+
+                        const flashMessage = this.$page.props.flash?.message || 'Template Added Successfully.';
+                        if (flashMessage) {
+                            this.$page.props.flash = { message: flashMessage };
+                        }
+                    }
+                });
             } catch (error) {
-                console.error('Error saving template:', error);
                 alert('An error occurred. Please try again.');
             }
         },
@@ -1376,8 +1386,16 @@ const allFunctions = {
                 this.editTemplateForm.image = blob;
                 this.editTemplateForm.jsonData = this.stage.toJSON();
 
-                this.editTemplateForm.post(route('template.edit', id))
-                await this.fetchInitialDesigns();
+                this.editTemplateForm.post(route('template.edit', id), {
+                    onSuccess: async () => {
+                        await this.fetchInitialDesigns();
+
+                        const flashMessage = this.$page.props.flash?.message || 'Saved Successfully.';
+                        if (flashMessage) {
+                            this.$page.props.flash = { message: flashMessage };
+                        }
+                    }
+                })
             } catch (error) {
                 alert('Error while saving!')
             }
@@ -1386,8 +1404,16 @@ const allFunctions = {
             if (confirm("Are you sure ? ")) {
                 try {
                     this.deleteTemplateForm.type = type;
-                    this.deleteTemplateForm.delete(route('template.delete', id));
-                    await this.fetchInitialDesigns();
+                    this.deleteTemplateForm.delete(route('template.delete', id), {
+                        onSuccess: async () => {
+                            await this.fetchInitialDesigns();
+
+                            const flashMessage = this.$page.props.flash?.message || 'Deleted Successfully.';
+                            if (flashMessage) {
+                                this.$page.props.flash = { message: flashMessage };
+                            }
+                        }
+                    });
                 } catch (error) {
                     alert('Error while deleting')
                 }
@@ -1395,6 +1421,7 @@ const allFunctions = {
         },
         async addToCart() {
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 let dataURL = this.stage.toDataURL({ pixelRatio: 3 });
                 let blob = await this.createImage(dataURL);
 
@@ -1404,7 +1431,7 @@ const allFunctions = {
                 this.printForm.jsonData = this.stage.toJSON();
                 this.printForm.image = blob;
 
-                this.printForm.post(route('cart.add'));
+                this.printForm.post(route('cart.add'), {_token: csrfToken });
             } catch (error) {
                 console.log(error)
             }

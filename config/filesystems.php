@@ -58,7 +58,7 @@ return [
 
         'public_images' => [
             'driver' => 'local',
-            'root' => public_path(),
+            'root' => base_path('../'),
         ],
         'public_fonts' => [
             'driver' => 'local',

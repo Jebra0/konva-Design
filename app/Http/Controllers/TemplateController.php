@@ -76,7 +76,7 @@ class TemplateController extends Controller
         $template->image = $path;
         $template->save();
 
-        return redirect()->route('home')->with('message', 'Added Successfully.');
+        return redirect()->back()->with('message', 'Added Successfully.');
     }
 
     public function uploadTemplate(Request $request)
@@ -115,7 +115,7 @@ class TemplateController extends Controller
 
         Storage::disk('public_images')->delete($image->image);
 
-        return redirect()->route('home')->with('message', 'Deleted Successfully.');
+        return redirect()->back()->with('message', 'Deleted Successfully.');
     }
 
     public function deleteAdminImages(Request $request){
@@ -164,6 +164,9 @@ class TemplateController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        $request->validate([
+            'type' => 'required|in:template,text,shape,myDesigns',
+        ]);
         if ($request->type == 'template') {
             $template = Template::findOrFail($id);
         }
@@ -176,13 +179,14 @@ class TemplateController extends Controller
         if ($request->type == 'myDesigns') {
             $template = Design::findOrFail($id);
         }
+        $imageDeleted = !Storage::disk('public_images')->exists($template->image) || Storage::disk('public_images')->delete($template->image);
+        if($imageDeleted){
+            $templateDeleted = $template->delete();
+            if($templateDeleted){
+                return redirect()->back()->with('message', 'Deleted Successfully.');
+            }
+        }
 
-        $image = '/'.$template->pluck('image');
-
-        Storage::disk('public_images')->delete($image);
-        $template->delete();
-
-        return redirect()->back()->with('message', 'Deleted Successfully.');
     }
 
     public function search(Request $request)
@@ -191,7 +195,7 @@ class TemplateController extends Controller
             "name" => "string|required"
         ]);
         $templates = Template::where('name', 'like', '%' . $request->name . '%')
-            ->select(['id', 'image'])
+            ->select(['id', 'image', 'user_id'])
             ->get();
 
         return response()->json($templates);

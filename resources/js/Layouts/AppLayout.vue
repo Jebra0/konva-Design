@@ -51,8 +51,8 @@
             <template v-slot:append>
                 <Link href="/" class="design_btn mx-6" >Design</Link>
 
-                <v-badge :content="items" color="red" class="mr-5" v-if="items > 0">
-                    <Link href="/cart" >
+                <v-badge :content="items" color="red" class="mr-5" v-if="!this.isAdmin && items > 0">
+                    <Link v-if="!this.isAdmin" :href="route('cart.index')">
                       <v-icon color="blue-grey" style="cursor: pointer;">mdi-cart</v-icon>
                     </Link>
                 </v-badge>

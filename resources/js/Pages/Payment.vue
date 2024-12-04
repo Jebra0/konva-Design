@@ -1,6 +1,12 @@
 <template>
+    <Head>
+        <title>Payment</title>
+    </Head>
     <v-container fluid align="center">
         <Alert />
+        <h5>Fake Cards For Testing The Payment: </h5>
+        <a target="_blank" href="https://docs.stripe.com/testing" style="color: #0d47a1; text-decoration: underline">get test cards</a>
+        <br>
         <form id="payment-form" @submit.prevent="handleSubmit">
             <div id="payment-element"></div>
             <button id="submit">
@@ -20,8 +26,9 @@
 <script>
 import axios from "axios";
 import Alert from "@/Components/Alert.vue";
+import {Head} from "@inertiajs/vue3";
 export default {
-    components: {Alert},
+    components: {Head, Alert},
     data(){
         return{
             elements: '',
@@ -71,7 +78,7 @@ export default {
             const { error } = await this.stripe.confirmPayment({
                 elements: this.elements,
                 confirmParams: {
-                    return_url: `http://localhost:8000/payment/stripe/callback/${this.order.id}`,
+                    return_url: `https://konvadesign.jebra-projects.infinityfreeapp.com/payment/stripe/callback/${this.order.id}`,
                 },
             });
 
